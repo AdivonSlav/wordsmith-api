@@ -4,7 +4,6 @@ using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.API.Controllers
 {
-    [Route("[controller]")]
     public class ReadController<T, TSearch> : ControllerBase
         where T : class
         where TSearch : SearchObject

@@ -1,5 +1,7 @@
 ﻿
 using AutoMapper;
+using Wordsmith.DataAccess.DB.Entities;
+using Wordsmith.Models;
 
 namespace Wordsmith.DataAccess.AutoMapper
 {
@@ -7,7 +9,7 @@ namespace Wordsmith.DataAccess.AutoMapper
     {
         public MappingProfile()
         {
-            
+            CreateMap<ReportReason, ReportReasonDTO>();
         }
     }
 }

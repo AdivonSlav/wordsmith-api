@@ -1,18 +1,21 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Wordsmith.DataAccess.AutoMapper;
-using Wordsmith.DataAccess.DB;
-using Wordsmith.DataAccess.DB.Entities;
+using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Services;
 using Wordsmith.Models;
 using Wordsmith.Models.SearchObjects;
 
 #pragma warning disable IDE0058
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add implementations for services so they can be dependency injected
 builder.Services
-    .AddTransient<IReadService<ReportReasonDTO, SearchObject>, ReadService<ReportReasonDTO,
+    .AddTransient<IReadService<ReportReasonDto, SearchObject>, ReadService<ReportReasonDto,
         ReportReason, SearchObject>>();
 
 
@@ -22,11 +25,48 @@ builder.Services.AddRouting(options =>
     options.LowercaseUrls = true;
     options.LowercaseQueryStrings = true;
 });
-// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var jwtScheme = new OpenApiSecurityScheme()
+    {
+        BearerFormat = "JWT",
+        Name = "JWT Authentication",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+        Description = "Put **_ONLY_** your bearer token in the textbox below!",
+        Reference = new OpenApiReference()
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+
+    options.AddSecurityDefinition(jwtScheme.Reference.Id, jwtScheme);
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        { jwtScheme, Array.Empty<string>() }
+    });
+});
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = "https://localhost:7443";
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateAudience = false
+        };
+    });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "wordsmith_api.read", "wordsmith_api.write", "wordsmith_api.full_access");
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -37,7 +77,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -48,8 +88,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization("ApiScope");
 
 app.Run();

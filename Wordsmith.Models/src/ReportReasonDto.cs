@@ -1,8 +1,8 @@
 namespace Wordsmith.Models;
 
-public class ReportReasonDTO
+public class ReportReasonDto
 {
-    public int Id { get; set;  }
+    public int Id { get; set; }
 
     public string Reason { get; set; } = string.Empty;
 }

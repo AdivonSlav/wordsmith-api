@@ -1,68 +1,65 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Wordsmith.DataAccess.DB;
+using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.SearchObjects;
 
-namespace Wordsmith.DataAccess.Services
+namespace Wordsmith.DataAccess.Services;
+
+public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
+    where TDb : class
+    where T : class
+    where TSearch : SearchObject
 {
-    public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
-        where TDb : class
-        where T : class
-        where TSearch : SearchObject
+    protected readonly DatabaseContext Context;
+    protected readonly IMapper Mapper;
+
+    public ReadService(DatabaseContext context, IMapper mapper)
     {
-        protected readonly DatabaseContext Context;
-        protected readonly IMapper Mapper;
+        Context = context;
+        Mapper = mapper;
+    }
 
-        public ReadService(DatabaseContext context, IMapper mapper)
+    public virtual async Task<QueryResult<T>> Get(TSearch? search = null)
+    {
+        var query = Context.Set<TDb>().AsQueryable();
+        var result = new QueryResult<T>();
+
+        query = AddInclude(query, search);
+        query = AddFilter(query, search);
+
+        if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
+            query = query.Take(search.PageSize.Value).Skip(search.Page.Value * search.PageSize.Value);
+
+        try
         {
-            Context = context;
-            Mapper = mapper;
+            var list = await query.ToListAsync();
+
+            var tmp = Mapper.Map<List<T>>(list);
+            result.Result = tmp;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e); // TODO: Replace with a logger call
+            return null;
         }
 
-        public virtual async Task<QueryResult<T>> Get(TSearch? search = null)
-        {
-            IQueryable<TDb> query = Context.Set<TDb>().AsQueryable();
-            var result = new QueryResult<T>();
+        return result;
+    }
 
-            query = AddInclude(query, search);
-            query = AddFilter(query, search);
+    public virtual async Task<T> GetById(int id)
+    {
+        var entity = await Context.Set<TDb>().FindAsync(id);
 
-            if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
-            {
-                query = query.Take(search.PageSize.Value).Skip(search.Page.Value * search.PageSize.Value);
-            }
+        return Mapper.Map<T>(entity);
+    }
 
-            try
-            {
-                List<TDb> list = await query.ToListAsync();
+    protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, TSearch? search = null)
+    {
+        return query;
+    }
 
-                List<T> tmp = Mapper.Map<List<T>>(list);
-                result.Result = tmp;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e); // TODO: Replace with a logger call
-                return null;
-            }
-
-            return result;
-        }
-
-        public virtual async Task<T> GetById(int id)
-        {
-            TDb entity = await Context.Set<TDb>().FindAsync(id);
-
-            return Mapper.Map<T>(entity);
-        }
-
-        protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, TSearch? search = null)
-        {
-            return query;
-        }
-        
-        protected virtual IQueryable<TDb> AddFilter(IQueryable<TDb> query, TSearch? search = null)
-        {
-            return query;
-        }
+    protected virtual IQueryable<TDb> AddFilter(IQueryable<TDb> query, TSearch? search = null)
+    {
+        return query;
     }
 }

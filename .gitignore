@@ -457,3 +457,6 @@ Folder.DotSettings
 
 # DEV options
 appsettings.Development.json
+
+# IdentityServer keys
+keys/

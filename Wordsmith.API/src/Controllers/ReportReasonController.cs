@@ -6,11 +6,8 @@ using Wordsmith.Models.SearchObjects;
 namespace Wordsmith.API.Controllers;
 
 [Route("report/reasons")]
-public class ReportReasonController : ReadController<Models.ReportReasonDTO, SearchObject>
+public class ReportReasonController : ReadController<ReportReasonDto, SearchObject>
 {
-    public ReportReasonController(IReadService<ReportReasonDTO, SearchObject> readService)
-        : base(readService)
-    {
-        
-    }
+    public ReportReasonController(IReadService<ReportReasonDto, SearchObject> readService)
+        : base(readService) { }
 }

@@ -8,9 +8,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Duende.IdentityServer" Version="6.3.3"/>
+        <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.3"/>
+        <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.3"/>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.21"/>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.21"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.10">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="src\Db\Migrations\ConfigurationDb\"/>
+        <Folder Include="src\Db\Migrations\PersistedGrantDb\"/>
+    </ItemGroup>
 </Project>

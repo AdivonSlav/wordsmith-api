@@ -1,15 +1,13 @@
-﻿
-using AutoMapper;
-using Wordsmith.DataAccess.DB.Entities;
+﻿using AutoMapper;
+using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models;
 
-namespace Wordsmith.DataAccess.AutoMapper
+namespace Wordsmith.DataAccess.AutoMapper;
+
+public class MappingProfile : Profile
 {
-    public class MappingProfile : Profile
+    public MappingProfile()
     {
-        public MappingProfile()
-        {
-            CreateMap<ReportReason, ReportReasonDTO>();
-        }
+        CreateMap<ReportReason, ReportReasonDto>();
     }
 }

@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.SearchObjects;
+using Wordsmith.Utils;
 
 namespace Wordsmith.DataAccess.Services;
 
@@ -39,7 +40,7 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         }
         catch (Exception e)
         {
-            Console.WriteLine(e); // TODO: Replace with a logger call
+            Logger.LogError("Failed to process query", e);
             return null;
         }
 

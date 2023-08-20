@@ -22,6 +22,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Wordsmith.Models\Wordsmith.Models.csproj"/>
+        <ProjectReference Include="..\Wordsmith.Utils\Wordsmith.Utils.csproj" />
     </ItemGroup>
 
 

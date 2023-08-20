@@ -22,6 +22,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Wordsmith.DataAccess\Wordsmith.DataAccess.csproj"/>
+        <ProjectReference Include="..\Wordsmith.Utils\Wordsmith.Utils.csproj" />
     </ItemGroup>
 
 </Project>

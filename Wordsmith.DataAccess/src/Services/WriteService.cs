@@ -1,7 +1,7 @@
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.SearchObjects;
+using Wordsmith.Utils;
 
 #pragma warning disable IDE0058
 
@@ -30,7 +30,7 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         }
         catch (Exception e)
         {
-            Console.WriteLine(e); // TODO: Replace with a logger call
+            Logger.LogError("Failed to save changes to database", e);
             return null;
         }
 
@@ -50,7 +50,7 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         }
         catch (Exception e)
         {
-            Console.WriteLine(e); // TODO: Replace with a logger call
+            Logger.LogError("Failed to save changes to database", e);
             return null;
         }
 

@@ -30,4 +30,8 @@
         <Folder Include="src\Db\Migrations\ConfigurationDb\"/>
         <Folder Include="src\Db\Migrations\PersistedGrantDb\"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Wordsmith.Utils\Wordsmith.Utils.csproj" />
+    </ItemGroup>
 </Project>

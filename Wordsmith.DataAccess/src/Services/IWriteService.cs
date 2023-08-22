@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace Wordsmith.DataAccess.Services;
 
 public interface IWriteService<T, TDb, TSearch, TInsert, TUpdate> : IReadService<T, TSearch>
@@ -7,6 +9,6 @@ public interface IWriteService<T, TDb, TSearch, TInsert, TUpdate> : IReadService
     where TInsert : class
     where TUpdate : class
 {
-    Task<T> Insert(TInsert insert);
-    Task<T> Update(int id, TUpdate update);
+    Task<ActionResult<T>> Insert(TInsert insert);
+    Task<ActionResult<T>> Update(int id, TUpdate update);
 }

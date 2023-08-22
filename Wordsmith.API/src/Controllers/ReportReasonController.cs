@@ -5,6 +5,7 @@ using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.API.Controllers;
 
+[ApiController]
 [Route("report/reasons")]
 public class ReportReasonController : ReadController<ReportReasonDto, SearchObject>
 {

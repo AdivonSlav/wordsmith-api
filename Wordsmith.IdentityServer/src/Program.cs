@@ -3,12 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Wordsmith.IdentityServer;
 using Wordsmith.IdentityServer.Db;
 using Wordsmith.IdentityServer.Db.Entities;
+using Wordsmith.IdentityServer.Middleware;
 using Wordsmith.Utils;
 
 try
 {
-    Logger.Init();
     var builder = WebApplication.CreateBuilder(args);
+    Logger.Init(builder.Configuration["Logging:NLog:LogLevel"] ?? "Debug");
 
     var migrationsAssembly = typeof(Config).Assembly.GetName().Name;
     var connectionString = builder.Configuration.GetConnectionString("Default");
@@ -17,6 +18,7 @@ try
     Config.UserClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["UserClientSecret"];
     Config.AdminClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["AdminClientSecret"];
 
+    builder.Services.AddTransient<IdentityServerExceptionHandler>();
     builder.Services.AddDbContext<IdentityDatabaseContext>(options =>
     {
         options.UseMySql(connectionString, serverVersion,
@@ -40,6 +42,7 @@ try
 
     var app = builder.Build();
 
+    app.UseMiddleware<IdentityServerExceptionHandler>();
     app.UseIdentityServer();
 
     if (args.Contains("--seed"))
@@ -54,6 +57,9 @@ try
 }
 catch (Exception e)
 {
-    Logger.LogFatal("IdentityServer bootstrapping failed due to unrecoverable errors", e);
-    throw;
+    Logger.LogFatal("IdentityServer bootstrapping failed due to an exception", e);
+}
+finally
+{
+    Logger.Cleanup();
 }

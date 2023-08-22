@@ -11,4 +11,9 @@ public class DatabaseContext : DbContext
         : base(options) { }
 
     public virtual DbSet<ReportReason> ReportReasons { get; set; }
+    public virtual DbSet<EBookReport> EBookReports { get; set; }
+    public virtual DbSet<ReportDetails> ReportDetails { get; set; }
+    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<UserReport> UserReports { get; set; }
+    public virtual DbSet<Image> Images { get; set; }
 }

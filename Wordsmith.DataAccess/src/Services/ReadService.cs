@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 
@@ -37,6 +38,10 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
 
             var tmp = Mapper.Map<List<T>>(list);
             result.Result = tmp;
+        }
+        catch (AppException)
+        {
+            throw;
         }
         catch (Exception e)
         {

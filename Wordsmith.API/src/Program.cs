@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.AutoMapper;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
@@ -14,14 +15,20 @@ using Wordsmith.Utils;
 
 try
 {
-    Logger.Init();
     var builder = WebApplication.CreateBuilder(args);
+    Logger.Init(builder.Configuration["Logging:NLog:LogLevel"] ?? "Debug");
 
     // Add implementations for services so they can be dependency injected
+    builder.Services.AddTransient<GlobalExceptionHandler>();
     builder.Services
         .AddTransient<IReadService<ReportReasonDto, SearchObject>, ReadService<ReportReasonDto,
             ReportReason, SearchObject>>();
+    builder.Services
+        .AddTransient<IUserService, UserService>();
 
+    var webRootPath = builder.Environment.WebRootPath;
+    var imageSettings = builder.Configuration.GetSection("ImageSettings");
+    ImageHelper.Init(webRootPath, imageSettings["AllowedSize"], imageSettings["AllowedFormats"]);
 
     // Ensure that URLs are auto-created as lowercase 
     builder.Services.AddRouting(options =>
@@ -91,19 +98,18 @@ try
     }
 
     app.UseHttpsRedirection();
-
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseMiddleware<GlobalExceptionHandler>();
 
-    app.MapControllers().RequireAuthorization("ApiScope");
+    app.MapControllers();
 
     Logger.LogInfo("Listening...");
     app.Run();
 }
 catch (Exception e)
 {
-    Logger.LogFatal("API bootstrapping failed due to unrecoverable errors", e);
-    throw;
+    Logger.LogFatal("API bootstrapping failed due to an exception", e);
 }
 finally
 {

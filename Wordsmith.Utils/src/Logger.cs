@@ -22,9 +22,16 @@ public static class Logger
         }
     }
 
-    public static void Init()
+    /// <summary>
+    /// Initializes the wrapper class for NLog and sets the passed log level
+    /// </summary>
+    /// <param name="minLogLevel"></param>
+    public static void Init(string minLogLevel)
     {
         _ = LogManager.Setup().LoadConfigurationFromAssemblyResource(typeof(Logger).GetTypeInfo().Assembly);
+        LogManager.Configuration.Variables["minLogLevel"] = minLogLevel;
+        LogManager.ReconfigExistingLoggers();
+        
         LogDebug("NLog initialized with the XML config in the Utils library");
     }
 

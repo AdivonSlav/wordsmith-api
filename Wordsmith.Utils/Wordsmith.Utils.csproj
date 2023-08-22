@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.3" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     </ItemGroup>
 
 
@@ -17,6 +18,13 @@
     <ItemGroup>
       <None Remove="NLog.config" />
       <EmbeddedResource Include="NLog.config" />
+    </ItemGroup>
+
+
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\Wordsmith.Models\Wordsmith.Models.csproj" />
     </ItemGroup>
 
 </Project>

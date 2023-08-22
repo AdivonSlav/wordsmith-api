@@ -1,9 +1,12 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 
-#pragma warning disable IDE0058
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+#pragma warning disable IDE0058 // Nullable reference
 
 namespace Wordsmith.DataAccess.Services;
 
@@ -17,49 +20,35 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
     public WriteService(DatabaseContext context, IMapper mapper)
         : base(context, mapper) { }
 
-    public virtual async Task<T> Insert(TInsert insert)
+    public virtual async Task<ActionResult<T>> Insert(TInsert insert)
     {
         var set = Context.Set<TDb>();
         var entity = Mapper.Map<TDb>(insert);
 
-        try
-        {
-            await set.AddAsync(entity);
-            await BeforeInsert(entity, insert);
-            await Context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to save changes to database", e);
-            return null;
-        }
+        await set.AddAsync(entity);
+        
+        await BeforeInsert(entity, insert);
+        await Context.SaveChangesAsync();
+        await AfterInsert(entity, insert);
 
-        return Mapper.Map<T>(entity);
+        return new CreatedAtActionResult(null, null, null, Mapper.Map<T>(entity));
     }
 
-    public virtual async Task<T> Update(int id, TUpdate update)
+    public virtual async Task<ActionResult<T>> Update(int id, TUpdate update)
     {
         var set = Context.Set<TDb>();
         var entity = await set.FindAsync(id);
 
         Mapper.Map(update, entity);
 
-        try
-        {
-            await Context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Failed to save changes to database", e);
-            return null;
-        }
+        await Context.SaveChangesAsync();
 
-        return Mapper.Map<T>(entity);
+        return new OkObjectResult(Mapper.Map<T>(entity));
     }
 
     // A task that needs to be done before a DB add operation is finalized
-    protected virtual Task BeforeInsert(TDb entity, TInsert insert)
-    {
-        return Task.CompletedTask;
-    }
+    protected virtual async Task BeforeInsert(TDb entity, TInsert insert) { }
+
+    // A task that needs to be done after a DB add operation is finalized
+    protected virtual async Task AfterInsert(TDb entity, TInsert insert) { }
 }

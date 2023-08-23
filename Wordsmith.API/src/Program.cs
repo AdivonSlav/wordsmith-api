@@ -79,13 +79,20 @@ try
         });
     });
 
-    var connectionString = builder.Configuration.GetConnectionString("Default");
+    var mysqlDetails = builder.Configuration.GetSection("Connection").GetSection("MySQL");
+    var mysqlConnectionString = $"Server={mysqlDetails["Host"]};" +
+                                $"Port={mysqlDetails["Port"]};" +
+                                $"Uid={mysqlDetails["User"]};" +
+                                $"Pwd={mysqlDetails["Password"]};" +
+                                $"Database={mysqlDetails["Database"]};";
+    var mysqlVersion = ServerVersion.AutoDetect(mysqlConnectionString);
+    
     builder.Services.AddDbContext<DatabaseContext>(options =>
     {
-        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
+        options.UseMySql(mysqlConnectionString, mysqlVersion,
             optionsBuilder => { optionsBuilder.MigrationsAssembly("Wordsmith.DataAccess"); });
     });
-
+    
     builder.Services.AddAutoMapper(typeof(MappingProfile));
 
     var app = builder.Build();

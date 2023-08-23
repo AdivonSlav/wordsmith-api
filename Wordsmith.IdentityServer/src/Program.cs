@@ -12,8 +12,13 @@ try
     Logger.Init(builder.Configuration["Logging:NLog:LogLevel"] ?? "Debug");
 
     var migrationsAssembly = typeof(Config).Assembly.GetName().Name;
-    var connectionString = builder.Configuration.GetConnectionString("Default");
-    var serverVersion = ServerVersion.AutoDetect(connectionString);
+    var mysqlDetails = builder.Configuration.GetSection("Connection").GetSection("MySQL");
+    var mysqlConnectionString = $"Server={mysqlDetails["Host"]};" +
+                                $"Port={mysqlDetails["Port"]};" +
+                                $"Uid={mysqlDetails["User"]};" +
+                                $"Pwd={mysqlDetails["Password"]};" +
+                                $"Database={mysqlDetails["Database"]};";
+    var mysqlVersion = ServerVersion.AutoDetect(mysqlConnectionString);
 
     Config.UserClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["UserClientSecret"];
     Config.AdminClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["AdminClientSecret"];
@@ -21,7 +26,7 @@ try
     builder.Services.AddTransient<IdentityServerExceptionHandler>();
     builder.Services.AddDbContext<IdentityDatabaseContext>(options =>
     {
-        options.UseMySql(connectionString, serverVersion,
+        options.UseMySql(mysqlConnectionString, mysqlVersion,
             sqlOptions => { sqlOptions.MigrationsAssembly(migrationsAssembly); });
     });
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<IdentityDatabaseContext>();
@@ -34,9 +39,9 @@ try
 
             options.EmitStaticAudienceClaim = true;
         })
-        .AddConfigurationStore(options => options.ConfigureDbContext = b => b.UseMySql(connectionString, serverVersion,
+        .AddConfigurationStore(options => options.ConfigureDbContext = b => b.UseMySql(mysqlConnectionString, mysqlVersion,
             sqlOptions => { sqlOptions.MigrationsAssembly(migrationsAssembly); }))
-        .AddOperationalStore(options => options.ConfigureDbContext = b => b.UseMySql(connectionString, serverVersion,
+        .AddOperationalStore(options => options.ConfigureDbContext = b => b.UseMySql(mysqlConnectionString, mysqlVersion,
             sqlOptions => { sqlOptions.MigrationsAssembly(migrationsAssembly); }))
         .AddAspNetIdentity<ApplicationUser>();
 

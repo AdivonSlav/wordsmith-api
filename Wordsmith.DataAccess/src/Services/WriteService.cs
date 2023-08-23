@@ -1,9 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
-using Wordsmith.Utils;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable IDE0058 // Nullable reference

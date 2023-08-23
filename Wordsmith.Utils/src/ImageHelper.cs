@@ -44,7 +44,7 @@ public static class ImageHelper
             _allowedFormats.Add(format);
         }
     }
-
+    
     public static SaveInfo SaveFromBase64(string encodedImage, string format, string filepath)
     {
         const int bitsEncodedPerChar = 6;

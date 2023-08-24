@@ -3,13 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using Wordsmith.IdentityServer;
 using Wordsmith.IdentityServer.Db;
 using Wordsmith.IdentityServer.Db.Entities;
+using Wordsmith.IdentityServer.HostedServices;
 using Wordsmith.IdentityServer.Middleware;
 using Wordsmith.Utils;
+using Wordsmith.Utils.RabbitMQ;
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
     Logger.Init(builder.Configuration["Logging:NLog:LogLevel"] ?? "Debug");
+    RabbitService.Init(
+        builder.Configuration["Connection:RabbitMQ:Host"],
+        builder.Configuration["Connection:RabbitMQ:User"],
+        builder.Configuration["Connection:RabbitMQ:Password"]);
 
     var migrationsAssembly = typeof(Config).Assembly.GetName().Name;
     var mysqlDetails = builder.Configuration.GetSection("Connection").GetSection("MySQL");
@@ -44,6 +50,8 @@ try
         .AddOperationalStore(options => options.ConfigureDbContext = b => b.UseMySql(mysqlConnectionString, mysqlVersion,
             sqlOptions => { sqlOptions.MigrationsAssembly(migrationsAssembly); }))
         .AddAspNetIdentity<ApplicationUser>();
+    builder.Services.AddSingleton<IMessageListener, MessageListener>();
+    builder.Services.AddHostedService<UserPersistenceHostedService>();
 
     var app = builder.Build();
 

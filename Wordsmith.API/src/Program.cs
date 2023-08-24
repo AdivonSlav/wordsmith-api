@@ -10,6 +10,7 @@ using Wordsmith.DataAccess.Services;
 using Wordsmith.Models;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
+using Wordsmith.Utils.RabbitMQ;
 
 #pragma warning disable IDE0058
 
@@ -17,7 +18,11 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     Logger.Init(builder.Configuration["Logging:NLog:LogLevel"] ?? "Debug");
-
+    RabbitService.Init(
+        builder.Configuration["Connection:RabbitMQ:Host"],
+        builder.Configuration["Connection:RabbitMQ:User"],
+        builder.Configuration["Connection:RabbitMQ:Password"]);
+    
     // Add implementations for services so they can be dependency injected
     builder.Services.AddTransient<GlobalExceptionHandler>();
     builder.Services
@@ -25,6 +30,7 @@ try
             ReportReason, SearchObject>>();
     builder.Services
         .AddTransient<IUserService, UserService>();
+    builder.Services.AddSingleton<IMessageProducer, MessageProducer>();
 
     var webRootPath = builder.Environment.WebRootPath;
     var imageSettings = builder.Configuration.GetSection("ImageSettings");

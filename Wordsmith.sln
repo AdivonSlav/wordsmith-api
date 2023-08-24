@@ -1,6 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordsmith.API", "Wordsmith.API\Wordsmith.API.csproj", "{DAAAB5F5-D87A-4BA4-9111-C3EFA331E966}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordsmith.DataAccess", "Wordsmith.DataAccess\Wordsmith.DataAccess.csproj", "{BCCB5190-4F5D-48D6-B6CD-BA95FA871F47}"

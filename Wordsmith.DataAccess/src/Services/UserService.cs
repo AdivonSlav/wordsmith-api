@@ -4,16 +4,23 @@ using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models;
 using Wordsmith.Models.Exceptions;
+using Wordsmith.Models.MessageObjects;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
+using Wordsmith.Utils.RabbitMQ;
 
 namespace Wordsmith.DataAccess.Services;
 
 public class UserService : WriteService<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>, IUserService
 {
-    public UserService(DatabaseContext databaseContext, IMapper mapper)
-        : base(databaseContext, mapper) { }
+    private readonly IMessageProducer _messageProducer;
+
+    public UserService(DatabaseContext databaseContext, IMapper mapper, IMessageProducer messageProducer)
+        : base(databaseContext, mapper)
+    {
+        _messageProducer = messageProducer;
+    }
 
     protected override async Task BeforeInsert(User entity, UserInsertRequest insert)
     {
@@ -43,8 +50,15 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
 
     protected override Task AfterInsert(User entity, UserInsertRequest insert)
     {
-        // TODO: Ensure that the object is passed via a message queue to the IdentityServer for persistence
-        return base.AfterInsert(entity, insert);
+        _messageProducer.SendMessage("user_insertion", new RegisterUserMessage()
+        {
+            Id = entity.Id,
+            Username = entity.Username,
+            Email = entity.Email,
+            Password = insert.Password
+        });
+
+        return Task.CompletedTask;
     }
 
     private async Task<bool> AlreadyExists(UserInsertRequest insert)

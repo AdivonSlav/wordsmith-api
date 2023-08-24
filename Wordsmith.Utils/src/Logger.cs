@@ -32,7 +32,7 @@ public static class Logger
         LogManager.Configuration.Variables["minLogLevel"] = minLogLevel;
         LogManager.ReconfigExistingLoggers();
         
-        LogDebug("NLog initialized with the XML config in the Utils library");
+        LogDebug("Initialized NLog with the XML config in the Utils library");
     }
 
     public static void Cleanup()

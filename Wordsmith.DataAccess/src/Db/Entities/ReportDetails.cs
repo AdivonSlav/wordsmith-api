@@ -3,20 +3,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Wordsmith.DataAccess.Db.Entities;
 
-[Table("reportdetails")]
+[Table("report_details")]
 public class ReportDetails
 {
     [Key] public int Id { get; set; }
-
-    public int UserId { get; set; }
-
-    public int ReportReasonId { get; set; }
-
-    [ForeignKey("ReportReasonId")] public virtual ReportReason ReportReason { get; set; }
-
+    
     public string Content { get; set; }
 
     public DateTime SubmissionDate { get; set; }
 
     public bool IsClosed { get; set; }
+    
+    public int ReportReasonId { get; set; }
+    
+    public int UserId { get; set; }
+
+    [ForeignKey(nameof(ReportReasonId))] public virtual ReportReason ReportReason { get; set; }
+    
+    [ForeignKey(nameof(UserId))] public virtual User Reporter { get; set; }
 }

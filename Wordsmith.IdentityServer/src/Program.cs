@@ -17,7 +17,9 @@ try
         builder.Configuration["Connection:RabbitMQ:User"],
         builder.Configuration["Connection:RabbitMQ:Password"]);
 
-    var migrationsAssembly = typeof(Config).Assembly.GetName().Name;
+    Config.UserClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["UserClientSecret"];
+    Config.AdminClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["AdminClientSecret"];
+    
     var mysqlDetails = builder.Configuration.GetSection("Connection").GetSection("MySQL");
     var mysqlConnectionString = $"Server={mysqlDetails["Host"]};" +
                                 $"Port={mysqlDetails["Port"]};" +
@@ -25,10 +27,8 @@ try
                                 $"Pwd={mysqlDetails["Password"]};" +
                                 $"Database={mysqlDetails["Database"]};";
     var mysqlVersion = ServerVersion.AutoDetect(mysqlConnectionString);
-
-    Config.UserClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["UserClientSecret"];
-    Config.AdminClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["AdminClientSecret"];
-
+    var migrationsAssembly = typeof(Config).Assembly.GetName().Name;
+    
     builder.Services.AddTransient<IdentityServerExceptionHandler>();
     builder.Services.AddDbContext<IdentityDatabaseContext>(options =>
     {
@@ -62,7 +62,7 @@ try
     {
         Logger.LogInfo("Seeding database...");
         SeedData.EnsureSeedData(app);
-        return;
+        return 0;
     }
 
     Logger.LogInfo("Listening...");
@@ -70,9 +70,19 @@ try
 }
 catch (Exception e)
 {
+    var type = e.GetType().Name;
+
+    if (type.Equals("HostAbortedException", StringComparison.Ordinal))
+    {
+        throw;
+    }
+    
     Logger.LogFatal("IdentityServer bootstrapping failed due to an exception", e);
+    return 1;
 }
 finally
 {
     Logger.Cleanup();
 }
+
+return 0;

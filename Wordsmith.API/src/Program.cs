@@ -92,11 +92,12 @@ try
                                 $"Pwd={mysqlDetails["Password"]};" +
                                 $"Database={mysqlDetails["Database"]};";
     var mysqlVersion = ServerVersion.AutoDetect(mysqlConnectionString);
-    
+    var migrationsAssembly = typeof(DatabaseContext).Assembly.GetName().Name; 
+        
     builder.Services.AddDbContext<DatabaseContext>(options =>
     {
         options.UseMySql(mysqlConnectionString, mysqlVersion,
-            optionsBuilder => { optionsBuilder.MigrationsAssembly("Wordsmith.DataAccess"); });
+            optionsBuilder => { optionsBuilder.MigrationsAssembly(migrationsAssembly); });
     });
     
     builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -122,9 +123,19 @@ try
 }
 catch (Exception e)
 {
+    var type = e.GetType().Name;
+
+    if (type.Equals("HostAbortedException", StringComparison.Ordinal))
+    {
+        throw;
+    }
+    
     Logger.LogFatal("API bootstrapping failed due to an exception", e);
+    return 1;
 }
 finally
 {
     Logger.Cleanup();
 }
+
+return 0;

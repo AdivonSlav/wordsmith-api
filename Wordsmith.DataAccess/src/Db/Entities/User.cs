@@ -21,11 +21,9 @@ public class User
 
     public DateTime RegistrationDate { get; set; }
     
+    public string Role { get; set; }
+    
     public int? ProfileImageId { get; set; }
     
-    public int RoleId { get; set; }
-    
     [ForeignKey(nameof(ProfileImageId))] public virtual Image ProfileImage { get; set; }
-    
-    [ForeignKey(nameof(RoleId))] public virtual Role Role { get; set; }
 }

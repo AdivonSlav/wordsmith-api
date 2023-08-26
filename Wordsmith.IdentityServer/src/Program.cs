@@ -17,8 +17,8 @@ try
         builder.Configuration["Connection:RabbitMQ:User"],
         builder.Configuration["Connection:RabbitMQ:Password"]);
 
-    Config.UserClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["UserClientSecret"];
-    Config.AdminClientSecret = builder.Configuration.GetSection("IdentityServerSecrets")["AdminClientSecret"];
+    Config.UserClientSecret = builder.Configuration.GetSection("IdentityServer")["Secrets:User"];
+    Config.AdminClientSecret = builder.Configuration.GetSection("IdentityServer")["Secrets:Admin"];
     
     var mysqlDetails = builder.Configuration.GetSection("Connection").GetSection("MySQL");
     var mysqlConnectionString = $"Server={mysqlDetails["Host"]};" +

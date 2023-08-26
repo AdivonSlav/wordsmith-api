@@ -10,6 +10,7 @@ using Wordsmith.DataAccess.Services;
 using Wordsmith.Models;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
+using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
 
 #pragma warning disable IDE0058
@@ -31,6 +32,16 @@ try
     builder.Services
         .AddTransient<IUserService, UserService>();
     builder.Services.AddSingleton<IMessageProducer, MessageProducer>();
+    builder.Services.AddScoped<ILoginClient, LoginClient>(provider =>
+    {
+        var clientFactory = provider.GetService<IHttpClientFactory>();
+        var identityServerAddress = builder.Configuration["IdentityServer:Host"];
+
+        if (identityServerAddress == null) throw new Exception("IdentityServer not configured!");
+        
+        return new LoginClient(identityServerAddress, clientFactory!);
+    });
+    builder.Services.AddHttpClient();
 
     var webRootPath = builder.Environment.WebRootPath;
     var imageSettings = builder.Configuration.GetSection("ImageSettings");

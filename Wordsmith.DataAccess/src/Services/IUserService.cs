@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models;
 using Wordsmith.Models.RequestObjects;
@@ -7,5 +8,6 @@ namespace Wordsmith.DataAccess.Services;
 
 public interface IUserService : IWriteService<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>
 {
-    
+    public Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login);
+    public Task<ActionResult<UserLoginDto>> Refresh(string bearerToken, string client);
 }

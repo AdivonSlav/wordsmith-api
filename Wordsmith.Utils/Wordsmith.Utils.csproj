@@ -8,6 +8,7 @@
 
 
     <ItemGroup>
+      <PackageReference Include="Duende.IdentityServer" Version="6.3.3" />
       <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.3" />
       <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
@@ -27,6 +28,10 @@
     <ItemGroup>
       <ProjectReference Include="..\Wordsmith.Models\Wordsmith.Models.csproj" />
     </ItemGroup>
+
+
+
+
 
 
 

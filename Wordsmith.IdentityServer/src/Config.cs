@@ -52,7 +52,7 @@ public static class Config
             },
             AllowedScopes = { "wordsmith_api.full_access" },
             AllowOfflineAccess = true,
-            RefreshTokenUsage = TokenUsage.ReUse,
+            RefreshTokenUsage = TokenUsage.OneTimeOnly,
             RefreshTokenExpiration = TokenExpiration.Absolute,
             AbsoluteRefreshTokenLifetime = 2592000 // 30 days
         }

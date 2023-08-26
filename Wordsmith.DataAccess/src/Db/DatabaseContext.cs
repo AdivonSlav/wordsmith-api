@@ -26,7 +26,6 @@ public class DatabaseContext : DbContext
     public virtual DbSet<Note> Notes { get; set; }
     public virtual DbSet<ReportDetails> ReportDetails { get; set; }
     public virtual DbSet<ReportReason> ReportReasons { get; set; }
-    public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<UserBan> UserBans { get; set; }
     public virtual DbSet<UserLibrary> UserLibraries { get; set; }

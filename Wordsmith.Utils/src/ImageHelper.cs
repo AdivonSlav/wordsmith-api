@@ -62,7 +62,8 @@ public static class ImageHelper
     public static SaveInfo SaveFromBase64(string encodedImage, string format, string filepath)
     {
         const int bitsEncodedPerChar = 6;
-        var bytesExpected = (encodedImage.Length * bitsEncodedPerChar) >> 3; // Divide by 8 bits in a byte
+        // Dividing the bits by 8 to get the byte value. Right-shifting by 3 is generally faster than doing / 8
+        var bytesExpected = (encodedImage.Length * bitsEncodedPerChar) >> 3;
         var imageBuffer = new Span<byte>(new byte[bytesExpected]);
 
         ConvertAndValidate(encodedImage, format, ref imageBuffer, out var identifiedFormat);

@@ -1,4 +1,3 @@
-using Wordsmith.IdentityServer.Db;
 using Wordsmith.IdentityServer.Middleware;
 using Wordsmith.IdentityServer.Startup;
 using Wordsmith.Utils;

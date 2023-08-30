@@ -23,6 +23,10 @@
     <ItemGroup>
         <ProjectReference Include="..\Wordsmith.DataAccess\Wordsmith.DataAccess.csproj"/>
         <ProjectReference Include="..\Wordsmith.Utils\Wordsmith.Utils.csproj" />
+    <ItemGroup>
+      <Folder Include="wwwroot\images\users\" />
+    </ItemGroup>
+
     </ItemGroup>
 
 

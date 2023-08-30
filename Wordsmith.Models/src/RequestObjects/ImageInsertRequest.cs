@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using Wordsmith.Models.ValidationAttributes;
 
 namespace Wordsmith.Models.RequestObjects;
 
 public class ImageInsertRequest
 {
     [Required]
+    [Base64Image]
     public string EncodedImage { get; set; }
     
     [Required]

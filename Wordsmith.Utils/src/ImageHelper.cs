@@ -16,6 +16,13 @@ public static class ImageHelper
     private static uint _allowedImageSize = 0;
     private static List<string> _allowedFormats = new List<string>();
 
+    /// <summary>
+    /// Initializes the ImageHelper by providing the necessary settings
+    /// </summary>
+    /// <param name="webRootPath">Path to the wwwroot directory</param>
+    /// <param name="allowedSize">The maximum allowed size for an image in bytes</param>
+    /// <param name="allowedFormats">Comma-separated list of allowed image extensions</param>
+    /// <exception cref="Exception">Invalid settings passed</exception>
     public static void Init(string? webRootPath, string? allowedSize, string? allowedFormats)
     {
         if (webRootPath == null || allowedSize == null || allowedFormats == null)
@@ -45,6 +52,13 @@ public static class ImageHelper
         }
     }
     
+    /// <summary>
+    /// Saves an image converted from Base64 to disk
+    /// </summary>
+    /// <param name="encodedImage">The Base64 encoding of the image</param>
+    /// <param name="format">The image extension</param>
+    /// <param name="filepath">Path to save</param>
+    /// <returns>Information on the image path, size and format after saving</returns>
     public static SaveInfo SaveFromBase64(string encodedImage, string format, string filepath)
     {
         const int bitsEncodedPerChar = 6;
@@ -63,11 +77,19 @@ public static class ImageHelper
         return new SaveInfo()
         {
             Path = filepath,
-            Format = format,
+            Format = identifiedFormat!.Name,
             Size = imageBuffer.Length,
         };
     }
 
+    /// <summary>
+    /// Takes in a Base64 encoding of an image, converts it to a byte array and validates it
+    /// </summary>
+    /// <param name="encodedImage">Base64 encoding of the image</param>
+    /// <param name="format">The image extension</param>
+    /// <param name="imageBuffer">A reference to a byte Span for storing of the image data</param>
+    /// <param name="identifiedFormat">The identified format of the image after conversion</param>
+    /// <exception cref="AppException">Validation failed for the image</exception>
     private static void ConvertAndValidate(string encodedImage, string format, ref Span<byte> imageBuffer, out IImageFormat? identifiedFormat)
     {
         if (!Convert.TryFromBase64String(encodedImage, imageBuffer, out var bytesWritten))
@@ -78,7 +100,7 @@ public static class ImageHelper
         if (imageBuffer.Length > _allowedImageSize)
         {
             throw new AppException("Image size is disallowed",
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
                     { "passedSize", imageBuffer.Length.ToString() },
                     { "allowedSize", _allowedImageSize.ToString() }
@@ -90,7 +112,7 @@ public static class ImageHelper
         if (identifiedFormat == null)
         {
             throw new AppException("Image format is disallowed",
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
                     { "passedFormat", format },
                     { "allowedFormats", string.Join(',', _allowedFormats) }
@@ -101,7 +123,7 @@ public static class ImageHelper
         if (!identifiedFormat.FileExtensions.Intersect(_allowedFormats).Any())
         {
             throw new AppException("Image format is disallowed",
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
                     { "passedFormat", format },
                     { "allowedFormats", string.Join(',', _allowedFormats) }

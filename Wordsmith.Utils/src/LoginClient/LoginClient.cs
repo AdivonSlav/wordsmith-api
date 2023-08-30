@@ -45,7 +45,7 @@ public class LoginClient : ILoginClient
 
         if (tokenResponse.IsError)
         {
-            throw new AppException("Unable to login", new Dictionary<string, string>()
+            throw new AppException("Unable to login", new Dictionary<string, object>()
             {
                 { "reason", tokenResponse.ErrorDescription ?? string.Empty }
             });
@@ -80,7 +80,7 @@ public class LoginClient : ILoginClient
         
         if (tokenResponse.IsError)
         {
-            throw new AppException("Unable to refresh login", new Dictionary<string, string>()
+            throw new AppException("Unable to refresh login", new Dictionary<string, object>()
             {
                 { "reason", tokenResponse.ErrorDescription ?? string.Empty }
             });

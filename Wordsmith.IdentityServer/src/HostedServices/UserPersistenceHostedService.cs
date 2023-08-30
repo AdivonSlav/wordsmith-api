@@ -20,10 +20,11 @@ public class UserPersistenceHostedService : BackgroundService
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageListener.Listen("user_insertion", HandleInsert);
+        await _messageListener.ListenAndReply("user_insertion", HandleInsert);
+        await _messageListener.ListenAndReply("user_update", HandleUpdate);
     }
 
-    private async Task HandleInsert(string message)
+    private async Task<OperationStatusMessage> HandleInsert(string message, string? correlationId)
     {
         using var scope = _serviceProvider.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -32,7 +33,7 @@ public class UserPersistenceHostedService : BackgroundService
 
         if (asUser == null)
         {
-            throw new Exception("Unable to deserialize JSON string to UserMessage");
+            throw new Exception("Unable to deserialize JSON string to RegisterUserMessage");
         }
             
         var newUser = new ApplicationUser()
@@ -47,7 +48,10 @@ public class UserPersistenceHostedService : BackgroundService
 
         if (!creationResult.Succeeded)
         {
-            throw new Exception($"Unable to persist user {asUser.Username} to the backing store");
+            return new OperationStatusMessage()
+            {
+                Succeeded = false, Errors = GetIdentityErrors(creationResult.Errors)
+            };
         }
 
         creationResult = await userManager.AddClaimsAsync(newUser, new Claim[]
@@ -58,7 +62,80 @@ public class UserPersistenceHostedService : BackgroundService
             
         if (!creationResult.Succeeded)
         {
-            throw new Exception($"Unable to persist claims for user {asUser.Username}");
+            return new OperationStatusMessage()
+            {
+                Succeeded = false, Errors = GetIdentityErrors(creationResult.Errors)
+            };
         }
+
+        return new OperationStatusMessage()
+        {
+            Succeeded = true
+        };
+    }
+
+    private async Task<OperationStatusMessage> HandleUpdate(string message, string? correlationId)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        var asUpdateMessage = JsonSerializer.Deserialize<UpdateUserMessage>(message);
+
+        if (asUpdateMessage == null)
+        {
+            return new OperationStatusMessage()
+                { Succeeded = false, Errors = { "Could not deserialize message into update message object! " } };
+        }
+
+        var temp = await userManager.GetUsersForClaimAsync(new Claim("user_ref_id", asUpdateMessage.Id.ToString()));
+
+        if (temp.Count == 0)
+        {
+            return new OperationStatusMessage()
+                { Succeeded = false, Errors = { "User was not found in the IdentityServer datastore!" } };
+        }
+        
+        var user = temp[0];
+
+        if (!string.IsNullOrEmpty(asUpdateMessage.Username))
+        {
+            var usernameResult = await userManager.SetUserNameAsync(user, asUpdateMessage.Username);
+            
+            if (!usernameResult.Succeeded)
+            {
+                return new OperationStatusMessage()
+                    { Succeeded = false, Errors = GetIdentityErrors(usernameResult.Errors) };  
+            }
+        }
+
+        if (!string.IsNullOrEmpty(asUpdateMessage.Email))
+        {
+            var emailResult = await userManager.SetEmailAsync(user, asUpdateMessage.Email);
+            if (!emailResult.Succeeded)
+            {
+                return new OperationStatusMessage()
+                    { Succeeded = false, Errors = GetIdentityErrors(emailResult.Errors) };  
+            }
+        }
+        
+        if (!string.IsNullOrEmpty(asUpdateMessage.Password))
+        {
+            var passwordResult = await userManager.ChangePasswordAsync(user, asUpdateMessage.OldPassword, asUpdateMessage.Password);
+            if (!passwordResult.Succeeded)
+            {
+                return new OperationStatusMessage()
+                    { Succeeded = false, Errors = GetIdentityErrors(passwordResult.Errors) };  
+            }
+        }
+
+        return new OperationStatusMessage()
+        {
+            Succeeded = true
+        };
+    }
+
+    private static List<string> GetIdentityErrors(IEnumerable<IdentityError> errors)
+    {
+        return errors.Select(error => error.Description).ToList();
     }
 }

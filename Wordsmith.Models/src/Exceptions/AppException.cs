@@ -11,7 +11,7 @@ public class AppException : Exception
         
     }
 
-    public AppException(string message, Dictionary<string, string> additionalInfo)
+    public AppException(string message, Dictionary<string, object> additionalInfo)
         : base(message)
     {
         foreach (var pair in additionalInfo)

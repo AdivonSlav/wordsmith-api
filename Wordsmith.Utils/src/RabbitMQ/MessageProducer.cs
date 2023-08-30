@@ -6,20 +6,23 @@ namespace Wordsmith.Utils.RabbitMQ;
 
 public class MessageProducer : IMessageProducer
 {
-    /// <summary>
-    /// Sends a message to the provided queue
-    /// </summary>
-    public void SendMessage<T>(string queue, T message)
+    public string SendMessage<T>(string queue, T message)
     {
         var connection = RabbitService.CreateConnection();
         using var channel = connection.CreateModel();
 
         channel.QueueDeclare(queue, durable: true, exclusive: false);
 
+        var props = channel.CreateBasicProperties();
+        props.CorrelationId = Guid.NewGuid().ToString();
+        props.ReplyTo = $"{queue}_replies";
+        
         var jsonString = JsonSerializer.Serialize(message);
         var body = Encoding.UTF8.GetBytes(jsonString);
         
-        channel.BasicPublish("", queue, body: body);
-        Logger.LogDebug($"Sent message via RabbitMQ {jsonString}");
+        channel.BasicPublish("", queue, body: body, basicProperties: props);
+        Logger.LogDebug($"Sent message via RabbitMQ on queue {queue}: {jsonString}");
+
+        return props.CorrelationId;
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Services;
@@ -18,6 +19,26 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
     public override Task<ActionResult<UserDto>> Insert([FromBody] UserInsertRequest insert)
     {
         return base.Insert(insert);
+    }
+
+    [Authorize(policy: "AdminOperations")]
+    public override Task<ActionResult<UserDto>> Update(int id, UserUpdateRequest update)
+    {
+        return base.Update(id, update);
+    }
+
+    [Authorize(policy: "All")]
+    [HttpPut("profile")]
+    public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
+        
+        if (WriteService is IUserService userService)
+        {
+            return userService.UpdateProfile(userId?.Value, update);
+        }
+        
+        throw new Exception("User service is unavailable");
     }
 
     [HttpGet("login")]

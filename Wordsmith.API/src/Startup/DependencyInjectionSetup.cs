@@ -47,7 +47,8 @@ public static class DependencyInjectionSetup
             .AddTransient<IReadService<ReportReasonDto, SearchObject>, ReadService<ReportReasonDto,
                 ReportReason, SearchObject>>();
         
-        services.AddSingleton<IMessageProducer, MessageProducer>();
+        services.AddScoped<IMessageProducer, MessageProducer>();
+        services.AddScoped<IMessageListener, MessageListener>();
         
         services.AddScoped<ILoginClient, LoginClient>(provider =>
         {
@@ -114,10 +115,20 @@ public static class DependencyInjectionSetup
             });
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("ApiScope", policy =>
+            options.AddPolicy("All", policy =>
             {
                 policy.RequireAuthenticatedUser();
                 policy.RequireClaim("scope", "wordsmith_api.read", "wordsmith_api.write", "wordsmith_api.full_access");
+            });
+            options.AddPolicy("AdminOperations", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim("scope", "wordsmith_api.full_access");
+            });
+            options.AddPolicy("UserOperations", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireClaim("scope", "wordsmith_api.read", "wordsmith_api.write");
             });
         });
         

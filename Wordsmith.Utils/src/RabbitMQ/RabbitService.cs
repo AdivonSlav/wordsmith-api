@@ -7,8 +7,12 @@ public static class RabbitService
     private static ConnectionFactory _connectionFactory = null!;
 
     /// <summary>
-    /// Initializes a RabbitMQ connection factory with the provided connection details
+    /// Initializes the ConnectionFactory of the RabbitService
     /// </summary>
+    /// <param name="hostname">Hostname of the RabbitMQ server</param>
+    /// <param name="username">Username of the RabbitMQ server</param>
+    /// <param name="password">Password of the RabbitMQ server</param>
+    /// <exception cref="Exception">Invalid settings passed</exception>
     public static void Init(string? hostname, string? username, string? password)
     {
         if (hostname == null || username == null || password == null)
@@ -30,7 +34,7 @@ public static class RabbitService
     }
 
     /// <summary>
-    /// Creates a connection using the connection details passed to the factory via Init()
+    /// Creates a connection using the connection details passed to the factory with Init()
     /// </summary>
     public static IConnection CreateConnection()
     {

@@ -14,6 +14,8 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>();
         CreateMap<UserInsertRequest, User>()
             .ForMember(dest => dest.ProfileImage, options => options.Ignore());
+        CreateMap<UserUpdateRequest, User>()
+            .ForMember(dest => dest.ProfileImage, options => options.Ignore());
         
         CreateMap<Image, ImageDto>()
             .ForMember(dest => dest.ImagePath, options => options.MapFrom(image => image.Path));

@@ -13,5 +13,7 @@ public class UserUpdateRequest
     [StringLength(20, MinimumLength = 6, ErrorMessage = "Password length must be between 6 and 20 characters")]
     public string? Password { get; set; }
     
-    public string? EncodedImage { get; set; }
+    public string? OldPassword { get; set; }
+    
+    public ImageInsertRequest? ProfileImage { get; set; }
 }

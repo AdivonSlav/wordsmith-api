@@ -54,7 +54,8 @@ public class LoginClient : ILoginClient
         return new UserLoginDto()
         {
             AccessToken = tokenResponse.AccessToken,
-            RefreshToken = tokenResponse.RefreshToken
+            RefreshToken = tokenResponse.RefreshToken,
+            ExpiresIn = tokenResponse.ExpiresIn
         };
     }
 

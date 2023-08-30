@@ -18,15 +18,18 @@ try
     
     var app = builder.Build();
 
+    app.ConfigureDatabase();
     app.UseMiddleware<IdentityServerExceptionHandler>();
     app.UseIdentityServer();
+    app.EnsureSeedData(builder.Configuration);
 
+    /*
     if (args.Contains("--seed"))
     {
         Logger.LogInfo("Seeding database...");
-        SeedData.EnsureSeedData(app);
         return 0;
     }
+    */
 
     Logger.LogInfo("Listening...");
     app.Run();

@@ -11,5 +11,5 @@ public interface IUserService : IWriteService<UserDto, User, SearchObject, UserI
 {
     public Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login);
     public Task<ActionResult<UserDto>> UpdateProfile(string? userId, UserUpdateRequest update);
-    public Task<ActionResult<UserLoginDto>> Refresh(string bearerToken, string client);
+    public Task<ActionResult<UserLoginDto>> Refresh(string? bearerToken, string client);
 }

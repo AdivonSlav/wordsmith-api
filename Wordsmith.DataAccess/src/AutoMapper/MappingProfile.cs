@@ -15,7 +15,12 @@ public class MappingProfile : Profile
         CreateMap<UserInsertRequest, User>()
             .ForMember(dest => dest.ProfileImage, options => options.Ignore());
         CreateMap<UserUpdateRequest, User>()
-            .ForMember(dest => dest.ProfileImage, options => options.Ignore());
+            .ForMember(dest => dest.ProfileImage, options => options.Ignore())
+            .ForAllMembers(options =>
+            {
+                // Only map from the update object if the source member is not null.
+                options.Condition((src, dest, sourceMember) => sourceMember != null);
+            });
         
         CreateMap<Image, ImageDto>()
             .ForMember(dest => dest.ImagePath, options => options.MapFrom(image => image.Path));

@@ -156,9 +156,11 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(Mapper.Map<UserDto>(entity));
     }
 
-    public async Task<ActionResult<UserLoginDto>> Refresh(string bearerToken, string client)
+    public async Task<ActionResult<UserLoginDto>> Refresh(string? bearerToken, string client)
     {
-        var refreshToken = bearerToken.Replace("Bearer", "").Trim();
+        var refreshToken = bearerToken?.Replace("Bearer", "").Trim();
+
+        if (refreshToken == null) throw new AppException("No refresh token was passed");
 
         var clientSecret = "";
         var clientId = "";

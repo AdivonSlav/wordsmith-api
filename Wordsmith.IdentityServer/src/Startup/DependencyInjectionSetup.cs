@@ -30,7 +30,14 @@ public static class DependencyInjectionSetup
                 sqlOptions => { sqlOptions.MigrationsAssembly(migrationsAssembly); });
         });
         
-        services.AddIdentity<ApplicationUser, IdentityRole>()
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequiredLength = 6;
+            })
             .AddEntityFrameworkStores<IdentityDatabaseContext>();
         
         services.AddIdentityServer(options =>

@@ -40,8 +40,10 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <li>WORDSMITH_IdentityServer__Secrets__User</li>
-      <li>WORDSMITH_IdentityServer__Secrets__Admin</li>
+      <ul>
+        <li>WORDSMITH_IdentityServer__Secrets__User</li>
+        <li>WORDSMITH_IdentityServer__Secrets__Admin</li>
+      </ul>
     </td>
     <td>
       These are used to sign and validate tokens issued by the Identity Server. Should be set to long and secure strings
@@ -49,11 +51,13 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <li>WORDSMITH_Connection__MySQL__Host</li>
-      <li>WORDSMITH_Connection__MySQL__Port</li>
-      <li>WORDSMITH_Connection__MySQL__User</li>
-      <li>WORDSMITH_Connection__MySQL__Password</li>
-      <li>WORDSMITH_Connection__MySQL__Database</li>
+      <ul>
+        <li>WORDSMITH_Connection__MySQL__Host</li>
+        <li>WORDSMITH_Connection__MySQL__Port</li>
+        <li>WORDSMITH_Connection__MySQL__User</li>
+        <li>WORDSMITH_Connection__MySQL__Password</li>
+        <li>WORDSMITH_Connection__MySQL__Database</li>
+      </ul>
     </td>
     <td>
       Used to create the connection string for connecting to a MySQL Server instance. Set the values that apply to your instance.
@@ -61,9 +65,11 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <li>WORDSMITH_Connection__RabbitMQ__Host</li>
-      <li>WORDSMITH_Connection__RabbitMQ__User</li>
-      <li>WORDSMITH_Connection__RabbitMQ__Password</li>
+      <ul>
+        <li>WORDSMITH_Connection__RabbitMQ__Host</li>
+        <li>WORDSMITH_Connection__RabbitMQ__User</li>
+        <li>WORDSMITH_Connection__RabbitMQ__Password</li>
+      </ul>
     </td>
     <td>
       Used to connect to the RabbitMQ message broker. Set the values that apply to your instance.
@@ -82,7 +88,9 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <li>WORDSMITH_ImageSettings__AllowedSize</li>
+      <ul>
+        <li>WORDSMITH_ImageSettings__AllowedSize</li>
+      </ul>
     </td>
     <td>
       The maximum allowed size in bytes for an image to be uploaded with the API. <b>Defaults to 5242880 (5MB).</b>
@@ -90,7 +98,9 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <li>WORDSMITH_ImageSettings__AllowedFormats</li>
+      <ul>
+        <li>WORDSMITH_ImageSettings__AllowedFormats</li>
+      </ul>
     </td>
     <td>
       Comma-separated list of allowed image formats for upload. <b>Defaults to png,jpeg</b>
@@ -98,7 +108,9 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <li>WORDSMITH_Logging__NLog__LogLevel</li>
+      <ul>
+        <li>WORDSMITH_Logging__NLog__LogLevel</li>
+      </ul>
     </td>
     <td>
       Minimum log level used by the Wordsmith Logger wrapper class. <b>Defaults to Debug.</b>

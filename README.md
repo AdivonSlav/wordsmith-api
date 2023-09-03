@@ -32,6 +32,7 @@ Afterwards, you will have to edit the *appsettings.json* files found in `Wordsmi
 
 ### Configuration Settings
 The following represent the environment variables supported by the application. They can be set through the respective *appsettings.json* file or as actual environment variables.
+
 <table>
   <tr>
     <th>Environment variables</th>
@@ -39,10 +40,8 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <code>
-        WORDSMITH_IdentityServer__Secrets__User<br>
-        WORDSMITH_IdentityServer__Secrets__Admin
-      </code>
+      <li>WORDSMITH_IdentityServer__Secrets__User</li>
+      <li>WORDSMITH_IdentityServer__Secrets__Admin</li>
     </td>
     <td>
       These are used to sign and validate tokens issued by the Identity Server. Should be set to long and secure strings
@@ -50,13 +49,11 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <code>
-        WORDSMITH_Connection__MySQL__Host<br>
-        WORDSMITH_Connection__MySQL__Port<br>
-        WORDSMITH_Connection__MySQL__User<br>
-        WORDSMITH_Connection__MySQL__Password<br>
-        WORDSMITH_Connection__MySQL__Database<br>
-      </code>
+      <li>WORDSMITH_Connection__MySQL__Host</li>
+      <li>WORDSMITH_Connection__MySQL__Port</li>
+      <li>WORDSMITH_Connection__MySQL__User</li>
+      <li>WORDSMITH_Connection__MySQL__Password</li>
+      <li>WORDSMITH_Connection__MySQL__Database</li>
     </td>
     <td>
       Used to create the connection string for connecting to a MySQL Server instance. Set the values that apply to your instance.
@@ -64,11 +61,9 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <code>
-        WORDSMITH_Connection__RabbitMQ__Host<br>
-        WORDSMITH_Connection__RabbitMQ__User<br>
-        WORDSMITH_Connection__RabbitMQ__Password<br>
-      </code>
+      <li>WORDSMITH_Connection__RabbitMQ__Host</li>
+      <li>WORDSMITH_Connection__RabbitMQ__User</li>
+      <li>WORDSMITH_Connection__RabbitMQ__Password</li>
     </td>
     <td>
       Used to connect to the RabbitMQ message broker. Set the values that apply to your instance.
@@ -76,43 +71,35 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <code>
-        WORDSMITH_Connection__IdentityServer__Host<br>
-        WORDSMITH_Connection__IdentityServer__Port<br>
-      </code>
+      <li>WORDSMITH_Connection__IdentityServer__Host</li>
+      <li>WORDSMITH_Connection__IdentityServer__Port</li>
     </td>
     <td>
-      Tells the API what the hostname and listen port of the Identity Server is. Defaults to <code>localhost</code> and <code>7443</code> respectively.
+      Tells the API what the hostname and listen port of the Identity Server is. <b>Defaults to localhost and 7443 respectively.</b>
     </td>
   </tr>
   <tr>
     <td>
-      <code>
-        WORDSMITH_ImageSettings__AllowedSize<br>
-      </code>
+      <li>WORDSMITH_ImageSettings__AllowedSize</li>
     </td>
     <td>
-      The maximum allowed size in bytes for an image to be uploaded with the API. Defaults to <code>5242880</code> (5MB).
+      The maximum allowed size in bytes for an image to be uploaded with the API. <b>Defaults to 5242880 (5MB).</b>
     </td>
   </tr>
   <tr>
     <td>
-      <code>
-        WORDSMITH_ImageSettings__AllowedFormats<br>
-      </code>
+      <li>WORDSMITH_ImageSettings__AllowedFormats</li>
     </td>
     <td>
-      Comma-separated list of allowed image formats for upload. Defaults to <code>png,jpeg</code>
+      Comma-separated list of allowed image formats for upload. <b>Defaults to png,jpeg</b>
     </td>
   </tr>
   <tr>
     <td>
-      <code>
-        WORDSMITH_Logging__NLog__LogLevel<br>
-      </code>
+      <li>WORDSMITH_Logging__NLog__LogLevel</li>
     </td>
     <td>
-      Minimum log level used by the Wordsmith Logger wrapper class. Defaults to <code>Debug</code>
+      Minimum log level used by the Wordsmith Logger wrapper class. <b>Defaults to Debug.</b>
     </td>
   </tr>
 </table>
@@ -123,7 +110,7 @@ Running the following command will restore any dependencies and build the soluti
 ```bash
 dotnet build -c Debug
 ```
-The solution can be ran from an IDE or manually using `dotnet run`. Either way, `Wordsmith.API` and `Wordsmith.IdentityServer` must be started together. 
+The solution can be ran from an IDE or manually using `dotnet run`. Either way, Wordsmith.API and Wordsmith.IdentityServer must be started together. 
 
 If using an IDE, set both projects as startup projects with your configuration of choice.
 
@@ -137,7 +124,7 @@ The API and Identity Server, by default, listen on ports 6000/6443 and 7000/7443
 ## Dockerization
 
 ### Dockerfiles
-The startup projects `Wordsmith.API` and `Wordsmith.IdentityServer` have Dockerfiles configured and ready to use in each project root. Both images are built and ran on the Ubuntu 22.04 base image with the Release configuration by default.
+The startup projects Wordsmith.API and Wordsmith.IdentityServer have Dockerfiles configured and ready to use in each project root. Both images are built and ran on the Ubuntu 22.04 base image with the Release configuration by default.
 
 In a Docker setting, only the HTTPS port is enabled and set to 443 and a self-signed testing certificate is provided. The CA certificate is added to the trusted Ubuntu store the build and is used to sign the server certificates used by both containers at runtime. This approach is meant for purely testing purposes and a different certificate approach should be taken in an actual production environment.
 

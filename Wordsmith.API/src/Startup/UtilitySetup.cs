@@ -12,7 +12,7 @@ public static class UtilitySetup
             configuration["Connection:RabbitMQ:Host"],
             configuration["Connection:RabbitMQ:User"],
             configuration["Connection:RabbitMQ:Password"]);
-    
+        
         var webRootPath = environment.WebRootPath;
         var imageSettings = configuration.GetSection("ImageSettings");
         ImageHelper.Init(webRootPath, imageSettings["AllowedSize"], imageSettings["AllowedFormats"]);

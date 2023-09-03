@@ -16,7 +16,8 @@ namespace Wordsmith.API.Startup;
 
 public static class DependencyInjectionSetup
 {
-    public static IServiceCollection RegisterDatabaseServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection RegisterDatabaseServices(this IServiceCollection services,
+        IConfiguration configuration)
     {
         var mysqlDetails = configuration.GetSection("Connection:MySQL");
         var mysqlConnectionString = $"Server={mysqlDetails["Host"]};" +
@@ -25,16 +26,16 @@ public static class DependencyInjectionSetup
                                     $"Pwd={mysqlDetails["Password"]};" +
                                     $"Database={mysqlDetails["Database"]};";
         var mysqlVersion = ServerVersion.AutoDetect(mysqlConnectionString);
-        var migrationsAssembly = typeof(DatabaseContext).Assembly.GetName().Name; 
-        
+        var migrationsAssembly = typeof(DatabaseContext).Assembly.GetName().Name;
+
         services.AddDbContext<DatabaseContext>(options =>
         {
             options.UseMySql(mysqlConnectionString, mysqlVersion,
                 optionsBuilder => { optionsBuilder.MigrationsAssembly(migrationsAssembly); });
         });
-        
+
         services.AddAutoMapper(typeof(MappingProfile));
-        
+
         return services;
     }
 
@@ -46,30 +47,34 @@ public static class DependencyInjectionSetup
         services
             .AddTransient<IReadService<ReportReasonDto, SearchObject>, ReadService<ReportReasonDto,
                 ReportReason, SearchObject>>();
-        
+
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();
-        
+
         services.AddScoped<ILoginClient, LoginClient>(provider =>
         {
             var clientFactory = provider.GetService<IHttpClientFactory>();
-            var identityServerAddress = configuration["IdentityServer:Host"];
+            var identityServerHost = configuration["Connection:IdentityServer:Host"];
+            var identityServerPort = configuration["Connection:IdentityServer:Port"];
 
-            if (identityServerAddress == null) throw new Exception("IdentityServer not configured!");
-        
+            if (string.IsNullOrWhiteSpace(identityServerHost) || string.IsNullOrWhiteSpace(identityServerPort))
+                throw new Exception("IdentityServer not configured!");
+
+            var identityServerAddress = $"https://{identityServerHost}:{identityServerPort}";
+
             return new LoginClient(identityServerAddress, clientFactory!);
         });
-        
+
         // Registers the HttpClientFactory to be used for managing client instances
         services.AddHttpClient();
-        
+
         // Ensure that URLs are auto-created as lowercase 
         services.AddRouting(options =>
         {
             options.LowercaseUrls = true;
             options.LowercaseQueryStrings = true;
         });
-        
+
         services.AddControllers();
         services.AddEndpointsApiExplorer();
 
@@ -102,12 +107,13 @@ public static class DependencyInjectionSetup
                 { jwtScheme, Array.Empty<string>() }
             });
         });
-        
+
         // Authentication is set up for JWT bearer tokens and the authority is the IdentityServer at the configured address
         services.AddAuthentication("Bearer")
             .AddJwtBearer("Bearer", options =>
             {
-                options.Authority = configuration["IdentityServer:Host"];
+                options.Authority =
+                    $"https://{configuration["Connection:IdentityServer:Host"]}:{configuration["Connection:IdentityServer:Port"]}";
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateAudience = false
@@ -131,7 +137,7 @@ public static class DependencyInjectionSetup
                 policy.RequireClaim("scope", "wordsmith_api.read", "wordsmith_api.write");
             });
         });
-        
+
         return services;
     }
 }

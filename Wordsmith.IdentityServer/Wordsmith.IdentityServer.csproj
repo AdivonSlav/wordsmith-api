@@ -8,12 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Duende.IdentityServer" Version="6.3.3"/>
         <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.3"/>
         <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.3"/>
@@ -33,5 +27,17 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Wordsmith.Utils\Wordsmith.Utils.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="appsettings.json" CopyToPublishDirectory="Always" />
+        <None Include="appsettings.Production.json" CopyToPublishDirectory="Always" />
+        <None Include="certs/*" CopyToPublishDirectory="Always" />
     </ItemGroup>
 </Project>

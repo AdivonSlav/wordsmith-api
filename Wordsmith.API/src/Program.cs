@@ -6,6 +6,7 @@ using Wordsmith.Utils;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    builder.Configuration.AddEnvironmentVariables(prefix: "WORDSMITH_");
     
     UtilitySetup.Init(builder.Configuration, builder.Environment);
     
@@ -14,13 +15,13 @@ try
     builder.Services.RegisterDatabaseServices(builder.Configuration);
 
     var app = builder.Build();
-
+    
     app.ConfigureDatabase();
     app.ConfigureSwagger();
     app.RegisterMiddleware();
     app.MapControllers();
 
-    Logger.LogInfo("Listening...");
+    Logger.LogInfo("Up and running");
     app.Run();
 }
 catch (Exception e)

@@ -6,6 +6,8 @@ using Wordsmith.Utils.RabbitMQ;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    builder.Configuration.AddEnvironmentVariables(prefix: "WORDSMITH_");
+    
     Logger.Init(builder.Configuration["Logging:NLog:LogLevel"] ?? "Debug");
     RabbitService.Init(
         builder.Configuration["Connection:RabbitMQ:Host"],
@@ -18,19 +20,10 @@ try
     var app = builder.Build();
 
     app.ConfigureDatabase();
-    app.UseMiddleware<IdentityServerExceptionHandler>();
-    app.UseIdentityServer();
+    app.RegisterMiddleware();
     app.EnsureSeedData(builder.Configuration);
 
-    /*
-    if (args.Contains("--seed"))
-    {
-        Logger.LogInfo("Seeding database...");
-        return 0;
-    }
-    */
-
-    Logger.LogInfo("Listening...");
+    Logger.LogInfo("Up and running");
     app.Run();
 }
 catch (Exception e)

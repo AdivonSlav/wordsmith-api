@@ -24,7 +24,11 @@ public class LoginClient : ILoginClient
     public async Task<UserLoginDto> RequestAccess(UserLoginRequest request, string clientId, string clientSecret, string scopeList)
     {
         var client = _clientFactory.CreateClient();
-        var discoveryDoc = await client.GetDiscoveryDocumentAsync(_identityAddress);
+        var discoveryDoc = await client.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest()
+        {
+            Address = _identityAddress,
+            Policy = { ValidateIssuerName = false, ValidateEndpoints = false }
+        });
 
         if (discoveryDoc.IsError)
         {

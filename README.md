@@ -71,8 +71,10 @@ The following represent the environment variables supported by the application. 
   </tr>
   <tr>
     <td>
-      <li>WORDSMITH_Connection__IdentityServer__Host</li>
-      <li>WORDSMITH_Connection__IdentityServer__Port</li>
+      <ul>
+        <li>WORDSMITH_Connection__IdentityServer__Host</li>
+        <li>WORDSMITH_Connection__IdentityServer__Port</li>
+      </ul>
     </td>
     <td>
       Tells the API what the hostname and listen port of the Identity Server is. <b>Defaults to localhost and 7443 respectively.</b>

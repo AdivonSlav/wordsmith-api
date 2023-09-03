@@ -28,7 +28,7 @@ Clone the repository and change into the solution folder
 ```bash
 git clone https://github.com/AdivonSlav/wordsmith-api && cd wordsmith-api
 ```
-Afterwards, you will have to edit the *appsettings.json* files found in `Wordsmith.API` and `Wordsmith.IdentityServer`, which are the startup projects of the solution. These contain environment variables and settings, some of which are already set to their default values. For development purposes, it is recommended to create an *appsettings.Development.json* file in the same directory and change any values you want. The .NET Runtime will automatically pick up this file and override settings with the same name if running within a development context (Debug configuration).
+Afterwards, you will have to edit the *appsettings.json* files found in Wordsmith.API and Wordsmith.IdentityServer, which are the startup projects of the solution. These contain environment variables and settings, some of which are already set to their default values. For development purposes, it is recommended to create an *appsettings.Development.json* file in the same directory and change any values you want. The .NET Runtime will automatically pick up this file and override settings with the same name if running within a development context (Debug configuration).
 
 ### Configuration Settings
 The following represent the environment variables supported by the application. They can be set through the respective *appsettings.json* file or as actual environment variables.

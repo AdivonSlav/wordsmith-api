@@ -26,7 +26,7 @@ Furthermore, you should have the following services running
 ### Initial Setup
 Clone the repository and change into the solution folder
 ```bash
-git clone https://github.com/AdivonSlav/wordsmith-api && cd wordsmith-api
+$ git clone https://github.com/AdivonSlav/wordsmith-api && cd wordsmith-api
 ```
 Afterwards, you will have to edit the *appsettings.json* files found in Wordsmith.API and Wordsmith.IdentityServer, which are the startup projects of the solution. These contain environment variables and settings, some of which are already set to their default values. For development purposes, it is recommended to create an *appsettings.Development.json* file in the same directory and change any values you want. The .NET Runtime will automatically pick up this file and override settings with the same name if running within a development context (Debug configuration).
 
@@ -122,7 +122,7 @@ The following represent the environment variables supported by the application. 
 ### Building and Running
 Running the following command will restore any dependencies and build the solution with the provided configuration. Alternatively, build through your IDE of choice
 ```bash
-dotnet build -c Debug
+$ dotnet build -c Debug
 ```
 The solution can be ran from an IDE or manually using `dotnet run`. Either way, Wordsmith.API and Wordsmith.IdentityServer must be started together. 
 
@@ -130,8 +130,8 @@ If using an IDE, set both projects as startup projects with your configuration o
 
 If running through a terminal, run both projects with the following commands (for ease of use, maintain two separate terminal tabs). Replace with your configuration of choice
 ```bash
-dotnet run --project Wordsmith.API -c Debug
-dotnet run --project Wordsmith.IdentityServer -c Debug
+$ dotnet run --project Wordsmith.API -c Debug
+$ dotnet run --project Wordsmith.IdentityServer -c Debug
 ```
 The API and Identity Server, by default, listen on ports 6000/6443 and 7000/7443 respectively. This can be changed in the *launchSettings.json* file of each project.
 
@@ -153,8 +153,8 @@ If running on Windows, simply execute *docker_build_and_run.bat*
 
 If running Linux or MacOS, run the following commands
 ```bash
-chmod u+x docker_build_and_run.sh
-./docker_build_and_run.sh
+$ chmod u+x docker_build_and_run.sh
+$ ./docker_build_and_run.sh
 ```
 
 Alternatively, images can be built separately by calling the commands outlined in the script manually and then running `docker compose up -d` in the solution root.

@@ -34,3 +34,11 @@ fi
 # Run docker compose
 echo "All images built succesfully, proceeding to docker compose..."
 docker compose up -d
+
+# Check build status
+if [ $? -eq 0 ]; then
+  echo "Services started succesfully"
+else
+  echo "Docker Compose failed to start services!"
+  exit 1
+fi

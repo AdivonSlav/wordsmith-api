@@ -16,6 +16,7 @@ if %errorlevel% equ 0 (
   echo %api_tag% built succesfully
 ) else (
   echo %api_tag% build failed
+  pause
   exit /b 1
 )
 
@@ -28,9 +29,21 @@ if %errorlevel% equ 0 (
   echo %identityserver_tag% built succesfully
 ) else (
   echo %identityserver_tag% build failed
+  pause
   exit /b 1
 )
 
 REM Run docker compose
 echo All images built succesfully, proceeding to docker compose...
 docker compose up -d
+
+REM Check build status
+if %errorlevel% equ 0 (
+  echo Services started succesfully
+) else (
+  echo Docker Compose failed to start services!
+  pause
+  exit /b 1
+)
+
+pause

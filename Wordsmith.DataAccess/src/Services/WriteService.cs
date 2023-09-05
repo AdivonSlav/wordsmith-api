@@ -37,10 +37,12 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         var set = Context.Set<TDb>();
         var entity = await set.FindAsync(id);
 
+        await BeforeUpdate(entity, update);
         Mapper.Map(update, entity);
 
         await Context.SaveChangesAsync();
-
+        await AfterUpdate(entity, update);
+        
         return new OkObjectResult(Mapper.Map<T>(entity));
     }
 
@@ -49,4 +51,8 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
 
     // A task that needs to be done after a DB add operation is finalized
     protected virtual async Task AfterInsert(TDb entity, TInsert insert) { }
+
+    protected virtual async Task BeforeUpdate(TDb entity, TUpdate update) { }
+    
+    protected virtual async Task AfterUpdate(TDb entity, TUpdate update) { }
 }

@@ -44,13 +44,11 @@ public static class DependencyInjectionSetup
     {
         services.AddTransient<GlobalExceptionHandler>();
         services.AddTransient<IUserService, UserService>();
-        services
-            .AddTransient<IReadService<ReportReasonDto, SearchObject>, ReadService<ReportReasonDto,
-                ReportReason, SearchObject>>();
-
+        services.AddTransient<IReportReasonService, ReportReasonService>();
+        services.AddTransient<IUserReportService, UserReportService>();
+        
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();
-
         services.AddScoped<ILoginClient, LoginClient>(provider =>
         {
             var clientFactory = provider.GetService<IHttpClientFactory>();

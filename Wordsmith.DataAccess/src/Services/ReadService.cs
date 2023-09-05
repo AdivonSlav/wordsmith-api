@@ -21,16 +21,21 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         Mapper = mapper;
     }
 
-    public virtual async Task<QueryResult<T>> Get(TSearch? search = null)
+    public virtual async Task<PaginatedResult<T>> Get(TSearch? search = null)
     {
         var query = Context.Set<TDb>().AsQueryable();
-        var result = new QueryResult<T>();
+        var result = new PaginatedResult<T>();
 
         query = AddInclude(query, search);
         query = AddFilter(query, search);
 
         if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
-            query = query.Take(search.PageSize.Value).Skip(search.Page.Value * search.PageSize.Value);
+        {
+            result.TotalCount = await query.CountAsync();
+            query = query.Skip((search.Page.Value - 1) * search.PageSize.Value).Take(search.PageSize.Value);
+            result.Page = search.Page;
+            result.TotalPages = (int)Math.Ceiling((double)(result.TotalCount / search.PageSize));
+        }
 
         try
         {

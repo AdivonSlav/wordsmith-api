@@ -114,14 +114,14 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(tokens);
     }
 
-    public async Task<ActionResult<UserDto>> UpdateProfile(string? userId, UserUpdateRequest request)
+    public async Task<ActionResult<UserDto>> UpdateProfile(string? userIdStr, UserUpdateRequest request)
     {
-        if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var idAsInt))
+        if (!int.TryParse(userIdStr, out var userId))
         {
-            throw new AppException("User id was null or could not be parsed");
+            throw new AppException("User could not be parsed");
         }
 
-        var entity = await Context.Users.FindAsync(idAsInt);
+        var entity = await Context.Users.FindAsync(userId);
 
         if (entity == null)
         {
@@ -141,15 +141,16 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
 
         var autoResetEvent = new AutoResetEvent(false);
         var response = await WaitForReply(autoResetEvent, "user_update_replies", id);
-        
-        Logger.LogDebug($"Got reply from IdentityServer when updating user information");
+
+        Logger.LogDebug($"Got reply with id {id} from IdentityServer when updating user information");
 
         if (!response.Succeeded)
         {
-            throw new AppException("Could not update user!", new Dictionary<string, object>()
-            {
-                { "reason", response.Errors }
-            });
+            throw new AppException($"Could not change access for user {entity.Username}!",
+                new Dictionary<string, object>()
+                {
+                    { "reason", response.Errors }
+                });
         }
 
         await Context.SaveChangesAsync();
@@ -189,19 +190,104 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(tokens);
     }
 
+    public async Task<ActionResult> ChangeAccess(string adminIdStr, int userId, UserChangeAccessRequest changeAccess)
+    {
+        var user = await Context.Users.FindAsync(userId);
+
+        if (user == null)
+        {
+            throw new AppException("The user does not exist!");
+        }
+
+        if (!int.TryParse(adminIdStr, out var adminId))
+        {
+            throw new AppException("User id was null or could not be parsed");
+        }
+
+        var admin = await Context.Users.FindAsync(adminId);
+
+        if (admin == null)
+        {
+            throw new AppException("The admin does not exist!");
+        }
+
+        var alreadyRemovedAccess = await Context.UserBans.AnyAsync(userBan =>
+            userBan.UserId == userId &&
+            (userBan.ExpiryDate == null || userBan.ExpiryDate.Value > DateTime.UtcNow));
+
+        // If attempting to persist a change that's already present, just return OK
+        if ((alreadyRemovedAccess && !changeAccess.AllowedAccess) ||
+            (!alreadyRemovedAccess && changeAccess.AllowedAccess))
+        {
+            return new OkResult();
+        }
+
+        if (!changeAccess.AllowedAccess)
+        {
+            // Make a record in the database to indicate that the user has been banned
+            var newBan = new UserBan()
+            {
+                Admin = admin,
+                User = user,
+                BannedDate = DateTime.UtcNow,
+                ExpiryDate = changeAccess.ExpiryDate
+            };
+
+            await Context.UserBans.AddAsync(newBan);
+        }
+        else
+        {
+            // Make sure that the database reflects that the user is unbanned
+            var lastRemoval = await Context.UserBans
+                .Where(userBan => userBan.UserId == userId)
+                .OrderByDescending(userBan => userBan.BannedDate)
+                .FirstOrDefaultAsync();
+
+            if (lastRemoval == null) throw new Exception("The ban for this user not found!");
+            
+            lastRemoval.ExpiryDate = DateTime.UtcNow;
+        }
+
+        // Persist the access status over at the IdentityServer
+        var id = _messageProducer.SendMessage("user_change_access", new ChangeUserAccessMessage()
+        {
+            Id = user.Id,
+            AllowedAccess = changeAccess.AllowedAccess,
+            ExpiryDate = changeAccess.ExpiryDate
+        });
+
+        var autoResetEvent = new AutoResetEvent(false);
+        var response = await WaitForReply(autoResetEvent, "user_change_access_replies", id);
+
+        Logger.LogDebug($"Got reply with id {id} from IdentityServer when updating user information");
+
+        if (!response.Succeeded)
+        {
+            throw new AppException($"Could not change access for user {user.Username}!",
+                new Dictionary<string, object>()
+                {
+                    { "reason", response.Errors }
+                });
+        }
+
+        await Context.SaveChangesAsync();
+        return new OkResult();
+    }
+
     private async Task<bool> AlreadyExists(UserInsertRequest insert)
     {
         return await Context.Users.AnyAsync(user => user.Username == insert.Username || user.Email == insert.Email);
     }
 
-    private async Task<OperationStatusMessage> WaitForReply(EventWaitHandle autoResetEvent, string queue, string correlationId)
+    private async Task<OperationStatusMessage> WaitForReply(EventWaitHandle autoResetEvent, string queue,
+        string correlationId)
     {
         var response = new OperationStatusMessage();
-        
+
         // Here we listen for the reply of the IdentityServer
         // If the server replies, then we signal the thread to continue execution (with the provided wait handle) and
         // deserialize the reply as a status message
-        await _messageListener.Listen("user_update_replies", (message, id) =>
+        await _messageListener.Listen(queue, (message, id) =>
         {
             if (correlationId == id)
             {
@@ -216,10 +302,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         // If the thread is not signaled within an arbitrary time period (the TimeSpan provided), then we end the request 
         if (!await Task.Run(() => autoResetEvent.WaitOne(TimeSpan.FromSeconds(ReplyGracePeriod))))
         {
-            throw new AppException("Could not update user!", new Dictionary<string, object>()
-            {
-                { "reason", "timeout" }
-            });
+            throw new Exception("Request towards the user store timed out");
         }
 
         return response;

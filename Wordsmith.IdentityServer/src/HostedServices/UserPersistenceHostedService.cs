@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
+using Duende.IdentityServer.EntityFramework.Stores;
+using Duende.IdentityServer.Stores;
 using Microsoft.AspNetCore.Identity;
 using Wordsmith.IdentityServer.Db.Entities;
 using Wordsmith.Models.MessageObjects;
@@ -17,25 +19,26 @@ public class UserPersistenceHostedService : BackgroundService
         _messageListener = messageListener;
         _serviceProvider = serviceProvider;
     }
-    
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await _messageListener.ListenAndReply("user_insertion", HandleInsert);
         await _messageListener.ListenAndReply("user_update", HandleUpdate);
+        await _messageListener.ListenAndReply("user_change_access", HandleAccessChange);
     }
 
     private async Task<OperationStatusMessage> HandleInsert(string message, string? correlationId)
     {
         using var scope = _serviceProvider.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        
+
         var asUser = JsonSerializer.Deserialize<RegisterUserMessage>(message);
 
         if (asUser == null)
         {
             throw new Exception("Unable to deserialize JSON string to RegisterUserMessage");
         }
-            
+
         var newUser = new ApplicationUser()
         {
             UserName = asUser.Username,
@@ -59,7 +62,7 @@ public class UserPersistenceHostedService : BackgroundService
             new("role", "user"),
             new("user_ref_id", newUser.UserRefId.ToString()!)
         });
-            
+
         if (!creationResult.Succeeded)
         {
             return new OperationStatusMessage()
@@ -94,17 +97,17 @@ public class UserPersistenceHostedService : BackgroundService
             return new OperationStatusMessage()
                 { Succeeded = false, Errors = { "User was not found in the IdentityServer datastore!" } };
         }
-        
+
         var user = temp[0];
 
         if (!string.IsNullOrEmpty(asUpdateMessage.Username))
         {
             var usernameResult = await userManager.SetUserNameAsync(user, asUpdateMessage.Username);
-            
+
             if (!usernameResult.Succeeded)
             {
                 return new OperationStatusMessage()
-                    { Succeeded = false, Errors = GetIdentityErrors(usernameResult.Errors) };  
+                    { Succeeded = false, Errors = GetIdentityErrors(usernameResult.Errors) };
             }
         }
 
@@ -114,17 +117,18 @@ public class UserPersistenceHostedService : BackgroundService
             if (!emailResult.Succeeded)
             {
                 return new OperationStatusMessage()
-                    { Succeeded = false, Errors = GetIdentityErrors(emailResult.Errors) };  
+                    { Succeeded = false, Errors = GetIdentityErrors(emailResult.Errors) };
             }
         }
-        
+
         if (!string.IsNullOrEmpty(asUpdateMessage.Password))
         {
-            var passwordResult = await userManager.ChangePasswordAsync(user, asUpdateMessage.OldPassword, asUpdateMessage.Password);
+            var passwordResult =
+                await userManager.ChangePasswordAsync(user, asUpdateMessage.OldPassword, asUpdateMessage.Password);
             if (!passwordResult.Succeeded)
             {
                 return new OperationStatusMessage()
-                    { Succeeded = false, Errors = GetIdentityErrors(passwordResult.Errors) };  
+                    { Succeeded = false, Errors = GetIdentityErrors(passwordResult.Errors) };
             }
         }
 
@@ -132,6 +136,60 @@ public class UserPersistenceHostedService : BackgroundService
         {
             Succeeded = true
         };
+    }
+
+    private async Task<OperationStatusMessage> HandleAccessChange(string message, string? correlationId)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var refreshTokenStore = scope.ServiceProvider.GetRequiredService<IRefreshTokenStore>();
+
+        var asChangeAccessMessage = JsonSerializer.Deserialize<ChangeUserAccessMessage>(message);
+
+        if (asChangeAccessMessage == null)
+        {
+            return new OperationStatusMessage()
+            {
+                Succeeded = false, Errors = { "Could not deserialize message into a change access message object! " }
+            };
+        }
+
+        var temp = await userManager.GetUsersForClaimAsync(
+            new Claim("user_ref_id", asChangeAccessMessage.Id.ToString()));
+
+        if (temp.Count == 0)
+        {
+            return new OperationStatusMessage()
+                { Succeeded = false, Errors = { "User was not found in the IdentityServer datastore!" } };
+        }
+
+        var user = temp[0];
+        user.LockoutEnabled = true;
+
+        if (asChangeAccessMessage.ExpiryDate.HasValue)
+        {
+            user.LockoutEnd = asChangeAccessMessage.ExpiryDate.Value;
+        } 
+        else if (!asChangeAccessMessage.ExpiryDate.HasValue && !asChangeAccessMessage.AllowedAccess)
+        {
+            user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(200);
+        }
+        else
+        {
+            user.LockoutEnd = null;
+        }
+        
+        await refreshTokenStore.RemoveRefreshTokensAsync(user.Id, "user.client");
+        await refreshTokenStore.RemoveRefreshTokensAsync(user.Id, "admin.client");
+        var result = await userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            return new OperationStatusMessage()
+                { Succeeded = false, Errors = GetIdentityErrors(result.Errors) };
+        }
+
+        return new OperationStatusMessage() { Succeeded = true };
     }
 
     private static List<string> GetIdentityErrors(IEnumerable<IdentityError> errors)

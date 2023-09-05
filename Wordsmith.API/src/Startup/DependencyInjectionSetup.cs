@@ -114,7 +114,7 @@ public static class DependencyInjectionSetup
                     $"https://{configuration["Connection:IdentityServer:Host"]}:{configuration["Connection:IdentityServer:Port"]}";
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
-                    ValidateAudience = false
+                    ValidateAudience = false,
                 };
             });
         services.AddAuthorization(options =>

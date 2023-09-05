@@ -21,13 +21,13 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
         return base.Insert(insert);
     }
 
-    [Authorize(policy: "AdminOperations")]
+    [NonAction]
     public override Task<ActionResult<UserDto>> Update(int id, UserUpdateRequest update)
     {
         return base.Update(id, update);
     }
 
-    [Authorize(policy: "All")]
+    [Authorize("All")]
     [HttpPut("profile")]
     public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
     {

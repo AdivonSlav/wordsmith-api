@@ -25,7 +25,7 @@ public static class Logger
     /// <summary>
     /// Initializes the wrapper class for NLog and sets the passed log level
     /// </summary>
-    /// <param name="minLogLevel"></param>
+    /// <param name="minLogLevel">The minimum log level to use (e.g. Debug)</param>
     public static void Init(string minLogLevel)
     {
         _ = LogManager.Setup().LoadConfigurationFromAssemblyResource(typeof(Logger).GetTypeInfo().Assembly);
@@ -35,6 +35,9 @@ public static class Logger
         LogDebug("Initialized NLog with the XML config in the Utils library");
     }
 
+    /// <summary>
+    /// Shuts down all logging and disposes any targets specified in NLog.config
+    /// </summary>
     public static void Cleanup()
     {
         LogManager.Shutdown();
@@ -90,6 +93,16 @@ public static class Logger
         Log(LogLevel.Fatal, message, Assembly.GetCallingAssembly().FullName, exception, callerPath, callerMember, callerLine);
     }
     
+    /// <summary>
+    /// Takes information on a log and routes it to NLog
+    /// </summary>
+    /// <param name="level">Level of the log (e.g. Debug)</param>
+    /// <param name="message">Log message</param>
+    /// <param name="assemblyFullName">Name of the assembly that called the log method</param>
+    /// <param name="exception">An optional exception to be passed</param>
+    /// <param name="callerPath"></param>
+    /// <param name="callerMember"></param>
+    /// <param name="callerLine"></param>
     private static void Log(
         LogLevel level,
         string message,
@@ -112,6 +125,12 @@ public static class Logger
         logger.Log(logEvent);
     }
 
+    /// <summary>
+    /// Formats the [CallerFilePath] output based on the assembly name
+    /// </summary>
+    /// <param name="callerPath">Filepath to the class that called a method</param>
+    /// <param name="assemblyFullName">Name of the assembly of the class</param>
+    /// <returns>A formatted caller path output</returns>
     private static string FormatCallerPath(string callerPath, string? assemblyFullName)
     {
         var tmp = callerPath.LastIndexOf($"src{Path.DirectorySeparatorChar}", StringComparison.Ordinal) + 4;

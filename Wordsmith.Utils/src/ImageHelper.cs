@@ -3,6 +3,9 @@ using Wordsmith.Models.Exceptions;
 
 namespace Wordsmith.Utils;
 
+/// <summary>
+/// Represents information on an image save operation
+/// </summary>
 public struct SaveInfo
 {
     public string Path;

@@ -2,6 +2,7 @@ using AutoMapper;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.DataAccess.Services;

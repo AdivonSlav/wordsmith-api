@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
 
 namespace Wordsmith.DataAccess.AutoMapper;

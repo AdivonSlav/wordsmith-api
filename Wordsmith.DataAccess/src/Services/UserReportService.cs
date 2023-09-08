@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;

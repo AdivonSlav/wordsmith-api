@@ -46,6 +46,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IReportReasonService, ReportReasonService>();
         services.AddTransient<IUserReportService, UserReportService>();
+        services.AddTransient<IEBookService, EBookService>();
         
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();

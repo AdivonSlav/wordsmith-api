@@ -1,4 +1,4 @@
-namespace Wordsmith.Models;
+namespace Wordsmith.Models.DataTransferObjects;
 
 public class ImageDto
 {

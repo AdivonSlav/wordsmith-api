@@ -1,4 +1,5 @@
 using Wordsmith.Models;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
 
 namespace Wordsmith.Utils.LoginClient;

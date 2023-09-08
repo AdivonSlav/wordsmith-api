@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 

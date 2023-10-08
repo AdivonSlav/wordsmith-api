@@ -21,10 +21,10 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         Mapper = mapper;
     }
 
-    public virtual async Task<PaginatedResult<T>> Get(TSearch? search = null)
+    public virtual async Task<QueryResult<T>> Get(TSearch? search = null)
     {
         var query = Context.Set<TDb>().AsQueryable();
-        var result = new PaginatedResult<T>();
+        var result = new QueryResult<T>();
 
         query = AddInclude(query, search);
         query = AddFilter(query, search);

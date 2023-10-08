@@ -1,6 +1,6 @@
 namespace Wordsmith.Models.SearchObjects;
 
-public class PaginatedResult<T>
+public class QueryResult<T>
 {
     public List<T> Result { get; set; }
     public int? Page { get; set; }

@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using NLog;
 
 namespace Wordsmith.Utils;
@@ -46,11 +47,12 @@ public static class Logger
     public static void LogDebug(
         string message,
         Exception? exception = null,
+        object? additionalArg = null,
         [CallerFilePath] string callerPath = "",
         [CallerMemberName] string callerMember = "",
         [CallerLineNumber] int callerLine = 0)
     {
-        Log(LogLevel.Debug, message, Assembly.GetCallingAssembly().FullName, exception, callerPath, callerMember, callerLine);
+        Log(LogLevel.Debug, message, Assembly.GetCallingAssembly().FullName, exception, callerPath, callerMember, callerLine, additionalArg);
     }
     
     public static void LogInfo(
@@ -92,13 +94,14 @@ public static class Logger
     {
         Log(LogLevel.Fatal, message, Assembly.GetCallingAssembly().FullName, exception, callerPath, callerMember, callerLine);
     }
-    
+
     /// <summary>
     /// Takes information on a log and routes it to NLog
     /// </summary>
     /// <param name="level">Level of the log (e.g. Debug)</param>
     /// <param name="message">Log message</param>
     /// <param name="assemblyFullName">Name of the assembly that called the log method</param>
+    /// <param name="additionalArg">An additional argument</param>
     /// <param name="exception">An optional exception to be passed</param>
     /// <param name="callerPath"></param>
     /// <param name="callerMember"></param>
@@ -110,7 +113,8 @@ public static class Logger
         Exception? exception = null,
         string callerPath = "",
         string callerMember = "",
-        int callerLine = 0)
+        int callerLine = 0,
+        object? additionalArg = null)
     {
         var logger = LogManager.GetLogger(callerPath);
 
@@ -119,9 +123,16 @@ public static class Logger
         callerPath = FormatCallerPath(callerPath, assemblyFullName);
         
         var logEvent = new LogEventInfo(level, callerPath, message) { Exception = exception };
-        logEvent.Properties.Add("callerpath", callerPath);
-        logEvent.Properties.Add("callermember", callerMember);
-        logEvent.Properties.Add("callerline", callerLine);
+        
+        if (additionalArg != null)
+        {
+            logEvent.Message += $" @additionalArg";
+            logEvent.Parameters = new object[] { additionalArg };
+        }
+        
+        logEvent.Properties.Add("caller_path", callerPath);
+        logEvent.Properties.Add("caller_member", callerMember);
+        logEvent.Properties.Add("caller_line", callerLine);
         logger.Log(logEvent);
     }
 
@@ -138,5 +149,18 @@ public static class Logger
         var assemblyName = assemblyFullName?.Split(", ")[0];
         
         return $"{assemblyName}::{callerPath}";
+    }
+
+    private static string SerializeArguments(IEnumerable<object> args)
+    {
+        var output = "";
+        
+        foreach (var argument in args)
+        {
+            var serialized = JsonSerializer.Serialize(argument);
+            output += serialized + " ";
+        }
+
+        return output;
     }
 }

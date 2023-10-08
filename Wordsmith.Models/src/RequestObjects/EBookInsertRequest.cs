@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using Wordsmith.Models.ValidationAttributes;
+using Microsoft.AspNetCore.Http;
 
 namespace Wordsmith.Models.RequestObjects;
 
 public class EBookInsertRequest
 {
-    [Required]
     [StringLength(20)]
     public string Title { get; set; }
     
@@ -15,12 +14,17 @@ public class EBookInsertRequest
     
     public decimal? Price { get; set; }
     
-    [Base64Image]
-    public string? EncodedCoverArt { get; set; }
+    [Required]
+    public ImageInsertRequest CoverArt { get; set; }
+    
+    [Required]
+    public int AuthorId { get; set; }
     
     [Required]
     public int GenreId { get; set; }
     
     [Required]
     public int MaturityRatingId { get; set; }
+    
+    public IFormFile File { get; set; }
 }

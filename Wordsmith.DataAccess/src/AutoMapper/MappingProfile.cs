@@ -43,5 +43,9 @@ public class MappingProfile : Profile
         CreateMap<UserReportUpdateRequest, UserReport>()
             .ForPath(dest => dest.ReportDetails.IsClosed, options => options.MapFrom(src => src.IsClosed));
         CreateMap<UserReport, UserReportDto>();
+        
+        // eBooks
+        CreateMap<EBookInsertRequest, EBook>()
+            .ForMember(dest => dest.CoverArt, options => options.Ignore());
     }
 }

@@ -18,7 +18,7 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
         : base(userReportService) { }
 
     [Authorize("AdminOperations")]
-    public override Task<PaginatedResult<UserReportDto>> Get(UserReportSearchObject? search = null)
+    public override Task<QueryResult<UserReportDto>> Get(UserReportSearchObject? search = null)
     {
         return base.Get(search);
     }

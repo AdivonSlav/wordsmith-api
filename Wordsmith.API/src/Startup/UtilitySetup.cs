@@ -15,6 +15,9 @@ public static class UtilitySetup
         
         var webRootPath = environment.WebRootPath;
         var imageSettings = configuration.GetSection("ImageSettings");
+        var eBookSettings = configuration.GetSection("EBookSettings");
+        
         ImageHelper.Init(webRootPath, imageSettings["AllowedSize"], imageSettings["AllowedFormats"]);
+        EBookFileHelper.Init(eBookSettings["SavePath"]);
     }
 }

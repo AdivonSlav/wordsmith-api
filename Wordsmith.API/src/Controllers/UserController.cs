@@ -38,7 +38,7 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
     }
 
     [HttpGet("login")]
-    public Task<ActionResult<UserLoginDto>> Login([FromBody] UserLoginRequest login)
+    public Task<ActionResult<QueryResult<UserLoginDto>>> Login([FromQuery] UserLoginRequest login)
     {
         return ((WriteService as IUserService)!).Login(login);
     }

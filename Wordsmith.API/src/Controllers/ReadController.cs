@@ -16,13 +16,13 @@ public class ReadController<T, TSearch> : ControllerBase
     }
 
     [HttpGet()]
-    public virtual async Task<QueryResult<T>> Get([FromQuery] TSearch? search = null)
+    public virtual async Task<ActionResult<QueryResult<T>>> Get([FromQuery] TSearch? search = null)
     {
         return await ReadService.Get(search);
     }
 
     [HttpGet("{id:int}")]
-    public virtual async Task<T> GetById(int id)
+    public virtual async Task<ActionResult<T>> GetById(int id)
     {
         return await ReadService.GetById(id);
     }

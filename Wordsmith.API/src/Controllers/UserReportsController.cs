@@ -18,13 +18,13 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
         : base(userReportService) { }
 
     [Authorize("AdminOperations")]
-    public override Task<QueryResult<UserReportDto>> Get(UserReportSearchObject? search = null)
+    public override Task<ActionResult<QueryResult<UserReportDto>>> Get(UserReportSearchObject? search = null)
     {
         return base.Get(search);
     }
 
     [Authorize("AdminOperations")]
-    public override Task<UserReportDto> GetById(int id)
+    public override Task<ActionResult<UserReportDto>> GetById(int id)
     {
         return base.GetById(id);
     }

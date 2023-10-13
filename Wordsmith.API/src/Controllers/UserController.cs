@@ -28,6 +28,15 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
     }
 
     [Authorize("All")]
+    [HttpGet("profile")]
+    public Task<ActionResult<UserDto>> GetProfile()
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
+        
+        return base.GetById(int.Parse(userId!.Value));
+    }
+    
+    [Authorize("All")]
     [HttpPut("profile")]
     public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
     {
@@ -50,8 +59,8 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
         return ((WriteService as IUserService)!).Refresh(bearerToken, client);
     }
 
-    [HttpPut("{id:int}/change-access")]
     [Authorize("AdminOperations")]
+    [HttpPut("{id:int}/change-access")]
     public Task<ActionResult> ChangeAccess(int id, [FromBody] UserChangeAccessRequest changeAccess)
     {
         var adminId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");

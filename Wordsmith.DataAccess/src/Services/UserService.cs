@@ -109,6 +109,8 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         }
 
         var tokens = await _loginClient.RequestAccess(login, clientId, clientSecret, scopes);
+        tokens.User = Mapper.Map<UserDto>(entity);
+        
         var queryResult = new QueryResult<UserLoginDto>()
         {
             Result = new List<UserLoginDto>() { tokens }

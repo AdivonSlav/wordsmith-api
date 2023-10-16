@@ -22,7 +22,7 @@ public class ReadController<T, TSearch> : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public virtual async Task<ActionResult<T>> GetById(int id)
+    public virtual async Task<ActionResult<QueryResult<T>>> GetById(int id)
     {
         return await ReadService.GetById(id);
     }

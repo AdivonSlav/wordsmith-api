@@ -57,11 +57,15 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         return result;
     }
 
-    public virtual async Task<T> GetById(int id)
+    public virtual async Task<QueryResult<T>> GetById(int id)
     {
         var entity = await Context.Set<TDb>().FindAsync(id);
+        var queryResult = new QueryResult<T>()
+        {
+            Result = new List<T>() { Mapper.Map<T>(entity) }
+        };
 
-        return Mapper.Map<T>(entity);
+        return queryResult;
     }
 
     protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, TSearch? search = null)

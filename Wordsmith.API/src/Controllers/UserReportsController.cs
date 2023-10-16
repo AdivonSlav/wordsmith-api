@@ -24,7 +24,7 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     }
 
     [Authorize("AdminOperations")]
-    public override Task<ActionResult<UserReportDto>> GetById(int id)
+    public override Task<ActionResult<QueryResult<UserReportDto>>> GetById(int id)
     {
         return base.GetById(id);
     }

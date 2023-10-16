@@ -29,7 +29,7 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
 
     [Authorize("All")]
     [HttpGet("profile")]
-    public Task<ActionResult<UserDto>> GetProfile()
+    public Task<ActionResult<QueryResult<UserDto>>> GetProfile()
     {
         var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
         

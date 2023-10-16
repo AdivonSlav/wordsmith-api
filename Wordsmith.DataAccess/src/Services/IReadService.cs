@@ -7,5 +7,5 @@ public interface IReadService<T, TSearch>
     where TSearch : class
 {
     Task<QueryResult<T>> Get(TSearch? search = null);
-    Task<T> GetById(int id);
+    Task<QueryResult<T>> GetById(int id);
 }

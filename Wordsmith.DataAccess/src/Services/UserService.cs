@@ -121,7 +121,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(queryResult);
     }
 
-    public async Task<ActionResult<UserDto>> UpdateProfile(string? userIdStr, UserUpdateRequest request)
+    public async Task<ActionResult<UserDto>> UpdateProfile(string userIdStr, UserUpdateRequest request)
     {
         if (!int.TryParse(userIdStr, out var userId))
         {
@@ -161,6 +161,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         }
 
         await Context.SaveChangesAsync();
+        
         return new OkObjectResult(Mapper.Map<UserDto>(entity));
     }
 

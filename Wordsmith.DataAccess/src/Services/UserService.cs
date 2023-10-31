@@ -77,7 +77,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return Task.CompletedTask;
     }
 
-    public async Task<ActionResult<QueryResult<UserLoginDto>>> Login(UserLoginRequest login)
+    public async Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login)
     {
         var entity = await Context.Users.FirstOrDefaultAsync(user => user.Username == login.Username);
 
@@ -111,14 +111,9 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         var tokens = await _loginClient.RequestAccess(login, clientId, clientSecret, scopes);
         tokens.User = Mapper.Map<UserDto>(entity);
         
-        var queryResult = new QueryResult<UserLoginDto>()
-        {
-            Result = new List<UserLoginDto>() { tokens }
-        };
-        
         Logger.LogDebug($"Got access token {tokens.AccessToken}");
 
-        return new OkObjectResult(queryResult);
+        return new OkObjectResult(tokens);
     }
 
     public async Task<ActionResult<UserDto>> UpdateProfile(string userIdStr, UserUpdateRequest request)

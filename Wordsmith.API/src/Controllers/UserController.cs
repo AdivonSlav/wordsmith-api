@@ -45,8 +45,8 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
         return ((WriteService as IUserService)!).UpdateProfile(userId!.Value, update);
     }
 
-    [HttpGet("login")]
-    public Task<ActionResult<QueryResult<UserLoginDto>>> Login([FromQuery] UserLoginRequest login)
+    [HttpPost("login")]
+    public Task<ActionResult<UserLoginDto>> Login([FromBody] UserLoginRequest login)
     {
         return ((WriteService as IUserService)!).Login(login);
     }

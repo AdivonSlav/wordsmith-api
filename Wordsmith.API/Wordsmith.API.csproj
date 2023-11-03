@@ -27,6 +27,7 @@
     
     <ItemGroup>
       <Folder Include="certs\" />
+      <Folder Include="wwwroot\images\ebooks\" />
       <Folder Include="wwwroot\images\users\" />
     </ItemGroup>
     

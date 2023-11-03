@@ -1,5 +1,6 @@
 using System.Web;
 using Microsoft.AspNetCore.Http;
+using NLog;
 using VersOne.Epub;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
@@ -17,6 +18,11 @@ public static class EBookFileHelper
             throw new Exception("Not all eBook settings are set!");
         }
 
+        if (!Directory.Exists(savePath))
+        {
+            throw new Exception("The path for saving eBooks does not exist!");
+        }
+        
         _savePath = savePath;
     }
 
@@ -37,6 +43,7 @@ public static class EBookFileHelper
         var ebookData = new EBookParseDto()
         {
             Title = epub.Title,
+            AuthorName = epub.Author,
             Description = epub.Description ?? "",
             EncodedCoverArt = epub.CoverImage == null ? null : Convert.ToBase64String(epub.CoverImage),
             Chapters = new List<string>()
@@ -65,16 +72,21 @@ public static class EBookFileHelper
 
     public static async Task<string> SaveFile(IFormFile file)
     {
-        var randomFilename = $"eBook_{Guid.NewGuid()}.epub";
+        var randomFilename = $"eBook-{Guid.NewGuid()}.epub";
         var filePath = Path.Combine(_savePath, randomFilename);
-        await using var stream = new FileStream(filePath, FileMode.Create);
 
+        await using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
 
         var encodedFilename = HttpUtility.HtmlEncode(file.FileName);
         Logger.LogDebug($"Saved {encodedFilename} to {filePath}");
 
         return randomFilename;
+    }
+
+    public static bool Saved(string filename)
+    {
+        return File.Exists(Path.Combine(_savePath, filename));
     }
 
     public static async Task<bool> IsValidEpub(IFormFile file)
@@ -86,6 +98,7 @@ public static class EBookFileHelper
         }
         catch (Exception e)
         {
+            Logger.LogInfo("Invalid EPUB passed for parsing!");
             return false;
         }
 

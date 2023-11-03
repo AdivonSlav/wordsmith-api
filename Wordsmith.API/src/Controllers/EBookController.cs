@@ -15,11 +15,12 @@ public class
 {
     public EBookController(IEBookService eBookService) : base(eBookService) { }
 
-    public override Task<ActionResult<EBookDto>> Insert([FromForm] EBookInsertRequest insert)
+    [HttpPost("save")]
+    public async Task<ActionResult<string>> Save([EpubFile] IFormFile file)
     {
-        return base.Insert(insert);
+        return await (WriteService as IEBookService)!.Save(file);
     }
-
+    
     [HttpPost("parse")]
     public async Task<ActionResult<EBookParseDto>> Parse([EpubFile] IFormFile file)
     {

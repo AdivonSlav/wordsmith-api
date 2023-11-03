@@ -9,5 +9,6 @@ namespace Wordsmith.DataAccess.Services;
 
 public interface IEBookService : IWriteService<EBookDto, EBook, EBookSearchObject, EBookInsertRequest, EBookUpdateRequest>
 {
+    public Task<ActionResult<string>> Save(IFormFile file);
     public Task<ActionResult<EBookParseDto>> Parse(IFormFile file);
 }

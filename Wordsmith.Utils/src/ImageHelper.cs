@@ -1,3 +1,4 @@
+using System.Collections;
 using SixLabors.ImageSharp.Formats;
 using Wordsmith.Models.Exceptions;
 
@@ -41,6 +42,7 @@ public static class ImageHelper
         _webRootPath = webRootPath;
 
         Directory.CreateDirectory(Path.Combine(webRootPath, "images", "users"));
+        Directory.CreateDirectory(Path.Combine(webRootPath, "images", "ebooks"));
         
         if (!uint.TryParse(allowedSize, out _allowedImageSize))
         {
@@ -62,7 +64,7 @@ public static class ImageHelper
     /// <param name="format">The image extension</param>
     /// <param name="filepath">Path to save</param>
     /// <returns>Information on the image path, size and format after saving</returns>
-    public static SaveInfo SaveFromBase64(string encodedImage, string format, string filepath)
+    public static SaveInfo SaveFromBase64(string encodedImage, string? format, string filepath)
     {
         const int bitsEncodedPerChar = 6;
         // Dividing the bits by 8 to get the byte value. Right-shifting by 3 is generally faster than doing / 8
@@ -72,6 +74,14 @@ public static class ImageHelper
         ConvertAndValidate(encodedImage, format, ref imageBuffer, out var identifiedFormat);
         
         var pathToSave = Path.Combine(_webRootPath, filepath);
+
+        // If the extension isn't written, write one
+        if (pathToSave.Contains('.'))
+        {
+            var formatExtension = identifiedFormat!.FileExtensions.First();
+            pathToSave += $".{formatExtension}";
+            filepath += $".{formatExtension}";
+        }
 
         using var fileStream = File.OpenWrite(pathToSave);
         using var image = Image.Load(imageBuffer);
@@ -94,7 +104,7 @@ public static class ImageHelper
     /// <param name="imageBuffer">A reference to a byte Span for storing of the image data</param>
     /// <param name="identifiedFormat">The identified format of the image after conversion</param>
     /// <exception cref="AppException">Validation failed for the image</exception>
-    private static void ConvertAndValidate(string encodedImage, string format, ref Span<byte> imageBuffer, out IImageFormat? identifiedFormat)
+    private static void ConvertAndValidate(string encodedImage, string? format, ref Span<byte> imageBuffer, out IImageFormat? identifiedFormat)
     {
         if (!Convert.TryFromBase64String(encodedImage, imageBuffer, out var bytesWritten))
         {

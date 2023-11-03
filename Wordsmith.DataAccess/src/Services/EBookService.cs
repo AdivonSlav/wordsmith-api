@@ -19,25 +19,27 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
     protected override async Task BeforeInsert(EBook entity, EBookInsertRequest insert)
     {
         await ValidateForeignKeys(insert);
+        ValidateIfSaved(insert);
         
         entity.PublishedDate = DateTime.UtcNow;
         entity.UpdatedDate = entity.PublishedDate;
 
-        var fileName = await EBookFileHelper.SaveFile(insert.File);
-        entity.Path = fileName;
+        entity.Path = insert.SavedBookName;
 
-        var savePath = Path.Combine("images", "ebooks",
-            $"{entity.Title}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.{insert.CoverArt.Format}");
-        var imageSaveInfo = ImageHelper.SaveFromBase64(insert.CoverArt.EncodedImage, insert.CoverArt.Format, savePath);
-        var newImage = new Image()
-        {
-            Format = imageSaveInfo.Format,
-            Size = imageSaveInfo.Size,
-            Path = savePath
-        };
+        await HandleImage(entity, insert);
+    }
 
-        await Context.Images.AddAsync(newImage);
-        entity.CoverArt = newImage;
+    protected override async Task AfterInsert(EBook entity, EBookInsertRequest insert)
+    {
+        await HandleChapters(entity, insert);
+
+        await Context.Entry(entity).Reference(e => e.Genre).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.MaturityRating).LoadAsync();
+    }
+
+    public async Task<ActionResult<string>> Save(IFormFile file)
+    {
+        return new CreatedAtActionResult(null, null, null, await EBookFileHelper.SaveFile(file));
     }
     
     public async Task<ActionResult<EBookParseDto>> Parse(IFormFile file)
@@ -64,4 +66,48 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         if (!maturityRatingExists) throw new AppException("The maturity rating for this eBook was not found!");
     }
 
+    private void ValidateIfSaved(EBookInsertRequest insert)
+    {
+        if (!EBookFileHelper.Saved(insert.SavedBookName))
+        {
+            throw new AppException("The eBook has not been saved to disk!");
+        }
+    }
+
+    private async Task HandleImage(EBook entity, EBookInsertRequest insert)
+    {
+        var savePath = Path.Combine("images", "ebooks",
+            $"{entity.Path.Split('.')[0]}");
+        var imageSaveInfo = ImageHelper.SaveFromBase64(insert.ParsedInfo.EncodedCoverArt, null, savePath);
+        var newImage = new Image()
+        {
+            Format = imageSaveInfo.Format,
+            Size = imageSaveInfo.Size,
+            Path = imageSaveInfo.Path
+        };
+
+        await Context.Images.AddAsync(newImage);
+        entity.CoverArt = newImage;
+    }
+
+    private async Task HandleChapters(EBook entity, EBookInsertRequest insert)
+    {
+        var chapters = new List<EBookChapter>();
+        
+        for (var i = 0; i < insert.ParsedInfo.Chapters.Count; i++)
+        {
+            var newChapter = new EBookChapter()
+            {
+                ChapterName = insert.ParsedInfo.Chapters[i],
+                ChapterNumber = i,
+                EBookId = entity.Id
+            };
+            
+            chapters.Add(newChapter);
+        }
+
+        await Context.EBookChapters.AddRangeAsync(chapters);
+        entity.ChapterCount = chapters.Count;
+        await Context.SaveChangesAsync();
+    }
 }

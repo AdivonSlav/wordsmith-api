@@ -52,7 +52,8 @@ public class MappingProfile : Profile
                     Content = src.Content,
                     ReportReasonId = src.ReportReasonId
                 });
-            });
+            })
+            .ForMember(dest => dest.EBookId, options => options.MapFrom(src => src.ReportedEBookId));
         CreateMap<EBookReportUpdateRequest, EBookReport>()
             .ForPath(dest => dest.ReportDetails.IsClosed, options => options.MapFrom(src => src.IsClosed));
         CreateMap<EBookReport, EBookReportDto>();

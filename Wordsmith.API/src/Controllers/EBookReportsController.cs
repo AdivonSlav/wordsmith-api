@@ -12,9 +12,7 @@ namespace Wordsmith.API.Controllers;
 [Route("ebook-reports")]
 public class EBookReportsController : WriteController<EBookReportDto, EBookReport, EBookReportSearchObject, EBookReportInsertRequest, EBookReportUpdateRequest>
 {
-    public EBookReportsController(
-        IWriteService<EBookReportDto, EBookReport, EBookReportSearchObject, EBookReportInsertRequest,
-            EBookReportUpdateRequest> writeService) : base(writeService) { }
+    public EBookReportsController(IEBookReportService eBookReportService) : base(eBookReportService) { }
 
     [Authorize("AdminOperations")]
     public override Task<ActionResult<QueryResult<EBookReportDto>>> Get(EBookReportSearchObject? search = null)

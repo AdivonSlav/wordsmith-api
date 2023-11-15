@@ -25,9 +25,11 @@ public class MappingProfile : Profile
         CreateMap<Image, ImageDto>()
             .ForMember(dest => dest.ImagePath, options => options.MapFrom(image => image.Path));
 
-        // User Reports
+        // Report Reason and Details
         CreateMap<ReportReason, ReportReasonDto>();
         CreateMap<ReportDetails, ReportDetailsDto>();
+        
+        // User Reports
         CreateMap<UserReportInsertRequest, UserReport>()
             .ForMember(dest => dest.ReportDetails, options =>
             {
@@ -40,6 +42,20 @@ public class MappingProfile : Profile
         CreateMap<UserReportUpdateRequest, UserReport>()
             .ForPath(dest => dest.ReportDetails.IsClosed, options => options.MapFrom(src => src.IsClosed));
         CreateMap<UserReport, UserReportDto>();
+        
+        // eBook Reports
+        CreateMap<EBookReportInsertRequest, EBookReport>()
+            .ForMember(dest => dest.ReportDetails, options =>
+            {
+                options.MapFrom(src => new ReportDetails()
+                {
+                    Content = src.Content,
+                    ReportReasonId = src.ReportReasonId
+                });
+            });
+        CreateMap<EBookReportUpdateRequest, EBookReport>()
+            .ForPath(dest => dest.ReportDetails.IsClosed, options => options.MapFrom(src => src.IsClosed));
+        CreateMap<EBookReport, EBookReportDto>();
         
         // eBooks
         CreateMap<EBookInsertRequest, EBook>()

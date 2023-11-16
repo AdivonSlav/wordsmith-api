@@ -1,4 +1,3 @@
-using Wordsmith.IdentityServer.Middleware;
 using Wordsmith.IdentityServer.Startup;
 using Wordsmith.Utils;
 using Wordsmith.Utils.RabbitMQ;

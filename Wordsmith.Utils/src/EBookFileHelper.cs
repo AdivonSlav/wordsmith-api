@@ -1,6 +1,5 @@
 using System.Web;
 using Microsoft.AspNetCore.Http;
-using NLog;
 using VersOne.Epub;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;

@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using System.Text.Json;
-using Duende.IdentityServer.EntityFramework.Stores;
 using Duende.IdentityServer.Stores;
 using Microsoft.AspNetCore.Identity;
 using Wordsmith.IdentityServer.Db.Entities;

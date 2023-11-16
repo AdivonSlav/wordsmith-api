@@ -5,10 +5,7 @@ using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.AutoMapper;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Services;
-using Wordsmith.Models;
-using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
 

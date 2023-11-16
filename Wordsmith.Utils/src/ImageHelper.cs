@@ -1,4 +1,3 @@
-using System.Collections;
 using SixLabors.ImageSharp.Formats;
 using Wordsmith.Models.Exceptions;
 

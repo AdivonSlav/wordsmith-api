@@ -1,5 +1,4 @@
 using IdentityModel.Client;
-using Wordsmith.Models;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects;

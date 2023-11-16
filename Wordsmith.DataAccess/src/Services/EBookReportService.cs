@@ -17,6 +17,11 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
     protected override IQueryable<EBookReport> AddInclude(IQueryable<EBookReport> query, EBookReportSearchObject search = null)
     {
         query = query.Include(report => report.ReportedEBook)
+            .ThenInclude(eBook => eBook.CoverArt)
+            .Include(report => report.ReportedEBook)
+            .ThenInclude(eBook => eBook.Genre)
+            .Include(report => report.ReportedEBook)
+            .ThenInclude(eBook => eBook.MaturityRating)
             .Include(report => report.ReportDetails)
             .ThenInclude(details => details.Reporter)
             .Include(report => report.ReportDetails)

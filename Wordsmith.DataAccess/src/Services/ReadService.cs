@@ -15,7 +15,7 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
     protected readonly DatabaseContext Context;
     protected readonly IMapper Mapper;
 
-    public ReadService(DatabaseContext context, IMapper mapper)
+    protected ReadService(DatabaseContext context, IMapper mapper)
     {
         Context = context;
         Mapper = mapper;

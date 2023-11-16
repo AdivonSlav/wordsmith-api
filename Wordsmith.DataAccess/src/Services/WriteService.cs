@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -37,6 +38,11 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         var set = Context.Set<TDb>();
         var entity = await set.FindAsync(id);
 
+        if (entity == null)
+        {
+            throw new AppException("The entity passed for updating was not found!");
+        }
+        
         await BeforeUpdate(entity, update);
         Mapper.Map(update, entity);
 

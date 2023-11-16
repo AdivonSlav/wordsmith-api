@@ -45,7 +45,7 @@ public static class EBookFileHelper
             Title = epub.Title,
             AuthorName = epub.Author,
             Description = epub.Description ?? "",
-            EncodedCoverArt = epub.CoverImage == null ? null : Convert.ToBase64String(epub.CoverImage),
+            EncodedCoverArt = (epub.CoverImage == null ? null : Convert.ToBase64String(epub.CoverImage)) ?? string.Empty,
             Chapters = new List<string>()
         };
 

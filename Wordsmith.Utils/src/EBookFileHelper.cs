@@ -37,7 +37,7 @@ public static class EBookFileHelper
         }
         catch (Exception e)
         {
-            throw new AppException("Could not read EPUB");
+            throw new AppException($"Could not read EPUB {e.Message}");
         }
 
         var ebookData = new EBookParseDto()
@@ -98,7 +98,7 @@ public static class EBookFileHelper
         }
         catch (Exception e)
         {
-            Logger.LogInfo("Invalid EPUB passed for parsing!");
+            Logger.LogInfo($"Invalid EPUB passed for parsing! {e.Message}");
             return false;
         }
 

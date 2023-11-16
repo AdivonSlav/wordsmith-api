@@ -14,7 +14,7 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
     public EBookReportService(DatabaseContext context, IMapper mapper)
         : base(context, mapper) {}
 
-    protected override IQueryable<EBookReport> AddInclude(IQueryable<EBookReport> query, EBookReportSearchObject search = null)
+    protected override IQueryable<EBookReport> AddInclude(IQueryable<EBookReport> query, EBookReportSearchObject? search = null)
     {
         query = query.Include(report => report.ReportedEBook)
             .ThenInclude(eBook => eBook.CoverArt)
@@ -30,7 +30,7 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
         return query;
     }
 
-    protected override IQueryable<EBookReport> AddFilter(IQueryable<EBookReport> query, EBookReportSearchObject search = null)
+    protected override IQueryable<EBookReport> AddFilter(IQueryable<EBookReport> query, EBookReportSearchObject? search = null)
     {
         if (search?.ReportedEBookId != null)
         {

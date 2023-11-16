@@ -16,7 +16,7 @@ public class UserReportService : WriteService<UserReportDto, UserReport, UserRep
     public UserReportService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
     protected override IQueryable<UserReport> AddInclude(IQueryable<UserReport> query,
-        UserReportSearchObject search = null)
+        UserReportSearchObject? search = null)
     {
         query = query.Include(report => report.ReportedUser)
             .Include(report => report.ReportDetails)
@@ -28,7 +28,7 @@ public class UserReportService : WriteService<UserReportDto, UserReport, UserRep
     }
 
     protected override IQueryable<UserReport> AddFilter(IQueryable<UserReport> query,
-        UserReportSearchObject search = null)
+        UserReportSearchObject? search = null)
     {
         if (search?.ReportedUserId != null)
         {

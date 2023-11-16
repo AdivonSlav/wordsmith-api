@@ -11,7 +11,7 @@ public class ReportReasonService : ReadService<ReportReasonDto, ReportReason, Re
 {
     public ReportReasonService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override IQueryable<ReportReason> AddFilter(IQueryable<ReportReason> query, ReportReasonSearch search = null)
+    protected override IQueryable<ReportReason> AddFilter(IQueryable<ReportReason> query, ReportReasonSearch? search = null)
     {
         if (!string.IsNullOrEmpty(search?.Subject))
         {

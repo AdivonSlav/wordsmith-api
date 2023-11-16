@@ -51,7 +51,7 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         catch (Exception e)
         {
             Logger.LogError("Failed to process query", e);
-            return null;
+            throw;
         }
 
         return result;

@@ -34,7 +34,7 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
             result.TotalCount = await query.CountAsync();
             query = query.Skip((search.Page.Value - 1) * search.PageSize.Value).Take(search.PageSize.Value);
             result.Page = search.Page;
-            result.TotalPages = (int)Math.Ceiling((double)(result.TotalCount / search.PageSize));
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / (double)search.PageSize);
         }
 
         try

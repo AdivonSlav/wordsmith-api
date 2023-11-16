@@ -128,7 +128,7 @@ public static class ImageHelper
             throw new AppException("Image format is disallowed",
                 new Dictionary<string, object>()
                 {
-                    { "passedFormat", format },
+                    { "passedFormat", format ?? "" },
                     { "allowedFormats", string.Join(',', _allowedFormats) }
                 });
         }
@@ -139,7 +139,7 @@ public static class ImageHelper
             throw new AppException("Image format is disallowed",
                 new Dictionary<string, object>()
                 {
-                    { "passedFormat", format },
+                    { "passedFormat", format ?? "" },
                     { "allowedFormats", string.Join(',', _allowedFormats) }
                 });
         }

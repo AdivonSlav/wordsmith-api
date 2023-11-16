@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
         <RootNamespace>Wordsmith.DataAccess</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

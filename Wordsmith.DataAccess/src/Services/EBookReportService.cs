@@ -41,6 +41,18 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
         {
             query = query.Where(report => report.ReportDetails.IsClosed == search.IsClosed.Value);
         }
+        
+        if (search?.Reason != null)
+        {
+            query = query.Where(report => report.ReportDetails.ReportReason.Reason == search.Reason);
+        }
+
+        if (search?.ReportDate != null)
+        {
+            query = query.Where(report => report.ReportDetails.SubmissionDate.Day == search.ReportDate.Value.Day &&
+                                          report.ReportDetails.SubmissionDate.Month == search.ReportDate.Value.Month &&
+                                          report.ReportDetails.SubmissionDate.Year == search.ReportDate.Value.Year);
+        }
 
         return query;
     }

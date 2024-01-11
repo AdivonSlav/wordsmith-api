@@ -23,15 +23,15 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     }
 
     [Authorize("AdminOperations")]
-    public override Task<ActionResult<QueryResult<UserReportDto>>> Get(UserReportSearchObject? search = null)
+    public override async Task<ActionResult<QueryResult<UserReportDto>>> Get(UserReportSearchObject? search = null)
     {
-        return base.Get(search);
+        return await base.Get(search);
     }
 
     [Authorize("AdminOperations")]
-    public override Task<ActionResult<QueryResult<UserReportDto>>> GetById(int id)
+    public override async Task<ActionResult<QueryResult<UserReportDto>>> GetById(int id)
     {
-        return base.GetById(id);
+        return await base.GetById(id);
     }
 
     [Authorize("All")]
@@ -44,8 +44,8 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     }
 
     [Authorize("AdminOperations")]
-    public override Task<ActionResult<UserReportDto>> Update(int id, UserReportUpdateRequest update)
+    public override async Task<ActionResult<UserReportDto>> Update(int id, UserReportUpdateRequest update)
     {
-        return base.Update(id, update);
+        return await base.Update(id, update);
     }
 }

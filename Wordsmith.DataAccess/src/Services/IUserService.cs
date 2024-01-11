@@ -1,4 +1,5 @@
 #nullable enable
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
@@ -10,9 +11,11 @@ namespace Wordsmith.DataAccess.Services;
 public interface IUserService : IWriteService<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>
 {
     public Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login);
-    public Task<ActionResult<UserDto>> UpdateProfile(string userIdStr, UserUpdateRequest update);
-    public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(string userIdStr);
-    public Task<ActionResult<ImageDto>> UpdateProfileImage(string userIdStr, ImageInsertRequest update); 
+    public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update, IEnumerable<Claim> userClaims);
+    public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(IEnumerable<Claim> userClaims);
+    public Task<ActionResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, IEnumerable<Claim> userClaims); 
     public Task<ActionResult<UserLoginDto>> Refresh(string? bearerToken, string client);
-    public Task<ActionResult> ChangeAccess(string adminIdStr, int userId,  UserChangeAccessRequest changeAccess);
+    public Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess,
+        IEnumerable<Claim> userClaims);
+    public Task<User> GetUserFromClaims(IEnumerable<Claim> userClaims);
 }

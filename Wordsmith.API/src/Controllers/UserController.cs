@@ -29,38 +29,32 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
 
     [Authorize("All")]
     [HttpGet("profile")]
-    public Task<ActionResult<QueryResult<UserDto>>> GetProfile()
+    public async Task<ActionResult<QueryResult<UserDto>>> GetProfile()
     {
-        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
-        
-        return base.GetById(int.Parse(userId!.Value));
+        var user = await ((WriteService as IUserService)!).GetUserFromClaims(HttpContext.User.Claims);
+
+        return await base.GetById(user.Id);
     }
     
     [Authorize("All")]
     [HttpPut("profile")]
     public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
     {
-        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
-
-        return ((WriteService as IUserService)!).UpdateProfile(userId!.Value, update);
+        return ((WriteService as IUserService)!).UpdateProfile(update, HttpContext.User.Claims);
     }
 
     [Authorize("All")]
     [HttpGet("profile/image")]
     public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage()
     {
-        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
-
-        return ((WriteService as IUserService)!).GetProfileImage(userId!.Value);
+        return ((WriteService as IUserService)!).GetProfileImage(HttpContext.User.Claims);
     }
     
     [Authorize("All")]
     [HttpPut("profile/image")]
     public Task<ActionResult<ImageDto>> UpdateProfileImage([FromBody] ImageInsertRequest update)
     {
-        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
-
-        return ((WriteService as IUserService)!).UpdateProfileImage(userId!.Value, update);
+        return ((WriteService as IUserService)!).UpdateProfileImage(update, HttpContext.User.Claims);
     }
 
     [HttpPost("login")]
@@ -81,8 +75,6 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
     [HttpPut("{id:int}/change-access")]
     public Task<ActionResult> ChangeAccess(int id, [FromBody] UserChangeAccessRequest changeAccess)
     {
-        var adminId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
-
-        return ((WriteService as IUserService)!).ChangeAccess(adminId!.Value, id, changeAccess);
+        return ((WriteService as IUserService)!).ChangeAccess(id, changeAccess, HttpContext.User.Claims);
     }
 }

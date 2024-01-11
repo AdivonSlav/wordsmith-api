@@ -56,9 +56,8 @@ public class UserReportService : WriteService<UserReportDto, UserReport, UserRep
 
     protected override async Task BeforeInsert(UserReport entity, UserReportInsertRequest insert)
     {
-        if (!insert.ReporterUserId.HasValue) throw new AppException("The user making the report does not exist!");
-
-        if (insert.ReporterUserId.Value == insert.ReportedUserId)
+        // The reporter should already exist here as it is checked within the controller claims call
+        if (insert.ReporterUserId!.Value == insert.ReportedUserId)
         {
             throw new AppException("You cannot report yourself!");
         }

@@ -1,3 +1,4 @@
+using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db.Entities;
@@ -13,8 +14,13 @@ namespace Wordsmith.API.Controllers;
 public class UserReportsController : WriteController<UserReportDto, UserReport, UserReportSearchObject,
     UserReportInsertRequest, UserReportUpdateRequest>
 {
-    public UserReportsController(IUserReportService userReportService)
-        : base(userReportService) { }
+    protected IUserService UserService;
+
+    public UserReportsController(IUserReportService userReportService, IUserService userService)
+        : base(userReportService)
+    {
+        UserService = userService;
+    }
 
     [Authorize("AdminOperations")]
     public override Task<ActionResult<QueryResult<UserReportDto>>> Get(UserReportSearchObject? search = null)
@@ -29,12 +35,12 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     }
 
     [Authorize("All")]
-    public override Task<ActionResult<UserReportDto>> Insert(UserReportInsertRequest insert)
+    public override async Task<ActionResult<UserReportDto>> Insert(UserReportInsertRequest insert)
     {
-        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
-        insert.ReporterUserId = userId?.Value != null ? int.Parse(userId.Value) : null;
-
-        return base.Insert(insert);
+        var user = await UserService.GetUserFromClaims(HttpContext.User.Claims);
+        insert.ReporterUserId = user.Id;
+        
+        return await base.Insert(insert);
     }
 
     [Authorize("AdminOperations")]

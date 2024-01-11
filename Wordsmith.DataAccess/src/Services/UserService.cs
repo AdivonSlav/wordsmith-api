@@ -1,4 +1,5 @@
 #nullable enable
+using System.Security.Claims;
 using System.Text.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -115,19 +116,9 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(tokens);
     }
 
-    public async Task<ActionResult<UserDto>> UpdateProfile(string userIdStr, UserUpdateRequest request)
+    public async Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest request, IEnumerable<Claim> userClaims)
     {
-        if (!int.TryParse(userIdStr, out var userId))
-        {
-            throw new AppException("User could not be parsed");
-        }
-
-        var entity = await Context.Users.FindAsync(userId);
-
-        if (entity == null)
-        {
-            throw new AppException("User does not exist");
-        }
+        var entity = await GetUserFromClaims(userClaims);
 
         Mapper.Map(request, entity);
 
@@ -159,19 +150,9 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(Mapper.Map<UserDto>(entity));
     }
 
-    public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(string userIdStr)
+    public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(IEnumerable<Claim> userClaims)
     {
-        if (!int.TryParse(userIdStr, out var userId))
-        {
-            throw new AppException("User could not be parsed");
-        }
-
-        var entity = await Context.Users.FindAsync(userId);
-        
-        if (entity == null)
-        {
-            throw new AppException("User does not exist");
-        }
+        var entity = await GetUserFromClaims(userClaims);
 
         await Context.Entry(entity).Reference(e => e.ProfileImage).LoadAsync(); // ProfileImage must be loaded in before 
         
@@ -188,19 +169,9 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return result;
     }
 
-    public async Task<ActionResult<ImageDto>> UpdateProfileImage(string userIdStr, ImageInsertRequest update)
+    public async Task<ActionResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, IEnumerable<Claim> userClaims)
     {
-        if (!int.TryParse(userIdStr, out var userId))
-        {
-            throw new AppException("User could not be parsed");
-        }
-
-        var entity = await Context.Users.FindAsync(userId);
-        
-        if (entity == null)
-        {
-            throw new AppException("User does not exist");
-        }
+        var entity = await GetUserFromClaims(userClaims);
         
         await Context.Entry(entity).Reference(e => e.ProfileImage).LoadAsync(); // ProfileImage must be loaded in before 
 
@@ -275,7 +246,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(tokens);
     }
 
-    public async Task<ActionResult> ChangeAccess(string adminIdStr, int userId, UserChangeAccessRequest changeAccess)
+    public async Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, IEnumerable<Claim> userClaims)
     {
         var user = await Context.Users.FindAsync(userId);
 
@@ -284,17 +255,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
             throw new AppException("The user does not exist!");
         }
 
-        if (!int.TryParse(adminIdStr, out var adminId))
-        {
-            throw new AppException("User id was null or could not be parsed");
-        }
-
-        var admin = await Context.Users.FindAsync(adminId);
-
-        if (admin == null)
-        {
-            throw new AppException("The admin does not exist!");
-        }
+        var admin = await GetUserFromClaims(userClaims);
 
         var alreadyRemovedAccess = await Context.UserBans.AnyAsync(userBan =>
             userBan.UserId == userId &&
@@ -391,5 +352,19 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         }
 
         return response;
+    }
+
+    public async Task<User> GetUserFromClaims(IEnumerable<Claim> userClaims)
+    {
+        var refId = userClaims.FirstOrDefault(c => c.Type == "user_ref_id")!.Value; // Should never be null unless tokens are misconfigured
+        
+        if (!int.TryParse(refId, out var userId))
+        {
+            throw new Exception($"User with ref id {refId} could not be parsed!");
+        }
+
+        var entity = await Context.Users.FindAsync(userId);
+
+        return entity ?? throw new AppException("User passed for auth does not exist!");
     }
 }

@@ -16,15 +16,15 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
         : base(userService) { }
 
     [HttpPost("register")]
-    public override Task<ActionResult<UserDto>> Insert([FromBody] UserInsertRequest insert)
+    public override async Task<ActionResult<UserDto>> Insert([FromBody] UserInsertRequest insert)
     {
-        return base.Insert(insert);
+        return await base.Insert(insert);
     }
 
     [NonAction]
-    public override Task<ActionResult<UserDto>> Update(int id, UserUpdateRequest update)
+    public override async Task<ActionResult<UserDto>> Update(int id, UserUpdateRequest update)
     {
-        return base.Update(id, update);
+        return await base.Update(id, update);
     }
 
     [Authorize("All")]
@@ -38,43 +38,43 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
     
     [Authorize("All")]
     [HttpPut("profile")]
-    public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
+    public async Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
     {
-        return ((WriteService as IUserService)!).UpdateProfile(update, HttpContext.User.Claims);
+        return await ((WriteService as IUserService)!).UpdateProfile(update, HttpContext.User.Claims);
     }
 
     [Authorize("All")]
     [HttpGet("profile/image")]
-    public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage()
+    public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage()
     {
-        return ((WriteService as IUserService)!).GetProfileImage(HttpContext.User.Claims);
+        return await ((WriteService as IUserService)!).GetProfileImage(HttpContext.User.Claims);
     }
     
     [Authorize("All")]
     [HttpPut("profile/image")]
-    public Task<ActionResult<ImageDto>> UpdateProfileImage([FromBody] ImageInsertRequest update)
+    public async Task<ActionResult<ImageDto>> UpdateProfileImage([FromBody] ImageInsertRequest update)
     {
-        return ((WriteService as IUserService)!).UpdateProfileImage(update, HttpContext.User.Claims);
+        return await ((WriteService as IUserService)!).UpdateProfileImage(update, HttpContext.User.Claims);
     }
 
     [HttpPost("login")]
-    public Task<ActionResult<UserLoginDto>> Login([FromBody] UserLoginRequest login)
+    public async Task<ActionResult<UserLoginDto>> Login([FromBody] UserLoginRequest login)
     {
-        return ((WriteService as IUserService)!).Login(login);
+        return await ((WriteService as IUserService)!).Login(login);
     }
 
     [HttpGet("refresh")]
-    public Task<ActionResult<UserLoginDto>> Refresh([FromQuery] string client)
+    public async Task<ActionResult<UserLoginDto>> Refresh([FromQuery] string client)
     {
         var bearerToken = HttpContext.Request.Headers["Authorization"];
 
-        return ((WriteService as IUserService)!).Refresh(bearerToken, client);
+        return await ((WriteService as IUserService)!).Refresh(bearerToken, client);
     }
 
     [Authorize("AdminOperations")]
     [HttpPut("{id:int}/change-access")]
-    public Task<ActionResult> ChangeAccess(int id, [FromBody] UserChangeAccessRequest changeAccess)
+    public async Task<ActionResult> ChangeAccess(int id, [FromBody] UserChangeAccessRequest changeAccess)
     {
-        return ((WriteService as IUserService)!).ChangeAccess(id, changeAccess, HttpContext.User.Claims);
+        return await ((WriteService as IUserService)!).ChangeAccess(id, changeAccess, HttpContext.User.Claims);
     }
 }

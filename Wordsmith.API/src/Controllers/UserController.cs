@@ -45,6 +45,24 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
         return ((WriteService as IUserService)!).UpdateProfile(userId!.Value, update);
     }
 
+    [Authorize("All")]
+    [HttpGet("profile/image")]
+    public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage()
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
+
+        return ((WriteService as IUserService)!).GetProfileImage(userId!.Value);
+    }
+    
+    [Authorize("All")]
+    [HttpPut("profile/image")]
+    public Task<ActionResult<ImageDto>> UpdateProfileImage([FromBody] ImageInsertRequest update)
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "user_ref_id");
+
+        return ((WriteService as IUserService)!).UpdateProfileImage(userId!.Value, update);
+    }
+
     [HttpPost("login")]
     public Task<ActionResult<UserLoginDto>> Login([FromBody] UserLoginRequest login)
     {

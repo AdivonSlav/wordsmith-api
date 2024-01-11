@@ -75,7 +75,7 @@ public static class ImageHelper
         var pathToSave = Path.Combine(_webRootPath, filepath);
 
         // If the extension isn't written, write one
-        if (pathToSave.Contains('.'))
+        if (!pathToSave.Contains('.'))
         {
             var formatExtension = identifiedFormat!.FileExtensions.First();
             pathToSave += $".{formatExtension}";
@@ -93,6 +93,22 @@ public static class ImageHelper
             Format = identifiedFormat!.Name,
             Size = imageBuffer.Length,
         };
+    }
+    
+    /// <summary>
+    /// Deletes an image residing on disk
+    /// </summary>
+    /// <param name="imageName">Name of the image, including the subfolders</param>
+    public static void DeleteImage(string imageName)
+    {
+        var filepath = Path.Combine(_webRootPath, imageName);
+
+        if (!File.Exists(filepath))
+        {
+            throw new Exception($"Image with path {filepath} was not found on disk, but was scheduled for deletion!");
+        }
+        
+        File.Delete(filepath);
     }
 
     /// <summary>

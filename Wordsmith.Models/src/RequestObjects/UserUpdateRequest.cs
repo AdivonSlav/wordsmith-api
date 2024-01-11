@@ -17,6 +17,4 @@ public class UserUpdateRequest
     
     [RequiredIfOtherPresent(nameof(Password))]
     public string? OldPassword { get; set; }
-    
-    public ImageInsertRequest? ProfileImage { get; set; }
 }

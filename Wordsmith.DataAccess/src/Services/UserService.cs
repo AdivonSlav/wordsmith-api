@@ -159,6 +159,89 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return new OkObjectResult(Mapper.Map<UserDto>(entity));
     }
 
+    public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(string userIdStr)
+    {
+        if (!int.TryParse(userIdStr, out var userId))
+        {
+            throw new AppException("User could not be parsed");
+        }
+
+        var entity = await Context.Users.FindAsync(userId);
+        
+        if (entity == null)
+        {
+            throw new AppException("User does not exist");
+        }
+
+        await Context.Entry(entity).Reference(e => e.ProfileImage).LoadAsync(); // ProfileImage must be loaded in before 
+        
+        var result = new QueryResult<ImageDto>()
+        {
+            Result = new List<ImageDto>()
+        };
+
+        if (entity.ProfileImage != null)
+        {
+            result.Result.Add(Mapper.Map<ImageDto>(entity.ProfileImage));
+        }
+
+        return result;
+    }
+
+    public async Task<ActionResult<ImageDto>> UpdateProfileImage(string userIdStr, ImageInsertRequest update)
+    {
+        if (!int.TryParse(userIdStr, out var userId))
+        {
+            throw new AppException("User could not be parsed");
+        }
+
+        var entity = await Context.Users.FindAsync(userId);
+        
+        if (entity == null)
+        {
+            throw new AppException("User does not exist");
+        }
+        
+        await Context.Entry(entity).Reference(e => e.ProfileImage).LoadAsync(); // ProfileImage must be loaded in before 
+
+        // This is kept as a call prior to the creation of the new image in case deletion of the existing image fails
+        // In that case it's better to immediately end execution here when DeleteImage returns an exception
+        if (entity.ProfileImage != null)
+        {
+            ImageHelper.DeleteImage(entity.ProfileImage.Path);
+        }
+        
+        ImageDto updatedImage;
+        var savePath = Path.Combine("images", "users",
+            $"{entity.Username}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.{update.Format}");
+        var result = ImageHelper.SaveFromBase64(update.EncodedImage, update.Format, savePath);
+        
+        if (entity.ProfileImage != null)
+        {
+            entity.ProfileImage.Format = result.Format;
+            entity.ProfileImage.Path = result.Path;
+            entity.ProfileImage.Size = result.Size;
+            updatedImage = Mapper.Map<ImageDto>(entity.ProfileImage);
+        }
+        else
+        {
+            var newImageEntity = new Image()
+            {
+                Path = result.Path,
+                Format = result.Format,
+                Size = result.Size
+            };
+            
+            await Context.Images.AddAsync(newImageEntity);
+            entity.ProfileImage = newImageEntity;
+            updatedImage = Mapper.Map<ImageDto>(entity.ProfileImage);
+        }
+        
+        await Context.SaveChangesAsync();
+
+        return updatedImage;
+    }
+
     public async Task<ActionResult<UserLoginDto>> Refresh(string? bearerToken, string client)
     {
         var refreshToken = bearerToken?.Replace("Bearer", "").Trim();

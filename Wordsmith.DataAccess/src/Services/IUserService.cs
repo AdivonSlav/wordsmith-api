@@ -11,6 +11,8 @@ public interface IUserService : IWriteService<UserDto, User, SearchObject, UserI
 {
     public Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login);
     public Task<ActionResult<UserDto>> UpdateProfile(string userIdStr, UserUpdateRequest update);
+    public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(string userIdStr);
+    public Task<ActionResult<ImageDto>> UpdateProfileImage(string userIdStr, ImageInsertRequest update); 
     public Task<ActionResult<UserLoginDto>> Refresh(string? bearerToken, string client);
     public Task<ActionResult> ChangeAccess(string adminIdStr, int userId,  UserChangeAccessRequest changeAccess);
 }

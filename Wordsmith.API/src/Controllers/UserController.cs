@@ -63,12 +63,12 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
         return await ((WriteService as IUserService)!).Login(login);
     }
 
-    [HttpGet("refresh")]
-    public async Task<ActionResult<UserLoginDto>> Refresh([FromQuery] string client)
+    [HttpGet("login/refresh")]
+    public async Task<ActionResult<QueryResult<UserLoginDto>>> Refresh([FromQuery] int id)
     {
         var bearerToken = HttpContext.Request.Headers["Authorization"];
 
-        return await ((WriteService as IUserService)!).Refresh(bearerToken, client);
+        return await ((WriteService as IUserService)!).Refresh(bearerToken, id);
     }
 
     [Authorize("AdminOperations")]

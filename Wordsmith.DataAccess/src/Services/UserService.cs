@@ -213,25 +213,28 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return updatedImage;
     }
 
-    public async Task<ActionResult<UserLoginDto>> Refresh(string? bearerToken, string client)
+    public async Task<ActionResult<QueryResult<UserLoginDto>>> Refresh(string? bearerToken, int id)
     {
         var refreshToken = bearerToken?.Replace("Bearer", "").Trim();
 
         if (refreshToken == null) throw new AppException("No refresh token was passed");
 
+        var entity = await Context.Users.FindAsync(id);
+
+        if (entity == null) throw new AppException("User with the id passed was not found");
+        
         var clientSecret = "";
         var clientId = "";
 
-        switch (client)
+        if (string.Equals(entity.Role, "admin", StringComparison.OrdinalIgnoreCase))
         {
-            case "user":
-                clientSecret = _configuration["IdentityServer:Secrets:User"];
-                clientId = "user.client";
-                break;
-            case "admin":
-                clientSecret = _configuration["IdentityServer:Secrets:Admin"];
-                clientId = "admin.client";
-                break;
+            clientSecret = _configuration["IdentityServer:Secrets:Admin"];
+            clientId = "admin.client";
+        }
+        else if (string.Equals(entity.Role, "user", StringComparison.OrdinalIgnoreCase))
+        {
+            clientSecret = _configuration["IdentityServer:Secrets:User"];
+            clientId = "user.client";
         }
 
         if (string.IsNullOrEmpty(clientSecret))
@@ -243,7 +246,10 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
 
         Logger.LogDebug($"Got access token {tokens.AccessToken}");
 
-        return new OkObjectResult(tokens);
+        return new OkObjectResult(new QueryResult<UserLoginDto>()
+        {
+            Result = new List<UserLoginDto>() { tokens }
+        });
     }
 
     public async Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, IEnumerable<Claim> userClaims)

@@ -243,6 +243,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         }
 
         var tokens = await _loginClient.RequestAccess(refreshToken, clientId, clientSecret);
+        tokens.User = Mapper.Map<UserDto>(entity);
 
         Logger.LogDebug($"Got access token {tokens.AccessToken}");
 

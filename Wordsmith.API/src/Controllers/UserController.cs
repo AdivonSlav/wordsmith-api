@@ -31,9 +31,7 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
     [HttpGet("profile")]
     public async Task<ActionResult<QueryResult<UserDto>>> GetProfile()
     {
-        var user = await ((WriteService as IUserService)!).GetUserFromClaims(HttpContext.User.Claims);
-
-        return await base.GetById(user.Id);
+        return await ((WriteService as IUserService)!).GetUserFromClaimsAsDto(HttpContext.User.Claims);
     }
     
     [Authorize("All")]

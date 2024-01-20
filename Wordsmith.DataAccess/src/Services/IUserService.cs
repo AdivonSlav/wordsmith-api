@@ -20,4 +20,5 @@ public interface IUserService : IWriteService<UserDto, User, SearchObject, UserI
     public Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess,
         IEnumerable<Claim> userClaims);
     public Task<User> GetUserFromClaims(IEnumerable<Claim> userClaims);
+    public Task<QueryResult<UserDto>> GetUserFromClaimsAsDto(IEnumerable<Claim> userClaims);
 }

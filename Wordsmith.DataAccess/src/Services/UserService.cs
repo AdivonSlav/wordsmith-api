@@ -411,4 +411,14 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
 
         return entity ?? throw new AppException("User passed for auth does not exist!");
     }
+
+    public async Task<QueryResult<UserDto>> GetUserFromClaimsAsDto(IEnumerable<Claim> userClaims)
+    {
+        var entity = await GetUserFromClaims(userClaims);
+
+        return new QueryResult<UserDto>()
+        {
+            Result = new List<UserDto>() { Mapper.Map<UserDto>(entity) }
+        };
+    }
 }

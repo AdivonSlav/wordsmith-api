@@ -25,4 +25,14 @@ public interface ILoginClient
     /// <param name="clientSecret">The secret used to issue tokens by the IdentityServer for the specified client</param>
     /// <returns>An object containing the access token, refresh token and the access token expiry time</returns>
     public Task<UserLoginDto> RequestAccess(string refreshToken, string clientId, string clientSecret);
+
+    /// <summary>
+    /// Sends a request to the IdentityServer token endpoint with the Resource Owner Password grant type and not-null properties
+    /// if it is active
+    /// </summary>
+    /// <param name="accessToken"></param>
+    /// <param name="clientId"></param>
+    /// <param name="clientSecret"></param>
+    /// <returns></returns>
+    public Task<UserLoginDto> VerifyAccess(string accessToken, string clientId, string clientSecret);
 }

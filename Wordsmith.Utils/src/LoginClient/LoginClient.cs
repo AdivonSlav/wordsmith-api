@@ -59,7 +59,7 @@ public class LoginClient : ILoginClient
         {
             AccessToken = tokenResponse.AccessToken,
             RefreshToken = tokenResponse.RefreshToken,
-            ExpiresIn = tokenResponse.ExpiresIn
+            ExpiresIn = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn)
         };
     }
 
@@ -95,7 +95,43 @@ public class LoginClient : ILoginClient
         {
             AccessToken = tokenResponse.AccessToken,
             RefreshToken = tokenResponse.RefreshToken,
-            ExpiresIn = tokenResponse.ExpiresIn
+            ExpiresIn = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn)
+        };
+    }
+
+    public async Task<UserLoginDto> VerifyAccess(string accessToken, string clientId, string clientSecret)
+    {
+        var client = _clientFactory.CreateClient();
+        var discoveryDoc = await client.GetDiscoveryDocumentAsync(_identityAddress);
+        
+        if (discoveryDoc.IsError)
+        {
+            throw new Exception(
+                $"Unable to retrieve discovery document from the Identity Server at {_identityAddress}",
+                innerException: new Exception(discoveryDoc.Error));
+        }
+
+        var response = await client.IntrospectTokenAsync(new TokenIntrospectionRequest()
+        {
+            Address = discoveryDoc.IntrospectionEndpoint,
+            Token = accessToken,
+            ClientId = "wordsmith_api",
+            ClientSecret = clientSecret
+        });
+
+        if (response.IsError)
+        {
+            throw new AppException("Unable verify access token validity", new Dictionary<string, object>()
+            {
+                { "reason", response.Error ?? string.Empty }
+            });
+        }
+
+        return new UserLoginDto()
+        {
+            AccessToken = response.IsActive ? accessToken : null,
+            RefreshToken = null,
+            ExpiresIn = null,
         };
     }
 }

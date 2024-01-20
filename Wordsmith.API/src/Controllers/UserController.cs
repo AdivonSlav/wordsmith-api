@@ -71,6 +71,14 @@ public class UserController : WriteController<UserDto, User, SearchObject, UserI
         return await ((WriteService as IUserService)!).Refresh(bearerToken, id);
     }
 
+    [HttpGet("login/verify")]
+    public async Task<ActionResult<QueryResult<UserLoginDto>>> VerifyLogin()
+    {
+        var bearerToken = HttpContext.Request.Headers["Authorization"];
+        
+        return await ((WriteService as IUserService)!).VerifyLogin(bearerToken, HttpContext.User.Claims);
+    }
+
     [Authorize("AdminOperations")]
     [HttpPut("{id:int}/change-access")]
     public async Task<ActionResult> ChangeAccess(int id, [FromBody] UserChangeAccessRequest changeAccess)

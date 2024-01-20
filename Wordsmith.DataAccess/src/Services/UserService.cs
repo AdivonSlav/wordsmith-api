@@ -253,6 +253,43 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         });
     }
 
+    public async Task<ActionResult<QueryResult<UserLoginDto>>> VerifyLogin(string? bearerToken, IEnumerable<Claim> userClaims)
+    {
+        var accessToken = bearerToken?.Replace("Bearer", "").Trim();
+
+        if (accessToken == null) throw new AppException("No refresh token was passed");
+
+        var entity = await GetUserFromClaims(userClaims);
+        var clientSecret = "";
+        var clientId = "";
+
+        if (string.Equals(entity.Role, "admin", StringComparison.OrdinalIgnoreCase))
+        {
+            clientSecret = _configuration["IdentityServer:Secrets:Admin"];
+            clientId = "admin.client";
+        }
+        else if (string.Equals(entity.Role, "user", StringComparison.OrdinalIgnoreCase))
+        {
+            clientSecret = _configuration["IdentityServer:Secrets:User"];
+            clientId = "user.client";
+        }
+        
+        if (string.IsNullOrEmpty(clientSecret))
+        {
+            throw new Exception("IdentityServer client secret has not been configured!");
+        }
+
+        var userLogin = await _loginClient.VerifyAccess(accessToken, clientId, clientSecret);
+        userLogin.User = Mapper.Map<UserDto>(entity);
+        
+        Logger.LogDebug($"Verified access token validity for user with id {entity.Id}");
+
+        return new OkObjectResult(new QueryResult<UserLoginDto>()
+        {
+            Result = new List<UserLoginDto>() { userLogin }
+        });
+    }
+
     public async Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, IEnumerable<Claim> userClaims)
     {
         var user = await Context.Users.FindAsync(userId);

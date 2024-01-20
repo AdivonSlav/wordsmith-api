@@ -111,7 +111,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         var tokens = await _loginClient.RequestAccess(login, clientId, clientSecret, scopes);
         tokens.User = Mapper.Map<UserDto>(entity);
         
-        Logger.LogDebug($"Got access token {tokens.AccessToken}");
+        Logger.LogDebug($"Created login session for user with id {entity.Id}");
 
         return new OkObjectResult(tokens);
     }
@@ -245,7 +245,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         var tokens = await _loginClient.RequestAccess(refreshToken, clientId, clientSecret);
         tokens.User = Mapper.Map<UserDto>(entity);
 
-        Logger.LogDebug($"Got access token {tokens.AccessToken}");
+        Logger.LogDebug($"Refreshed login session for user with id ${entity.Id}");
 
         return new OkObjectResult(new QueryResult<UserLoginDto>()
         {

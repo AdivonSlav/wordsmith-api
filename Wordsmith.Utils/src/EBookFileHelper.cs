@@ -47,7 +47,7 @@ public static class EBookFileHelper
             EncodedCoverArt = (epub.CoverImage == null ? null : Convert.ToBase64String(epub.CoverImage)) ?? string.Empty,
             Chapters = new List<string>()
         };
-
+        
         if (epub.Navigation != null)
         {
             foreach (var navItem in epub.Navigation.Where(navItem => navItem.Type == EpubNavigationItemType.LINK))

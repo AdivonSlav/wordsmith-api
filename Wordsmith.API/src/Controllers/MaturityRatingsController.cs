@@ -7,9 +7,9 @@ namespace Wordsmith.API.Controllers;
 
 [ApiController]
 [Route("maturity-ratings")]
-public class MaturityRatingController : ReadController<MaturityRatingDto, MaturityRatingSearchObject>
+public class MaturityRatingsController : ReadController<MaturityRatingDto, MaturityRatingSearchObject>
 {
-    public MaturityRatingController(IMaturityRatingService maturityRatingService) : base(maturityRatingService) { }
+    public MaturityRatingsController(IMaturityRatingService maturityRatingService) : base(maturityRatingService) { }
     
     
 }

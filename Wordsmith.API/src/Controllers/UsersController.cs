@@ -10,9 +10,9 @@ namespace Wordsmith.API.Controllers;
 
 [ApiController]
 [Route("users")]
-public class UserController : WriteController<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>
+public class UsersController : WriteController<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>
 {
-    public UserController(IUserService userService)
+    public UsersController(IUserService userService)
         : base(userService) { }
 
     [HttpPost("register")]

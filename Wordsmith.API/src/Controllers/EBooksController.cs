@@ -12,9 +12,9 @@ namespace Wordsmith.API.Controllers;
 [ApiController]
 [Route("ebooks")]
 public class
-    EBookController : WriteController<EBookDto, EBook, EBookSearchObject, EBookInsertRequest, EBookUpdateRequest>
+    EBooksController : WriteController<EBookDto, EBook, EBookSearchObject, EBookInsertRequest, EBookUpdateRequest>
 {
-    public EBookController(IEBookService eBookService) : base(eBookService) { }
+    public EBooksController(IEBookService eBookService) : base(eBookService) { }
 
     [Authorize("All")]
     public override Task<ActionResult<EBookDto>> Insert(EBookInsertRequest insert)

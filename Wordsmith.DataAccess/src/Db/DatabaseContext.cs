@@ -36,6 +36,9 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<AuthorFollow>().HasKey(e => new { e.AuthorUserId, e.UserId });
         modelBuilder.Entity<FavoriteEBook>().HasKey(e => new { e.EBookId, e.UserId });
         modelBuilder.Entity<UserLibrary>().HasKey(e => new { e.EBookId, e.UserId });
+
+        modelBuilder.Entity<Genre>().HasData(DatabaseSeeds.CreateGenres());
+        modelBuilder.Entity<MaturityRating>().HasData(DatabaseSeeds.CreateMaturityRatings());
         
         base.OnModelCreating(modelBuilder);
     }

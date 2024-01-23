@@ -19,8 +19,6 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
         query = query.Include(report => report.ReportedEBook)
             .ThenInclude(eBook => eBook.CoverArt)
             .Include(report => report.ReportedEBook)
-            .ThenInclude(eBook => eBook.Genre)
-            .Include(report => report.ReportedEBook)
             .ThenInclude(eBook => eBook.MaturityRating)
             .Include(report => report.ReportDetails)
             .ThenInclude(details => details.Reporter)

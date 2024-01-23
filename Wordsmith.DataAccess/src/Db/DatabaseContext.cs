@@ -18,6 +18,7 @@ public class DatabaseContext : DbContext
     public virtual DbSet<EBookPromotion> EBookPromotions { get; set; }
     public virtual DbSet<EBookRating> EBookRatings { get; set; }
     public virtual DbSet<EBookReport> EBookReports { get; set; }
+    public virtual DbSet<EBookGenre> EBookGenres { get; set; }
     public virtual DbSet<EBookSale> EBookSales { get; set; }
     public virtual DbSet<FavoriteEBook> FavoriteEBooks { get; set; }
     public virtual DbSet<Genre> Genres { get; set; }
@@ -36,6 +37,7 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<AuthorFollow>().HasKey(e => new { e.AuthorUserId, e.UserId });
         modelBuilder.Entity<FavoriteEBook>().HasKey(e => new { e.EBookId, e.UserId });
         modelBuilder.Entity<UserLibrary>().HasKey(e => new { e.EBookId, e.UserId });
+        modelBuilder.Entity<EBookGenre>().HasKey(e => new { e.EBookId, e.GenreId });
 
         modelBuilder.Entity<Genre>().HasData(DatabaseSeeds.CreateGenres());
         modelBuilder.Entity<MaturityRating>().HasData(DatabaseSeeds.CreateMaturityRatings());

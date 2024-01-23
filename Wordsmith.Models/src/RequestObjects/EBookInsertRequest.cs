@@ -14,7 +14,7 @@ public class EBookInsertRequest
     public int AuthorId { get; set; }
     
     [Required]
-    public int GenreId { get; set; }
+    public List<int> GenreIds { get; set; }
     
     [Required]
     public int MaturityRatingId { get; set; }

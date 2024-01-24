@@ -11,8 +11,8 @@ using Wordsmith.DataAccess.Db;
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240121175550_PopulateMaturityAndGenres")]
-    partial class PopulateMaturityAndGenres
+    [Migration("20240124154702_PopulateGenresAndMaturityRatings")]
+    partial class PopulateGenresAndMaturityRatings
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -108,8 +108,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("GenreId")
-                        .HasColumnType("int");
+                    b.Property<string>("Genres")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("HiddenDate")
                         .HasColumnType("datetime(6)");
@@ -144,8 +144,6 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("CoverArtId");
-
-                    b.HasIndex("GenreId");
 
                     b.HasIndex("MaturityRatingId");
 
@@ -182,6 +180,21 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.HasIndex("EBookId");
 
                     b.ToTable("ebook_chapters");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookGenre", b =>
+                {
+                    b.Property<int>("EBookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GenreId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EBookId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("ebook_genres");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookPromotion", b =>
@@ -562,6 +575,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("ShortName")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
@@ -573,17 +589,20 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "K"
+                            Name = "Kids",
+                            ShortName = "K"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "T"
+                            Name = "Teens",
+                            ShortName = "T"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "M"
+                            Name = "Mature",
+                            ShortName = "M"
                         });
                 });
 
@@ -847,12 +866,6 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.Genre", "Genre")
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Wordsmith.DataAccess.Db.Entities.MaturityRating", "MaturityRating")
                         .WithMany()
                         .HasForeignKey("MaturityRatingId")
@@ -862,8 +875,6 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("CoverArt");
-
-                    b.Navigation("Genre");
 
                     b.Navigation("MaturityRating");
                 });
@@ -877,6 +888,25 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .IsRequired();
 
                     b.Navigation("EBook");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookGenre", b =>
+                {
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
+                        .WithMany()
+                        .HasForeignKey("EBookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.Genre", "Genre")
+                        .WithMany()
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EBook");
+
+                    b.Navigation("Genre");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookPromotion", b =>

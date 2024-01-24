@@ -8,7 +8,7 @@ public static class DatabaseSeeds
     {
         var ratings = GetMaturityRatings();
 
-        return ratings.Select((rating, i) => new MaturityRating() { Id = i + 1, Name = rating }).ToList();
+        return ratings.Select((rating, i) => new MaturityRating() { Id = i + 1, Name = rating.Split(";")[0], ShortName = rating.Split(";")[1] }).ToList();
     }
     
     public static IEnumerable<Genre> CreateGenres()
@@ -22,9 +22,9 @@ public static class DatabaseSeeds
     {
         return new List<string>()
         {
-            "K",
-            "T",
-            "M"
+            "Kids;K",
+            "Teens;T",
+            "Mature;M"
         };
     }
 

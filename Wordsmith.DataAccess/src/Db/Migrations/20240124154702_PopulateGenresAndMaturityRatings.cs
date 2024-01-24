@@ -7,11 +7,18 @@
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     /// <inheritdoc />
-    public partial class PopulateMaturityAndGenres : Migration
+    public partial class PopulateGenresAndMaturityRatings : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<string>(
+                name: "ShortName",
+                table: "maturity_ratings",
+                type: "longtext",
+                nullable: true)
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.InsertData(
                 table: "genres",
                 columns: new[] { "Id", "Name" },
@@ -61,12 +68,12 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
             migrationBuilder.InsertData(
                 table: "maturity_ratings",
-                columns: new[] { "Id", "Name" },
+                columns: new[] { "Id", "Name", "ShortName" },
                 values: new object[,]
                 {
-                    { 1, "K" },
-                    { 2, "T" },
-                    { 3, "M" }
+                    { 1, "Kids", "K" },
+                    { 2, "Teens", "T" },
+                    { 3, "Mature", "M" }
                 });
         }
 
@@ -287,6 +294,10 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 table: "maturity_ratings",
                 keyColumn: "Id",
                 keyValue: 3);
+
+            migrationBuilder.DropColumn(
+                name: "ShortName",
+                table: "maturity_ratings");
         }
     }
 }

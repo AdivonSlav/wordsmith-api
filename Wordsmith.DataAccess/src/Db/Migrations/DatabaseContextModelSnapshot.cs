@@ -572,6 +572,9 @@ namespace Wordsmith.DataAccess.Db.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("ShortName")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
@@ -583,17 +586,20 @@ namespace Wordsmith.DataAccess.Db.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "K"
+                            Name = "Kids",
+                            ShortName = "K"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "T"
+                            Name = "Teens",
+                            ShortName = "T"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "M"
+                            Name = "Mature",
+                            ShortName = "M"
                         });
                 });
 

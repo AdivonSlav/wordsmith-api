@@ -19,14 +19,13 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
     protected override async Task BeforeInsert(EBook entity, EBookInsertRequest insert)
     {
         await ValidateForeignKeys(insert);
-        ValidateIfSaved(insert);
+        await HandleImage(entity, insert);
         
         entity.PublishedDate = DateTime.UtcNow;
         entity.UpdatedDate = entity.PublishedDate;
 
-        entity.Path = insert.SavedBookName;
-
-        await HandleImage(entity, insert);
+        var fileName = await EBookFileHelper.SaveFile(insert.file);
+        entity.Path = fileName;
     }
 
     protected override async Task AfterInsert(EBook entity, EBookInsertRequest insert)
@@ -37,11 +36,6 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         await Context.Entry(entity).Reference(e => e.MaturityRating).LoadAsync();
     }
 
-    public async Task<ActionResult<string>> Save(IFormFile file)
-    {
-        return new CreatedAtActionResult(null, null, null, await EBookFileHelper.SaveFile(file));
-    }
-    
     public async Task<ActionResult<EBookParseDto>> Parse(IFormFile file)
     {
         if (!await EBookFileHelper.IsValidEpub(file))
@@ -72,19 +66,10 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         }
     }
 
-    private void ValidateIfSaved(EBookInsertRequest insert)
-    {
-        if (!EBookFileHelper.Saved(insert.SavedBookName))
-        {
-            throw new AppException("The eBook has not been saved to disk!");
-        }
-    }
-
     private async Task HandleImage(EBook entity, EBookInsertRequest insert)
     {
-        var savePath = Path.Combine("images", "ebooks",
-            $"{entity.Path.Split('.')[0]}");
-        var imageSaveInfo = ImageHelper.SaveFromBase64(insert.ParsedInfo.EncodedCoverArt, null, savePath);
+        var savePath = Path.Combine("images", "ebooks", $"eBook-{Guid.NewGuid()}");
+        var imageSaveInfo = ImageHelper.SaveFromBase64(insert.EncodedCoverArt, null, savePath);
         var newImage = new Image()
         {
             Format = imageSaveInfo.Format,
@@ -100,11 +85,11 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
     {
         var chapters = new List<EBookChapter>();
         
-        for (var i = 0; i < insert.ParsedInfo.Chapters.Count; i++)
+        for (var i = 0; i < insert.Chapters.Count; i++)
         {
             var newChapter = new EBookChapter()
             {
-                ChapterName = insert.ParsedInfo.Chapters[i],
+                ChapterName = insert.Chapters[i],
                 ChapterNumber = i,
                 EBookId = entity.Id
             };

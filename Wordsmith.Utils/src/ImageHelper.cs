@@ -75,7 +75,7 @@ public static class ImageHelper
         var pathToSave = Path.Combine(_webRootPath, filepath);
 
         // If the extension isn't written, write one
-        if (!pathToSave.Contains('.'))
+        if (!filepath.Contains('.'))
         {
             var formatExtension = identifiedFormat!.FileExtensions.First();
             pathToSave += $".{formatExtension}";

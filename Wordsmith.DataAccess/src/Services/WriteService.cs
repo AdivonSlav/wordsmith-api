@@ -24,12 +24,23 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         var set = Context.Set<TDb>();
         var entity = Mapper.Map<TDb>(insert);
 
-        await set.AddAsync(entity);
-        
-        await BeforeInsert(entity, insert);
-        await Context.SaveChangesAsync();
-        await AfterInsert(entity, insert);
+        await using var transaction = await Context.Database.BeginTransactionAsync();
 
+        try
+        {
+            await set.AddAsync(entity);
+
+            await BeforeInsert(entity, insert);
+            await Context.SaveChangesAsync();
+            await AfterInsert(entity, insert);
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+        
         return new CreatedAtActionResult(null, null, null, Mapper.Map<T>(entity));
     }
 
@@ -43,11 +54,22 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
             throw new AppException("The entity passed for updating was not found!");
         }
         
-        await BeforeUpdate(entity, update);
-        Mapper.Map(update, entity);
+        await using var transaction = await Context.Database.BeginTransactionAsync();
 
-        await Context.SaveChangesAsync();
-        await AfterUpdate(entity, update);
+        try
+        {
+            await BeforeUpdate(entity, update);
+            Mapper.Map(update, entity);
+
+            await Context.SaveChangesAsync();
+            await AfterUpdate(entity, update);
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
         
         return new OkObjectResult(Mapper.Map<T>(entity));
     }

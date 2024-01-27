@@ -17,16 +17,9 @@ public class
     public EBooksController(IEBookService eBookService) : base(eBookService) { }
 
     [Authorize("All")]
-    public override Task<ActionResult<EBookDto>> Insert(EBookInsertRequest insert)
+    public override Task<ActionResult<EBookDto>> Insert([FromForm] EBookInsertRequest insert)
     {
         return base.Insert(insert);
-    }
-
-    [Authorize("All")]
-    [HttpPost("save")]
-    public async Task<ActionResult<string>> Save([EpubFile] IFormFile file)
-    {
-        return await (WriteService as IEBookService)!.Save(file);
     }
 
     [Authorize("All")]

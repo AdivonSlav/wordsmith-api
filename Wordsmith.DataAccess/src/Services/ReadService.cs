@@ -40,8 +40,8 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         try
         {
             var list = await query.ToListAsync();
-
             var tmp = Mapper.Map<List<T>>(list);
+
             result.Result = tmp;
         }
         catch (AppException)
@@ -60,12 +60,12 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
     public virtual async Task<QueryResult<T>> GetById(int id)
     {
         var entity = await Context.Set<TDb>().FindAsync(id);
-        var queryResult = new QueryResult<T>()
+        var result = new QueryResult<T>()
         {
             Result = new List<T>() { Mapper.Map<T>(entity) }
         };
-
-        return queryResult;
+        
+        return result;
     }
 
     protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, TSearch? search = null)

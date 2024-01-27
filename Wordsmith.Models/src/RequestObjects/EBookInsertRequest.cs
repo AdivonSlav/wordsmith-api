@@ -1,12 +1,22 @@
 using System.ComponentModel.DataAnnotations;
-using Wordsmith.Models.DataTransferObjects;
+using Microsoft.AspNetCore.Http;
+using Wordsmith.Models.ValidationAttributes;
 
 namespace Wordsmith.Models.RequestObjects;
 
 public class EBookInsertRequest
 {
     [Required]
-    public EBookParseDto ParsedInfo { get; set; }
+    public string Title { get; set; }
+    
+    [Required]
+    public string Description { get; set; }
+    
+    [Required]
+    public string EncodedCoverArt { get; set; }
+    
+    [Required]
+    public List<string> Chapters { get; set; }
     
     public decimal? Price { get; set; }
     
@@ -20,5 +30,6 @@ public class EBookInsertRequest
     public int MaturityRatingId { get; set; }
     
     [Required]
-    public string SavedBookName { get; set; }
+    [EpubFile]
+    public IFormFile file { get; set; }
 }

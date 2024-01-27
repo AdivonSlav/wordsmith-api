@@ -42,7 +42,6 @@ public static class EBookFileHelper
         var ebookData = new EBookParseDto()
         {
             Title = epub.Title,
-            AuthorName = epub.Author,
             Description = epub.Description ?? "",
             EncodedCoverArt = (epub.CoverImage == null ? null : Convert.ToBase64String(epub.CoverImage)) ?? string.Empty,
             Chapters = new List<string>()

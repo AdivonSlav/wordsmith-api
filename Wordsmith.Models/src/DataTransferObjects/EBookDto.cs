@@ -22,7 +22,7 @@ public class EBookDto
     
     public ImageDto CoverArt { get; set; }
     
-    public GenreDto Genre { get; set; }
+    public string Genres { get; set; }
     
     public MaturityRatingDto MaturityRating { get; set; }
 }

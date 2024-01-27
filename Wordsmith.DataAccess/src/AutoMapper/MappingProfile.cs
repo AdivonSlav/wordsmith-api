@@ -60,9 +60,7 @@ public class MappingProfile : Profile
         
         // eBooks
         CreateMap<EBookInsertRequest, EBook>()
-            .ForMember(dest => dest.CoverArt, options => options.Ignore())
-            .ForMember(dest => dest.Title, options => options.MapFrom(src => src.ParsedInfo.Title))
-            .ForMember(dest => dest.Description, options => options.MapFrom(src => src.ParsedInfo.Description));
+            .ForMember(dest => dest.CoverArt, options => options.Ignore());
         CreateMap<EBook, EBookDto>();
         
         // Genres

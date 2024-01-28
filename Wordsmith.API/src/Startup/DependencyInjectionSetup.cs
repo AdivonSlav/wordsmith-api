@@ -109,6 +109,8 @@ public static class DependencyInjectionSetup
             {
                 { jwtScheme, Array.Empty<string>() }
             });
+            
+            options.EnableAnnotations();
         });
 
         // Authentication is set up for JWT bearer tokens and the authority is the IdentityServer at the configured address

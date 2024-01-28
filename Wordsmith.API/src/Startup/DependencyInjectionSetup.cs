@@ -28,7 +28,11 @@ public static class DependencyInjectionSetup
         services.AddDbContext<DatabaseContext>(options =>
         {
             options.UseMySql(mysqlConnectionString, mysqlVersion,
-                optionsBuilder => { optionsBuilder.MigrationsAssembly(migrationsAssembly); });
+                optionsBuilder =>
+                {
+                    optionsBuilder.MigrationsAssembly(migrationsAssembly);
+                    optionsBuilder.EnableStringComparisonTranslations();
+                });
         });
 
         services.AddAutoMapper(typeof(MappingProfile));

@@ -1,6 +1,8 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Extensions;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
@@ -35,6 +37,26 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
             query = query.Skip((search.Page.Value - 1) * search.PageSize.Value).Take(search.PageSize.Value);
             result.Page = search.Page;
             result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / (double)search.PageSize);
+        }
+
+        if (search?.OrderBy != null)
+        {
+            var orderByParts = search.OrderBy.Split(":");
+            var orderByProperty = orderByParts[0];
+            var orderByDirection = orderByParts[1];
+
+            if (orderByDirection == "asc")
+            {
+                query = query.OrderByProperty(orderByProperty);
+            } 
+            else if (orderByDirection == "desc")
+            {
+                query = query.OrderByProperty(orderByProperty, false);
+            }
+            else
+            {
+                throw new AppException("OrderBy must be asc or desc");
+            }
         }
 
         try

@@ -36,6 +36,33 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         await Context.Entry(entity).Reference(e => e.MaturityRating).LoadAsync();
     }
 
+    protected override IQueryable<EBook> AddFilter(IQueryable<EBook> query, EBookSearchObject search = null)
+    {
+        if (search?.Title != null)
+        {
+            query = query.Where(e => e.Title.Contains(search.Title, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        if (search?.Genres != null)
+        {
+            query = query.Where(e => e.EBookGenres.Any(g => search.Genres.Contains(g.GenreId)));
+        }
+
+        if (search?.MaturityRatingId != null)
+        {
+            query = query.Where(e => e.MaturityRatingId == search.MaturityRatingId.Value);
+        }
+
+        return query;
+    }
+
+    protected override IQueryable<EBook> AddInclude(IQueryable<EBook> query, EBookSearchObject search = null)
+    {
+        query = query.Include(e => e.MaturityRating).Include(e => e.CoverArt);
+
+        return query;
+    }
+
     public async Task<ActionResult<EBookParseDto>> Parse(IFormFile file)
     {
         if (!await EBookFileHelper.IsValidEpub(file))

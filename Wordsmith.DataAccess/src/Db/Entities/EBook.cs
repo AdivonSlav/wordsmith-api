@@ -49,4 +49,6 @@ public class EBook
     [ForeignKey(nameof(CoverArtId))] public virtual Image CoverArt { get; set; }
     
     [ForeignKey(nameof(MaturityRatingId))] public virtual MaturityRating MaturityRating { get; set; }
+    
+    public virtual ICollection<EBookGenre> EBookGenres { get; set; }
 }

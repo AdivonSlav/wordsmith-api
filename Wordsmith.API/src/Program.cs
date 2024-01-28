@@ -20,6 +20,7 @@ try
     app.ConfigureSwagger();
     app.RegisterMiddleware();
     app.MapControllers();
+    app.UseStaticFiles();
 
     Logger.LogInfo("Up and running");
     app.Run();

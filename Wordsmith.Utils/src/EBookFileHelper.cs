@@ -1,4 +1,6 @@
+using System.Text.RegularExpressions;
 using System.Web;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
 using VersOne.Epub;
 using Wordsmith.Models.DataTransferObjects;
@@ -38,11 +40,11 @@ public static class EBookFileHelper
         {
             throw new AppException($"Could not read EPUB {e.Message}");
         }
-
+        
         var ebookData = new EBookParseDto()
         {
-            Title = epub.Title,
-            Description = epub.Description ?? "",
+            Title = StripHtml(epub.Title),
+            Description = StripHtml(epub.Description ?? ""),
             EncodedCoverArt = (epub.CoverImage == null ? null : Convert.ToBase64String(epub.CoverImage)) ?? string.Empty,
             Chapters = new List<string>()
         };
@@ -101,5 +103,21 @@ public static class EBookFileHelper
         }
 
         return true;
+    }
+
+    private static string StripHtml(string input)
+    {
+        // Create whitespaces between HTML elements
+        input = input.Replace(">", "> ");
+        
+        // Parse HTML
+        var document = new HtmlDocument();
+        document.LoadHtml(input);
+
+        // Strip HTML decoded text from the HTML
+        var text = HttpUtility.HtmlDecode(document.DocumentNode.InnerText);
+
+        // Replace all whitespaces with a single space and trim
+        return Regex.Replace(text, @"\s+", " ").Trim();
     }
 }

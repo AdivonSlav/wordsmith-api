@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="Duende.IdentityServer" Version="6.3.5" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.58" />
       <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.5" />
       <PackageReference Include="RabbitMQ.Client" Version="6.6.0" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />

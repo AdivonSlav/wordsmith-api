@@ -23,6 +23,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         
         entity.PublishedDate = DateTime.UtcNow;
         entity.UpdatedDate = entity.PublishedDate;
+        entity.RatingAverage = 0.0;
 
         var fileName = await EBookFileHelper.SaveFile(insert.file);
         entity.Path = fileName;

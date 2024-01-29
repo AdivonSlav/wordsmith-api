@@ -7,9 +7,11 @@ namespace Wordsmith.Models.RequestObjects;
 public class EBookInsertRequest
 {
     [Required]
+    [StringLength(maximumLength: 40)]
     public string Title { get; set; }
     
     [Required]
+    [StringLength(maximumLength: 800)]
     public string Description { get; set; }
     
     [Required]

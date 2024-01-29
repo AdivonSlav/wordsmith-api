@@ -37,10 +37,10 @@ public static class Config
             },
             AllowedScopes = { "wordsmith_api.read", "wordsmith_api.write" },
             AllowOfflineAccess = true,
-            AccessTokenLifetime = 1800,
+            AccessTokenLifetime = 60 * 15, // 15 minutes (in seconds)
             RefreshTokenUsage = TokenUsage.OneTimeOnly,
             RefreshTokenExpiration = TokenExpiration.Absolute,
-            AbsoluteRefreshTokenLifetime = 2592000 // 30 days
+            AbsoluteRefreshTokenLifetime = 60 * 30 * 1440 // 30 days (in seconds)
         },
         new()
         {
@@ -53,10 +53,10 @@ public static class Config
             },
             AllowedScopes = { "wordsmith_api.full_access" },
             AllowOfflineAccess = true,
-            AccessTokenLifetime = 1800,
+            AccessTokenLifetime = 60 * 15, // 15 minutes (in seconds)
             RefreshTokenUsage = TokenUsage.OneTimeOnly,
             RefreshTokenExpiration = TokenExpiration.Absolute,
-            AbsoluteRefreshTokenLifetime = 2592000 // 30 days
+            AbsoluteRefreshTokenLifetime = 60 * 30 * 1440 // 30 days (in seconds)
         }
     };
 

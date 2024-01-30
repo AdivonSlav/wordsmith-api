@@ -4,9 +4,20 @@ namespace Wordsmith.IdentityServer;
 
 public static class Config
 {
-    public static string? UserClientSecret { get; set; }
-    public static string? AdminClientSecret { get; set; }
+    private static string _userClientSecret;
+    private static string _adminClientSecret;
 
+    /// <summary>
+    /// Initializes client secrets for IdentityServer
+    /// </summary>
+    /// <param name="userClientSecret">User client secret</param>
+    /// <param name="adminClientSecret">Admin client secret</param>
+    public static void InitSecrets(string userClientSecret, string adminClientSecret)
+    {
+        _userClientSecret = userClientSecret.Sha512();
+        _adminClientSecret = adminClientSecret.Sha512();
+    }
+    
     public static IEnumerable<ApiScope> ApiScopes => new List<ApiScope>()
     {
         new("wordsmith_api.read", "API read access"),
@@ -19,7 +30,7 @@ public static class Config
         new("wordsmith_api")
         {
             Scopes = new List<string>() { "wordsmith_api.read", "wordsmith_api.write", "wordsmith_api.full_access" },
-            ApiSecrets = new List<Secret>() { new(UserClientSecret.Sha256()), new(AdminClientSecret.Sha256()) },
+            ApiSecrets = new List<Secret>() { new(_userClientSecret), new(_adminClientSecret) },
             UserClaims = new List<string>() { "role", "user_ref_id" }
         }
     };
@@ -33,7 +44,7 @@ public static class Config
             AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
             ClientSecrets =
             {
-                new Secret(UserClientSecret.Sha256())
+                new Secret(_userClientSecret)
             },
             AllowedScopes = { "wordsmith_api.read", "wordsmith_api.write" },
             AllowOfflineAccess = true,
@@ -49,7 +60,7 @@ public static class Config
             AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
             ClientSecrets =
             {
-                new Secret(AdminClientSecret.Sha256())
+                new Secret(_adminClientSecret)
             },
             AllowedScopes = { "wordsmith_api.full_access" },
             AllowOfflineAccess = true,

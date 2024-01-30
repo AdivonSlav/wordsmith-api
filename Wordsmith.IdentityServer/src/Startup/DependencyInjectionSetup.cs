@@ -1,3 +1,4 @@
+using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.IdentityServer.Db;
@@ -12,8 +13,19 @@ public static class DependencyInjectionSetup
 {
     public static IServiceCollection RegisterDatabaseServices(this IServiceCollection services, IConfiguration configuration)
     {
-        Config.UserClientSecret = configuration.GetSection("IdentityServer")["Secrets:User"];
-        Config.AdminClientSecret = configuration.GetSection("IdentityServer")["Secrets:Admin"];
+        var userClientSecret = configuration.GetSection("IdentityServer")["Secrets:User"];
+        var adminClientSecret = configuration.GetSection("IdentityServer")["Secrets:Admin"];
+
+        if (string.IsNullOrEmpty(userClientSecret))
+        {
+            throw new Exception("No user client secret was passed for IdentityServer configuration!");
+        }
+        if (string.IsNullOrEmpty(adminClientSecret))
+        {
+            throw new Exception("No admin client secret was passed for IdentityServer configuration!");
+        }
+        
+        Config.InitSecrets(userClientSecret, adminClientSecret);
         
         var mysqlDetails = configuration.GetSection("Connection").GetSection("MySQL");
         var mysqlConnectionString = $"Server={mysqlDetails["Host"]};" +

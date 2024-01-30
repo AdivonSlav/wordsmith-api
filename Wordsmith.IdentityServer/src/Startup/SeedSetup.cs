@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Mappers;
-using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Wordsmith.IdentityServer.Db.Entities;
 
@@ -27,43 +26,25 @@ public static class SeedSetup
         if (!context.Clients.Any())
         {
             foreach (var client in Config.Clients.ToList()) context.Clients.Add(client.ToEntity());
-
-            context.SaveChanges();
         }
 
         if (!context.IdentityResources.Any())
         {
             foreach (var resource in Config.IdentityResources.ToList())
                 context.IdentityResources.Add(resource.ToEntity());
-
-            context.SaveChanges();
         }
 
         if (!context.ApiScopes.Any())
         {
             foreach (var resource in Config.ApiScopes.ToList()) context.ApiScopes.Add(resource.ToEntity());
-
-            context.SaveChanges();
         }
 
         if (!context.ApiResources.Any())
         {
             foreach (var resource in Config.ApiResources.ToList()) context.ApiResources.Add(resource.ToEntity());
-
-            context.SaveChanges();
         }
-
-        if (!context.IdentityProviders.Any())
-        {
-            context.IdentityProviders.Add(new OidcProvider
-            {
-                Scheme = "demoidsrv",
-                DisplayName = "IdentityServer",
-                Authority = "https://demo.duendesoftware.com",
-                ClientId = "login"
-            }.ToEntity());
-            context.SaveChanges();
-        }
+        
+        context.SaveChanges();
     }
 
     private static void EnsureUsers(IServiceScope scope, IConfiguration configuration)

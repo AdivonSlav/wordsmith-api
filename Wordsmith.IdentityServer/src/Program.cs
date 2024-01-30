@@ -23,6 +23,19 @@ try
     app.EnsureSeedData(builder.Configuration);
 
     Logger.LogInfo("Up and running");
+    
+    var addressEnv = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+
+    if (!string.IsNullOrEmpty(addressEnv))
+    {
+        var addresses = addressEnv.Split(";");
+
+        foreach (var address in addresses)
+        {
+            Logger.LogInfo($"Listening on {address}");
+        }
+    }
+    
     app.Run();
 }
 catch (Exception e)

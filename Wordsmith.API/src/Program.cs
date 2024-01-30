@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Wordsmith.API.Startup;
 using Wordsmith.Utils;
 
@@ -22,7 +23,20 @@ try
     app.MapControllers();
     app.UseStaticFiles();
 
-    Logger.LogInfo("Up and running");
+    Logger.LogInfo($"Up and running!");
+    
+    var addressEnv = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+
+    if (!string.IsNullOrEmpty(addressEnv))
+    {
+        var addresses = addressEnv.Split(";");
+
+        foreach (var address in addresses)
+        {
+            Logger.LogInfo($"Listening on {address}");
+        }
+    }
+    
     app.Run();
 }
 catch (Exception e)

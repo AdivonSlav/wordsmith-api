@@ -35,6 +35,8 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         await HandleGenres(entity, insert);
         await Context.SaveChangesAsync();
         await Context.Entry(entity).Reference(e => e.MaturityRating).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.CoverArt).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.Author).LoadAsync();
     }
 
     protected override IQueryable<EBook> AddFilter(IQueryable<EBook> query, EBookSearchObject search = null)
@@ -59,7 +61,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
 
     protected override IQueryable<EBook> AddInclude(IQueryable<EBook> query, EBookSearchObject search = null)
     {
-        query = query.Include(e => e.MaturityRating).Include(e => e.CoverArt);
+        query = query.Include(e => e.MaturityRating).Include(e => e.CoverArt).Include(e => e.Author);
 
         return query;
     }

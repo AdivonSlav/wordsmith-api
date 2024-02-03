@@ -20,6 +20,8 @@ public class EBookDto
     
     public string Path { get; set; }
     
+    public UserDto Author { get; set; }
+    
     public ImageDto CoverArt { get; set; }
     
     public string Genres { get; set; }

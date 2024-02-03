@@ -1,4 +1,3 @@
-using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.IdentityServer.Db;

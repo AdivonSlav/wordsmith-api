@@ -6,7 +6,7 @@ using VersOne.Epub;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 
-namespace Wordsmith.Utils;
+namespace Wordsmith.Utils.EBookFileHelper;
 
 public static class EBookFileHelper
 {
@@ -82,6 +82,26 @@ public static class EBookFileHelper
         Logger.LogDebug($"Saved {encodedFilename} to {filePath}");
 
         return randomFilename;
+    }
+
+    public static async Task<EBookFile> GetFile(string filename)
+    {
+        if (!Saved(filename))
+        {
+            throw new Exception($"File with name {filename} does not exist!");
+        }
+
+        using var memoryStream = new MemoryStream();
+        
+        await using var fileStream = new FileStream(Path.Combine(_savePath, filename), FileMode.Open);
+        await fileStream.CopyToAsync(memoryStream);
+        memoryStream.Seek(0, SeekOrigin.Begin);
+
+        return new EBookFile()
+        {
+            Bytes = memoryStream.ToArray(),
+            Filename = filename
+        };
     }
 
     public static bool Saved(string filename)

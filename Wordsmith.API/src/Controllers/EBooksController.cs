@@ -28,4 +28,11 @@ public class
     {
         return await (WriteService as IEBookService)!.Parse(file);
     }
+
+    [Authorize("All")]
+    [HttpGet("{id:int}/download")]
+    public async Task<IActionResult> Download(int id)
+    {
+        return await (WriteService as IEBookService)!.Download(id);
+    }
 }

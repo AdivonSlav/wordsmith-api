@@ -1,4 +1,5 @@
 using Wordsmith.Utils;
+using Wordsmith.Utils.EBookFileHelper;
 using Wordsmith.Utils.RabbitMQ;
 
 namespace Wordsmith.API.Startup;

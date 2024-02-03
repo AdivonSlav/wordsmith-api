@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
@@ -9,6 +10,7 @@ using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
+using Wordsmith.Utils.EBookFileHelper;
 
 namespace Wordsmith.DataAccess.Services;
 
@@ -77,7 +79,24 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
 
         return new OkObjectResult(data);
     }
-    
+
+    public async Task<IActionResult> Download(int id)
+    {
+        var entity = await Context.EBooks.FindAsync(id);
+
+        if (entity == null)
+        {
+            throw new AppException("The ebook does not exist!");
+        }
+
+        var ebookFile = await EBookFileHelper.GetFile(entity.Path);
+
+        return new FileContentResult(ebookFile.Bytes, MediaTypeHeaderValue.Parse("application/epub+zip"))
+        {
+            FileDownloadName = ebookFile.Filename
+        };
+    }
+
     private async Task ValidateForeignKeys(EBookInsertRequest insert)
     {
         var authorExists = await Context.Users.AnyAsync(user => user.Id == insert.AuthorId);

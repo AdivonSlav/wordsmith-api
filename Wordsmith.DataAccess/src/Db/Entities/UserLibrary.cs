@@ -19,7 +19,7 @@ public class UserLibrary
     
     public string ReadProgress { get; set; }
     
-    public int LastChapterId { get; set; }
+    public int? LastChapterId { get; set; }
     
     public int LastPage { get; set; }
     

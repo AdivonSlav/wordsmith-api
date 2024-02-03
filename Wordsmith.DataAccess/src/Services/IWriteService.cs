@@ -11,4 +11,5 @@ public interface IWriteService<T, TDb, TSearch, TInsert, TUpdate> : IReadService
 {
     Task<ActionResult<T>> Insert(TInsert insert);
     Task<ActionResult<T>> Update(int id, TUpdate update);
+    Task<ActionResult<string>> Delete(params int[] ids);
 }

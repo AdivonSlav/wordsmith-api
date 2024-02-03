@@ -22,4 +22,13 @@ public class UserLibraryController : WriteController<UserLibraryDto, UserLibrary
         
         return base.Insert(insert);
     }
+
+    [Authorize("All")]
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<string>> Delete(int id)
+    {
+        var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
+        
+        return await WriteService.Delete(id, int.Parse(userRefId.Value));
+    }
 }

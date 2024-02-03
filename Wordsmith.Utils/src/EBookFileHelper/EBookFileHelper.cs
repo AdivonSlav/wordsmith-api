@@ -78,8 +78,7 @@ public static class EBookFileHelper
         await using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
 
-        var encodedFilename = HttpUtility.HtmlEncode(file.FileName);
-        Logger.LogDebug($"Saved {encodedFilename} to {filePath}");
+        Logger.LogDebug($"Saved {filePath}");
 
         return randomFilename;
     }

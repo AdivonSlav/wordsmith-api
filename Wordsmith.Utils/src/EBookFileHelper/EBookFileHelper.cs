@@ -90,12 +90,15 @@ public static class EBookFileHelper
             throw new Exception($"File with name {filename} does not exist!");
         }
 
+        var filepath = Path.Combine(_savePath, filename);
         using var memoryStream = new MemoryStream();
         
-        await using var fileStream = new FileStream(Path.Combine(_savePath, filename), FileMode.Open);
+        await using var fileStream = new FileStream(filepath, FileMode.Open);
         await fileStream.CopyToAsync(memoryStream);
         memoryStream.Seek(0, SeekOrigin.Begin);
 
+        Logger.LogDebug($"Served {filepath}");
+        
         return new EBookFile()
         {
             Bytes = memoryStream.ToArray(),

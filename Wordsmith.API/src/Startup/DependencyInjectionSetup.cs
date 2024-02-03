@@ -1,9 +1,9 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
-using Wordsmith.DataAccess.AutoMapper;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Services;
 using Wordsmith.Utils.LoginClient;
@@ -35,7 +35,11 @@ public static class DependencyInjectionSetup
                 });
         });
 
-        services.AddAutoMapper(typeof(MappingProfile));
+        services.AddAutoMapper(config =>
+        {
+            var dataAccessAssembly = Assembly.GetAssembly(typeof(DatabaseContext));
+            config.AddMaps(dataAccessAssembly);
+        });
 
         return services;
     }

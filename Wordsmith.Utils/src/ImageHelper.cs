@@ -1,3 +1,4 @@
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using Wordsmith.Models.Exceptions;
 

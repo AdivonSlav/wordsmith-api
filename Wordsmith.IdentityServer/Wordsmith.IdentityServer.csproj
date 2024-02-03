@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Duende.IdentityServer" Version="6.3.5" />
-        <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.5" />
-        <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.5" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.24" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.24" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.13">
+        <PackageReference Include="Duende.IdentityServer" Version="6.3.8" />
+        <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.8" />
+        <PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.26" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.26" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.15">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

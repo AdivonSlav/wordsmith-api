@@ -50,27 +50,52 @@ public static class SeedSetup
     private static void EnsureUsers(IServiceScope scope, IConfiguration configuration)
     {
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var adminUser = userManager.FindByNameAsync("admin").Result;
+        var adminToCreate = configuration["DefaultAdmin"];
+        var userToCreate = configuration["DefaultUser"];
 
-        if (adminUser != null) return;
-
-        adminUser = new ApplicationUser()
+        if (userManager.Users.Any()) return;
+        
+        if (adminToCreate != null)
         {
-            UserName = "admin",
-            Email = "admin@example.com",
-            EmailConfirmed = true,
-            UserRefId = 1
-        };
+                var adminUser = new ApplicationUser()
+                {
+                    UserName = adminToCreate,
+                    Email = $"{adminToCreate}@example.com",
+                    EmailConfirmed = true,
+                    UserRefId = 1,
+                };
+                
+                var result = userManager.CreateAsync(adminUser, "default$123").Result;
+                if (!result.Succeeded) throw new Exception(result.Errors.First().Description);
+                
+                result = userManager.AddClaimsAsync(adminUser, new Claim[]
+                {
+                    new("role", "admin"),
+                    new("user_ref_id", adminUser.UserRefId.ToString()!)
+                }).Result;
+                if (!result.Succeeded) throw new Exception(result.Errors.First().Description);
+                
+        }
 
-        var result = userManager.CreateAsync(adminUser, "admin$123").Result;
-        if (!result.Succeeded) throw new Exception(result.Errors.First().Description);
-
-        result = userManager.AddClaimsAsync(adminUser, new Claim[]
+        if (userToCreate != null)
         {
-            new("role", "admin"),
-            new("user_ref_id", adminUser.UserRefId.ToString()!)
-        }).Result;
-
-        if (!result.Succeeded) throw new Exception(result.Errors.First().Description);
+                var user = new ApplicationUser()
+                {
+                    UserName = userToCreate,
+                    Email = $"{userToCreate}@example.com",
+                    EmailConfirmed = true,
+                    UserRefId = 2,
+                };
+                
+                var result = userManager.CreateAsync(user, "default$123").Result;
+                if (!result.Succeeded) throw new Exception(result.Errors.First().Description);
+                
+                result = userManager.AddClaimsAsync(user, new Claim[]
+                {
+                    new("role", "user"),
+                    new("user_ref_id", user.UserRefId.ToString()!)
+                }).Result;
+                if (!result.Succeeded) throw new Exception(result.Errors.First().Description);
+        }
     }
 }

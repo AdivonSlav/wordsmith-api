@@ -1,9 +1,52 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Wordsmith.DataAccess.Db.Entities;
+using Wordsmith.Utils;
 
 namespace Wordsmith.DataAccess.Db;
 
 public static class DatabaseSeeds
 {
+    public static void CreateUsers(DatabaseContext context, IConfiguration configuration)
+    {
+        if (context.Users.Any()) return;
+        
+        var adminToCreate = configuration["DefaultAdmin"];
+        var userToCreate = configuration["DefaultUser"];
+        var createdUsers = new List<User>();
+
+        if (adminToCreate != null)
+        {
+            createdUsers.Add(new User
+            {
+                Id = 1,
+                Username = adminToCreate,
+                Email = $"{adminToCreate}@example.com",
+                RegistrationDate = DateTime.UtcNow,
+                About = "Just an admin",
+                Role = "admin",
+            });
+        }
+        
+        if (userToCreate != null)
+        {
+            createdUsers.Add(new User
+            {
+                Id = 2,
+                Username = userToCreate,
+                Email = $"{userToCreate}@example.com",
+                RegistrationDate = DateTime.UtcNow,
+                About = "Just a user",
+                Role = "user",
+            });
+        }
+        
+        context.Users.AddRange(createdUsers);
+        context.SaveChanges();
+        Logger.LogInfo("Created default users!");
+    }
+    
     public static IEnumerable<MaturityRating> CreateMaturityRatings()
     {
         var ratings = GetMaturityRatings();

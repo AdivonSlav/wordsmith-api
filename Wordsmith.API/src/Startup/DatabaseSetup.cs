@@ -6,7 +6,7 @@ namespace Wordsmith.API.Startup;
 
 public static class DatabaseSetup
 {
-    public static IApplicationBuilder ConfigureDatabase(this IApplicationBuilder app)
+    public static IApplicationBuilder ConfigureDatabase(this IApplicationBuilder app, IConfiguration configuration)
     {
         using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
         var context = scope.ServiceProvider.GetService<DatabaseContext>();
@@ -15,6 +15,7 @@ public static class DatabaseSetup
 
         Logger.LogInfo("Checking for any pending database migrations...");
         context.Database.Migrate();
+        DatabaseSeeds.CreateUsers(context, configuration);
 
         return app;
     }

@@ -116,6 +116,17 @@ The following represent the environment variables supported by the application. 
       Minimum log level used by the Wordsmith Logger wrapper class. <b>Defaults to Debug.</b>
     </td>
   </tr>
+  <tr>
+    <td>
+      <ul>
+        <li>WORDSMITH_DefaultAdmin</li>
+        <li>WORDSMITH_DefaultUser</li>
+      </ul>
+    </td>
+    <td>
+      Default admin and user accounts to create on fresh database generation.</b>
+    </td>
+  </tr>
 </table>
 <hr>
 

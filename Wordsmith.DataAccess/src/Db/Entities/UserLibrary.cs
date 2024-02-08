@@ -27,7 +27,7 @@ public class UserLibrary
     
     public int LastPage { get; set; }
     
-    public int UserLibraryCategoryId { get; set; }
+    public int? UserLibraryCategoryId { get; set; }
     
     [ForeignKey(nameof(EBookId))] 
     public virtual EBook EBook { get; set; }

@@ -11,15 +11,15 @@ using Wordsmith.DataAccess.Db;
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230904173012_EditReportReasons")]
-    partial class EditReportReasons
+    [Migration("20240208133806_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "7.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.AppReport", b =>
@@ -96,6 +96,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ChapterCount")
                         .HasColumnType("int");
 
@@ -105,8 +108,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("GenreId")
-                        .HasColumnType("int");
+                    b.Property<string>("Genres")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("HiddenDate")
                         .HasColumnType("datetime(6)");
@@ -138,9 +141,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CoverArtId");
+                    b.HasIndex("AuthorId");
 
-                    b.HasIndex("GenreId");
+                    b.HasIndex("CoverArtId");
 
                     b.HasIndex("MaturityRatingId");
 
@@ -177,6 +180,21 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.HasIndex("EBookId");
 
                     b.ToTable("ebook_chapters");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookGenre", b =>
+                {
+                    b.Property<int>("EBookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GenreId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EBookId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("ebook_genres");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookPromotion", b =>
@@ -324,6 +342,208 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .IsUnique();
 
                     b.ToTable("genres");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Fiction"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Mystery"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Thriller"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Science Fiction"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Fantasy"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Romance"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Historical Fiction"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Horror"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Adventure"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Crime"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Comedy"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Drama"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Non-Fiction"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Biography"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Autobiography"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Name = "Memoir"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Name = "Self-Help"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Name = "Philosophy"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Name = "Psychology"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Name = "Science"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Name = "Technology"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Name = "Business"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Name = "Economics"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Name = "History"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Name = "Politics"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Name = "Sociology"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Name = "Travel"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Name = "Poetry"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Name = "Anthology"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Name = "Children's"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Name = "Young Adult (YA)"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Name = "Middle Grade"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Name = "Graphic Novel"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Name = "Comic Book"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            Name = "Satire"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Name = "Dystopian"
+                        },
+                        new
+                        {
+                            Id = 37,
+                            Name = "Utopian"
+                        },
+                        new
+                        {
+                            Id = 38,
+                            Name = "Paranormal"
+                        },
+                        new
+                        {
+                            Id = 39,
+                            Name = "Supernatural"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Name = "Historical Romance"
+                        });
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Image", b =>
@@ -355,12 +575,35 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("ShortName")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("maturity_ratings");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Kids",
+                            ShortName = "K"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Teens",
+                            ShortName = "T"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Mature",
+                            ShortName = "M"
+                        });
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Note", b =>
@@ -515,16 +758,17 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibrary", b =>
                 {
-                    b.Property<int>("EBookId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("EBookId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int>("LastChapterId")
+                    b.Property<int?>("LastChapterId")
                         .HasColumnType("int");
 
                     b.Property<int>("LastPage")
@@ -536,7 +780,15 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<DateTime>("SyncDate")
                         .HasColumnType("datetime(6)");
 
-                    b.HasKey("EBookId", "UserId");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserLibraryCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EBookId");
 
                     b.HasIndex("IsRead");
 
@@ -544,7 +796,30 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("UserLibraryCategoryId");
+
                     b.ToTable("user_libraries");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibraryCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("user_library_categories");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserReport", b =>
@@ -611,15 +886,15 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBook", b =>
                 {
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.Image", "CoverArt")
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "Author")
                         .WithMany()
-                        .HasForeignKey("CoverArtId")
+                        .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.Genre", "Genre")
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.Image", "CoverArt")
                         .WithMany()
-                        .HasForeignKey("GenreId")
+                        .HasForeignKey("CoverArtId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -629,9 +904,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CoverArt");
+                    b.Navigation("Author");
 
-                    b.Navigation("Genre");
+                    b.Navigation("CoverArt");
 
                     b.Navigation("MaturityRating");
                 });
@@ -645,6 +920,25 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .IsRequired();
 
                     b.Navigation("EBook");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookGenre", b =>
+                {
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
+                        .WithMany("EBookGenres")
+                        .HasForeignKey("EBookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.Genre", "Genre")
+                        .WithMany()
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EBook");
+
+                    b.Navigation("Genre");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookPromotion", b =>
@@ -818,9 +1112,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
                     b.HasOne("Wordsmith.DataAccess.Db.Entities.EBookChapter", "LastChapter")
                         .WithMany()
-                        .HasForeignKey("LastChapterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LastChapterId");
 
                     b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "User")
                         .WithMany()
@@ -828,9 +1120,27 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.UserLibraryCategory", "UserLibraryCategory")
+                        .WithMany()
+                        .HasForeignKey("UserLibraryCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("EBook");
 
                     b.Navigation("LastChapter");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserLibraryCategory");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibraryCategory", b =>
+                {
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -852,6 +1162,11 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Navigation("ReportDetails");
 
                     b.Navigation("ReportedUser");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBook", b =>
+                {
+                    b.Navigation("EBookGenres");
                 });
 #pragma warning restore 612, 618
         }

@@ -26,5 +26,9 @@
         <ProjectReference Include="..\Wordsmith.Utils\Wordsmith.Utils.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="src\Db\Migrations\" />
+    </ItemGroup>
+
 
 </Project>

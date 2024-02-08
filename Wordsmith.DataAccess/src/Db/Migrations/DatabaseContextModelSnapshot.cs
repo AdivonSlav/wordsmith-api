@@ -7,7 +7,7 @@ using Wordsmith.DataAccess.Db;
 
 #nullable disable
 
-namespace Wordsmith.DataAccess.Db.Migrations
+namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     partial class DatabaseContextModelSnapshot : ModelSnapshot
@@ -38,7 +38,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("app_reports", (string)null);
+                    b.ToTable("app_reports");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.AuthorFollow", b =>
@@ -53,7 +53,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("author_follows", (string)null);
+                    b.ToTable("author_follows");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Comment", b =>
@@ -84,7 +84,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("comments", (string)null);
+                    b.ToTable("comments");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBook", b =>
@@ -154,7 +154,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UpdatedDate");
 
-                    b.ToTable("ebook", (string)null);
+                    b.ToTable("ebook");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookChapter", b =>
@@ -176,7 +176,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("EBookId");
 
-                    b.ToTable("ebook_chapters", (string)null);
+                    b.ToTable("ebook_chapters");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookGenre", b =>
@@ -191,7 +191,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("ebook_genres", (string)null);
+                    b.ToTable("ebook_genres");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookPromotion", b =>
@@ -226,7 +226,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ebook_promotions", (string)null);
+                    b.ToTable("ebook_promotions");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookRating", b =>
@@ -253,7 +253,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ebook_ratings", (string)null);
+                    b.ToTable("ebook_ratings");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookReport", b =>
@@ -274,7 +274,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("ReportDetailsId");
 
-                    b.ToTable("ebook_reports", (string)null);
+                    b.ToTable("ebook_reports");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookSale", b =>
@@ -306,7 +306,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ebook_sales", (string)null);
+                    b.ToTable("ebook_sales");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.FavoriteEBook", b =>
@@ -321,7 +321,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("favorite_ebooks", (string)null);
+                    b.ToTable("favorite_ebooks");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Genre", b =>
@@ -338,7 +338,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("genres", (string)null);
+                    b.ToTable("genres");
 
                     b.HasData(
                         new
@@ -560,7 +560,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("images", (string)null);
+                    b.ToTable("images");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.MaturityRating", b =>
@@ -580,7 +580,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("maturity_ratings", (string)null);
+                    b.ToTable("maturity_ratings");
 
                     b.HasData(
                         new
@@ -636,7 +636,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("notes", (string)null);
+                    b.ToTable("notes");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.ReportDetails", b =>
@@ -666,7 +666,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("report_details", (string)null);
+                    b.ToTable("report_details");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.ReportReason", b =>
@@ -686,7 +686,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
                     b.HasIndex("Reason")
                         .IsUnique();
 
-                    b.ToTable("report_reasons", (string)null);
+                    b.ToTable("report_reasons");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.User", b =>
@@ -723,7 +723,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserBan", b =>
@@ -750,15 +750,16 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("user_bans", (string)null);
+                    b.ToTable("user_bans");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibrary", b =>
                 {
-                    b.Property<int>("EBookId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("EBookId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsRead")
@@ -776,7 +777,15 @@ namespace Wordsmith.DataAccess.Db.Migrations
                     b.Property<DateTime>("SyncDate")
                         .HasColumnType("datetime(6)");
 
-                    b.HasKey("EBookId", "UserId");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserLibraryCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EBookId");
 
                     b.HasIndex("IsRead");
 
@@ -784,7 +793,30 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("user_libraries", (string)null);
+                    b.HasIndex("UserLibraryCategoryId");
+
+                    b.ToTable("user_libraries");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibraryCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("user_library_categories");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserReport", b =>
@@ -805,7 +837,7 @@ namespace Wordsmith.DataAccess.Db.Migrations
 
                     b.HasIndex("ReportedUserId");
 
-                    b.ToTable("user_reports", (string)null);
+                    b.ToTable("user_reports");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.AppReport", b =>
@@ -1085,9 +1117,27 @@ namespace Wordsmith.DataAccess.Db.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.UserLibraryCategory", "UserLibraryCategory")
+                        .WithMany()
+                        .HasForeignKey("UserLibraryCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("EBook");
 
                     b.Navigation("LastChapter");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserLibraryCategory");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibraryCategory", b =>
+                {
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

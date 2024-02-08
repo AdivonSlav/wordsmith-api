@@ -29,15 +29,6 @@ public class UserLibrariesController : WriteController<UserLibraryDto, UserLibra
         return base.Get(search);
     }
 
-    // [Authorize("All")]
-    // [HttpGet("{eBookId:int}")]
-    // public async Task<ActionResult<QueryResult<UserLibraryDto>>> GetLibraryEntry(int eBookId)
-    // {
-    //     var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
-    //
-    //     return await (WriteService as IUserLibraryService)!.GetLibraryEntry(int.Parse(userRefId.Value), eBookId);
-    // }
-
     [Authorize("All")]
     public override async Task<ActionResult<UserLibraryDto>> Insert(UserLibraryInsertRequest insert)
     {
@@ -51,8 +42,6 @@ public class UserLibrariesController : WriteController<UserLibraryDto, UserLibra
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<string>> Delete(int id)
     {
-        var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
-        
-        return await WriteService.Delete(id, int.Parse(userRefId.Value));
+        return await WriteService.Delete(id);
     }
 }

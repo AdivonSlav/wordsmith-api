@@ -23,6 +23,14 @@ public class UserLibraryService : WriteService<UserLibraryDto, UserLibrary, User
         entity.LastPage = 0;
     }
 
+    protected override async Task AfterInsert(UserLibrary entity, UserLibraryInsertRequest insert)
+    {
+        await Context.Entry(entity).Reference(e => e.EBook).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.CoverArt).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
+    }
+
     private async Task ValidateInsertion(UserLibrary entity, UserLibraryInsertRequest insert)
     {
         var ebook = await Context.EBooks.FindAsync(insert.EBookId);

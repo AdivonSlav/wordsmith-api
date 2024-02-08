@@ -2,6 +2,8 @@ namespace Wordsmith.Models.DataTransferObjects;
 
 public class UserLibraryDto
 {
+    public int Id { get; set; }
+    
     public int EBookId { get; set; }
     
     public int UserId { get; set; }

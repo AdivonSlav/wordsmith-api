@@ -95,6 +95,7 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
             await BeforeDeletion(entity);
             await Context.SaveChangesAsync();
             await AfterDeletion(entity);
+            await transaction.CommitAsync();
         }
         catch
         {

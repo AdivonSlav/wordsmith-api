@@ -70,11 +70,6 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
 
     public async Task<ActionResult<EBookParseDto>> Parse(IFormFile file)
     {
-        if (!await EBookFileHelper.IsValidEpub(file))
-        {
-            throw new AppException("Invalid EPUB");
-        }
-
         var data = await EBookFileHelper.ParseEpub(file);
 
         return new OkObjectResult(data);

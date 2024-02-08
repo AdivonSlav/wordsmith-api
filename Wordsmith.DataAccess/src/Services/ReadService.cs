@@ -31,11 +31,6 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         query = AddInclude(query, search);
         query = AddFilter(query, search);
 
-        result.TotalCount = await query.CountAsync();
-        query = query.Skip((search.Page - 1) * search.PageSize).Take(search.PageSize);
-        result.Page = search.Page;
-        result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / (double)search.PageSize);
-        
         if (search?.OrderBy != null)
         {
             var orderByParts = search.OrderBy.Split(":");
@@ -61,6 +56,11 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
                 throw new AppException("OrderBy must be asc or desc");
             }
         }
+        
+        result.TotalCount = await query.CountAsync();
+        query = query.Skip((search!.Page - 1) * search.PageSize).Take(search.PageSize);
+        result.Page = search.Page;
+        result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / (double)search.PageSize);
 
         try
         {

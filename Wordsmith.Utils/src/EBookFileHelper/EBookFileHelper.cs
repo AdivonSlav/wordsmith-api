@@ -29,43 +29,33 @@ public static class EBookFileHelper
 
     public static async Task<EBookParseDto> ParseEpub(IFormFile file)
     {
-        EpubBook epub;
+        EpubBookRef epub;
 
         try
         {
             await using var stream = file.OpenReadStream();
-            epub = await EpubReader.ReadBookAsync(stream);
+            epub = await EpubReader.OpenBookAsync(stream);
         }
         catch (Exception e)
         {
-            throw new AppException($"Could not read EPUB {e.Message}");
+            Logger.LogInfo($"Could not read EPUB: {e.Message}");
+            throw new AppException($"Could not read EPUB!");
         }
         
         var ebookData = new EBookParseDto()
         {
             Title = StripHtml(epub.Title),
             Description = StripHtml(epub.Description ?? ""),
-            EncodedCoverArt = (epub.CoverImage == null ? null : Convert.ToBase64String(epub.CoverImage)) ?? string.Empty,
-            Chapters = new List<string>()
         };
+
+        epub.Dispose();
         
-        if (epub.Navigation != null)
-        {
-            foreach (var navItem in epub.Navigation.Where(navItem => navItem.Type == EpubNavigationItemType.LINK))
-            {
-                ebookData.Chapters.Add(navItem.Title);
-            }
-        }
-        else
-        {
-            for (var i = 0; i < epub.ReadingOrder.Count; i++)
-            {
-                ebookData.Chapters.Add($"Chapter {i}");
-            }
-        }
+        await ParseCoverArt(ebookData, file);
+        await ParseChapters(ebookData, file);
 
         var htmlEncodedFilename = HttpUtility.HtmlEncode(file.FileName);
         Logger.LogDebug($"Parsed {htmlEncodedFilename} successfully", additionalArg: ebookData);
+        
         
         return ebookData;
     }
@@ -111,22 +101,6 @@ public static class EBookFileHelper
         return File.Exists(Path.Combine(_savePath, filename));
     }
 
-    public static async Task<bool> IsValidEpub(IFormFile file)
-    {
-        try
-        {
-            await using var stream = file.OpenReadStream();
-            var epub = await EpubReader.OpenBookAsync(stream);
-        }
-        catch (Exception e)
-        {
-            Logger.LogInfo($"Invalid EPUB passed for parsing! {e.Message}");
-            return false;
-        }
-
-        return true;
-    }
-
     private static string StripHtml(string input)
     {
         // Create whitespaces between HTML elements
@@ -141,5 +115,61 @@ public static class EBookFileHelper
 
         // Replace all whitespaces with a single space and trim
         return Regex.Replace(text, @"\s+", " ").Trim();
+    }
+
+    private static async Task ParseChapters(EBookParseDto dto, IFormFile file)
+    {
+        EpubBookRef epubRef;
+        
+        try
+        {
+            epubRef = await EpubReader.OpenBookAsync(file.OpenReadStream());
+        }
+        catch (Exception e)
+        {
+            Logger.LogInfo($"Could not read EPUB: {e.Message}");
+            throw new AppException($"Could not read EPUB!");
+        }
+        
+        var navigation = await epubRef.GetNavigationAsync();
+
+        if (navigation == null)
+        {
+            throw new AppException("Your ebook does not contain any chapters! Make sure you have added a TOC");
+        }
+
+        dto.Chapters = new List<string>();
+        
+        foreach (var navItem in navigation)
+        {
+            dto.Chapters.Add(navItem.Title);
+        }
+        
+        epubRef.Dispose();
+    }
+
+    private static async Task ParseCoverArt(EBookParseDto dto, IFormFile file)
+    {
+        EpubBookRef epubRef;
+        
+        try
+        {
+            epubRef = await EpubReader.OpenBookAsync(file.OpenReadStream());
+        }
+        catch (Exception e)
+        {
+            Logger.LogInfo($"Could not read EPUB: {e.Message}");
+            throw new AppException($"Could not read EPUB!");
+        }
+        
+        var coverImageBytes = await epubRef.ReadCoverAsync();
+
+        if (coverImageBytes == null)
+        {
+            throw new AppException("Your ebook must have a cover image!");
+        }
+
+        dto.EncodedCoverArt = Convert.ToBase64String(coverImageBytes);
+        epubRef.Dispose();
     }
 }

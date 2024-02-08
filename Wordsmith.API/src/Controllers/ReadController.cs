@@ -16,7 +16,7 @@ public class ReadController<T, TSearch> : ControllerBase
     }
 
     [HttpGet()]
-    public virtual async Task<ActionResult<QueryResult<T>>> Get([FromQuery] TSearch? search = null)
+    public virtual async Task<ActionResult<QueryResult<T>>> Get([FromQuery] TSearch search)
     {
         return await ReadService.Get(search);
     }

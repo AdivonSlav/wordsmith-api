@@ -30,13 +30,13 @@ public class DatabaseContext : DbContext
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<UserBan> UserBans { get; set; }
     public virtual DbSet<UserLibrary> UserLibraries { get; set; }
+    public virtual DbSet<UserLibraryCategory> UserLibraryCategories { get; set; }
     public virtual DbSet<UserReport> UserReports { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AuthorFollow>().HasKey(e => new { e.AuthorUserId, e.UserId });
         modelBuilder.Entity<FavoriteEBook>().HasKey(e => new { e.EBookId, e.UserId });
-        modelBuilder.Entity<UserLibrary>().HasKey(e => new { e.EBookId, e.UserId });
         modelBuilder.Entity<EBookGenre>().HasKey(e => new { e.EBookId, e.GenreId });
 
         modelBuilder.Entity<Genre>().HasData(DatabaseSeeds.CreateGenres());

@@ -6,6 +6,8 @@ public class UserLibraryDto
     
     public int UserId { get; set; }
     
+    public EBookDto? EBook { get; set; }
+    
     public DateTime SyncDate { get; set; }
     
     public bool IsRead { get; set; }

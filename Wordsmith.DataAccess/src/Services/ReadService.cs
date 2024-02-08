@@ -23,7 +23,7 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         Mapper = mapper;
     }
 
-    public virtual async Task<QueryResult<T>> Get(TSearch? search = null)
+    public virtual async Task<QueryResult<T>> Get(TSearch search)
     {
         var query = Context.Set<TDb>().AsQueryable();
         var result = new QueryResult<T>();
@@ -31,17 +31,20 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         query = AddInclude(query, search);
         query = AddFilter(query, search);
 
-        if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
-        {
-            result.TotalCount = await query.CountAsync();
-            query = query.Skip((search.Page.Value - 1) * search.PageSize.Value).Take(search.PageSize.Value);
-            result.Page = search.Page;
-            result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / (double)search.PageSize);
-        }
-
+        result.TotalCount = await query.CountAsync();
+        query = query.Skip((search.Page - 1) * search.PageSize).Take(search.PageSize);
+        result.Page = search.Page;
+        result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / (double)search.PageSize);
+        
         if (search?.OrderBy != null)
         {
             var orderByParts = search.OrderBy.Split(":");
+
+            if (orderByParts.Length < 2)
+            {
+                throw new AppException("You must pass both a property and direction!");
+            }
+            
             var orderByProperty = orderByParts[0];
             var orderByDirection = orderByParts[1];
 
@@ -90,12 +93,12 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         return result;
     }
 
-    protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, TSearch? search = null)
+    protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, TSearch search)
     {
         return query;
     }
 
-    protected virtual IQueryable<TDb> AddFilter(IQueryable<TDb> query, TSearch? search = null)
+    protected virtual IQueryable<TDb> AddFilter(IQueryable<TDb> query, TSearch search)
     {
         return query;
     }

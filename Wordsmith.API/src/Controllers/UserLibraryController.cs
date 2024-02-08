@@ -9,20 +9,44 @@ using Wordsmith.Models.SearchObjects;
 namespace Wordsmith.API.Controllers;
 
 [ApiController]
-[Route("user-library")]
-public class UserLibraryController : WriteController<UserLibraryDto, UserLibrary, UserLibrarySearchObject, UserLibraryInsertRequest,UserLibraryUpdateRequest>
+[Route("user-libraries")]
+public class UserLibrariesController : WriteController<UserLibraryDto, UserLibrary, UserLibrarySearchObject, UserLibraryInsertRequest,UserLibraryUpdateRequest>
 {
-    public UserLibraryController(IUserLibraryService userLibraryService) : base(userLibraryService) { }
+    public UserLibrariesController(IUserLibraryService userLibraryService) : base(userLibraryService) { }
+
+    [NonAction]
+    public override Task<ActionResult<QueryResult<UserLibraryDto>>> GetById(int id)
+    {
+        return base.GetById(id);
+    }
 
     [Authorize("All")]
-    public override Task<ActionResult<UserLibraryDto>> Insert(UserLibraryInsertRequest insert)
+    public override Task<ActionResult<QueryResult<UserLibraryDto>>> Get(UserLibrarySearchObject search)
+    {
+        var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
+        search.UserId = int.Parse(userRefId.Value);
+        
+        return base.Get(search);
+    }
+
+    // [Authorize("All")]
+    // [HttpGet("{eBookId:int}")]
+    // public async Task<ActionResult<QueryResult<UserLibraryDto>>> GetLibraryEntry(int eBookId)
+    // {
+    //     var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
+    //
+    //     return await (WriteService as IUserLibraryService)!.GetLibraryEntry(int.Parse(userRefId.Value), eBookId);
+    // }
+
+    [Authorize("All")]
+    public override async Task<ActionResult<UserLibraryDto>> Insert(UserLibraryInsertRequest insert)
     {
         var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
         insert.UserId = int.Parse(userRefId.Value);
         
-        return base.Insert(insert);
+        return await base.Insert(insert);
     }
-
+    
     [Authorize("All")]
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<string>> Delete(int id)

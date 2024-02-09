@@ -7,7 +7,7 @@ namespace Wordsmith.API.Controllers;
 
 [ApiController]
 [Route("user-library-categories")]
-public class UserLibraryCategoryController : ReadController<UserLibraryCategoryDto, UserLibraryCategorySearchObject>
+public class UserLibraryCategoriesController : ReadController<UserLibraryCategoryDto, UserLibraryCategorySearchObject>
 {
-    public UserLibraryCategoryController(IUserLibraryCategoryService userLibraryCategoryService) : base(userLibraryCategoryService) { }
+    public UserLibraryCategoriesController(IUserLibraryCategoryService userLibraryCategoryService) : base(userLibraryCategoryService) { }
 }

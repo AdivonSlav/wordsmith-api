@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using Wordsmith.Models.RequestObjects.Image;
 using Wordsmith.Models.ValidationAttributes;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-namespace Wordsmith.Models.RequestObjects;
+namespace Wordsmith.Models.RequestObjects.User;
 
 public class UserInsertRequest
 {

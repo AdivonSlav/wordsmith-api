@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.EBook;
 using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.DataAccess.Services.EBook;

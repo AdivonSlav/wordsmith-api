@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Wordsmith.Models.ValidationAttributes;
 
-namespace Wordsmith.Models.RequestObjects;
+namespace Wordsmith.Models.RequestObjects.EBook;
 
 public class EBookInsertRequest
 {

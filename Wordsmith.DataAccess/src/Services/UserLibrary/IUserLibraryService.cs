@@ -1,5 +1,6 @@
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.UserLibrary;
 using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.DataAccess.Services.UserLibrary;

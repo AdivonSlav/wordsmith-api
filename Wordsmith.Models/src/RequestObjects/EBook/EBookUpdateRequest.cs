@@ -1,4 +1,4 @@
-namespace Wordsmith.Models.RequestObjects;
+namespace Wordsmith.Models.RequestObjects.EBook;
 
 public class EBookUpdateRequest
 {

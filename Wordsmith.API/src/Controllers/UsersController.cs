@@ -5,6 +5,8 @@ using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.User;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.Image;
+using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.API.Controllers;

@@ -2,6 +2,7 @@ using AutoMapper;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.EBookReport;
 
 namespace Wordsmith.DataAccess.AutoMapper;
 

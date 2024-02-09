@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Wordsmith.Models.RequestObjects;
+namespace Wordsmith.Models.RequestObjects.EBookReport;
 
 public class EBookReportInsertRequest
 {

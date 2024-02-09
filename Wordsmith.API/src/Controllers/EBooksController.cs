@@ -5,6 +5,7 @@ using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.EBook;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.EBook;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Models.ValidationAttributes;
 

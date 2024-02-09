@@ -11,6 +11,8 @@ using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.MessageObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.Image;
+using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.LoginClient;

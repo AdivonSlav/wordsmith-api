@@ -3,6 +3,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.Image;
+using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.DataAccess.Services.User;

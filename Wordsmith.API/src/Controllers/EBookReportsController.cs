@@ -5,6 +5,7 @@ using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.EBookReport;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
+using Wordsmith.Models.RequestObjects.EBookReport;
 using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.API.Controllers;

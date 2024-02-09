@@ -56,6 +56,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<IMaturityRatingService, MaturityRatingService>();
         services.AddTransient<IGenreService, GenreService>();
         services.AddTransient<IUserLibraryService, UserLibraryService>();
+        services.AddTransient<IUserLibraryCategoryService, UserLibraryCategoryService>();
         
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();

@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.EBook;
 using Wordsmith.DataAccess.Services.EBookReport;
 using Wordsmith.DataAccess.Services.Genre;

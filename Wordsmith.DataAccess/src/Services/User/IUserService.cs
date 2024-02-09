@@ -1,8 +1,6 @@
 #nullable enable
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.Models.DataTransferObjects;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.Image;
 using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
@@ -12,14 +10,12 @@ namespace Wordsmith.DataAccess.Services.User;
 public interface IUserService : IWriteService<UserDto, Db.Entities.User, SearchObject, UserInsertRequest, UserUpdateRequest>
 {
     public Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login);
-    public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update, IEnumerable<Claim> userClaims);
-    public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(IEnumerable<Claim> userClaims);
-    public Task<ActionResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, IEnumerable<Claim> userClaims); 
-    public Task<ActionResult<QueryResult<UserLoginDto>>> Refresh(string? bearerToken, int id);
+    public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update, int userId);
+    public Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(int userId);
+    public Task<ActionResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, int userId); 
+    public Task<ActionResult<QueryResult<UserLoginDto>>> Refresh(string? bearerToken, int userId);
     public Task<ActionResult<QueryResult<UserLoginDto>>> VerifyLogin(string? bearerToken,
-        IEnumerable<Claim> userClaims);
+        int userId);
     public Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess,
-        IEnumerable<Claim> userClaims);
-    public Task<Db.Entities.User> GetUserFromClaims(IEnumerable<Claim> userClaims);
-    public Task<QueryResult<UserDto>> GetUserFromClaimsAsDto(IEnumerable<Claim> userClaims);
+        int adminId);
 }

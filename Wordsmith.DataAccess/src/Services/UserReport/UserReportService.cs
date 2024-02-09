@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.UserReport;
 using Wordsmith.Models.SearchObjects;
 
@@ -15,7 +14,7 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
     public UserReportService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
     protected override IQueryable<Db.Entities.UserReport> AddInclude(IQueryable<Db.Entities.UserReport> query,
-        UserReportSearchObject? search = null)
+        UserReportSearchObject search)
     {
         query = query.Include(report => report.ReportedUser)
             .Include(report => report.ReportDetails)
@@ -27,7 +26,7 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
     }
 
     protected override IQueryable<Db.Entities.UserReport> AddFilter(IQueryable<Db.Entities.UserReport> query,
-        UserReportSearchObject? search = null)
+        UserReportSearchObject search)
     {
         if (search?.ReportedUserId != null)
         {
@@ -56,18 +55,12 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
 
     protected override async Task BeforeInsert(Db.Entities.UserReport entity, UserReportInsertRequest insert)
     {
-        // The reporter should already exist here as it is checked within the controller claims call
-        if (insert.ReporterUserId!.Value == insert.ReportedUserId)
-        {
-            throw new AppException("You cannot report yourself!");
-        }
+        await ValidateInsertion(insert);
 
-        entity.ReportDetails.UserId = insert.ReporterUserId.Value;
+        entity.ReportDetails.UserId = insert.ReporterUserId;
         await Context.Entry(entity).Reference(e => e.ReportedUser).LoadAsync();
         await Context.Entry(entity.ReportDetails).Reference(e => e.Reporter).LoadAsync();
         await Context.Entry(entity.ReportDetails).Reference(e => e.ReportReason).LoadAsync();
-
-        if (entity.ReportedUser == null) throw new AppException("The reported user does not exist");
 
         entity.ReportDetails.SubmissionDate = DateTime.UtcNow;
         entity.ReportDetails.IsClosed = false;
@@ -76,5 +69,23 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
     protected override async Task BeforeUpdate(Db.Entities.UserReport entity, UserReportUpdateRequest update)
     {
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
+    }
+
+    private async Task ValidateInsertion(UserReportInsertRequest insert)
+    {
+        if (insert.ReporterUserId == insert.ReportedUserId)
+        {
+            throw new AppException("You cannot report yourself!");
+        }
+
+        if (!await Context.Users.AnyAsync(e => e.Id == insert.ReporterUserId))
+        {
+            throw new AppException("The user making the report does not exist!");
+        }
+
+        if (!await Context.Users.AnyAsync(e => e.Id == insert.ReportedUserId))
+        {
+            throw new AppException("The user you are trying to report does not exist!");
+        }
     }
 }

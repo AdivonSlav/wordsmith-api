@@ -7,7 +7,7 @@ public class UserReportInsertRequest
     [Required]
     public int ReportedUserId { get; set; }
     
-    public int? ReporterUserId { get; set; }
+    public int ReporterUserId { get; set; }
     
     [Required]
     [StringLength(200)]

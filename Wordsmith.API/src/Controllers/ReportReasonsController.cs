@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.ReportReason;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.SearchObjects;

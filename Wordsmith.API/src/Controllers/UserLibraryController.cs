@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using Wordsmith.DataAccess.Db.Entities;
-using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.UserLibrary;
 using Wordsmith.Models.DataTransferObjects;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.UserLibrary;
 using Wordsmith.Models.SearchObjects;
 
@@ -22,24 +21,25 @@ public class UserLibrariesController : WriteController<UserLibraryDto, UserLibra
         return base.GetById(id);
     }
 
+    [SwaggerOperation("Get a user's library entries based on a search criteria")]
     [Authorize("All")]
     public override Task<ActionResult<QueryResult<UserLibraryDto>>> Get(UserLibrarySearchObject search)
     {
-        var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
-        search.UserId = int.Parse(userRefId.Value);
+        search.UserId = GetAuthUserId();
         
         return base.Get(search);
     }
 
+    [SwaggerOperation("Add a new library entry for a user")]
     [Authorize("All")]
     public override async Task<ActionResult<UserLibraryDto>> Insert(UserLibraryInsertRequest insert)
     {
-        var userRefId = HttpContext.User.Claims.First(c => c.Type == "user_ref_id");
-        insert.UserId = int.Parse(userRefId.Value);
+        insert.UserId = GetAuthUserId();
         
         return await base.Insert(insert);
     }
     
+    [SwaggerOperation("Remove a library entry for a user")]
     [Authorize("All")]
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<string>> Delete(int id)

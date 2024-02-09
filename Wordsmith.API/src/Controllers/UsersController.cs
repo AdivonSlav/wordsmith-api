@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using Wordsmith.DataAccess.Db.Entities;
-using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.User;
 using Wordsmith.Models.DataTransferObjects;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.Image;
 using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
@@ -18,6 +17,7 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
     public UsersController(IUserService userService)
         : base(userService) { }
 
+    [SwaggerOperation("Adds a new user")]
     [HttpPost("register")]
     public override async Task<ActionResult<UserDto>> Insert([FromBody] UserInsertRequest insert)
     {
@@ -30,40 +30,50 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
         return await base.Update(id, update);
     }
 
+    [SwaggerOperation("Get the profile of the user from the provided bearer token")]
     [Authorize("All")]
     [HttpGet("profile")]
     public async Task<ActionResult<QueryResult<UserDto>>> GetProfile()
     {
-        return await ((WriteService as IUserService)!).GetUserFromClaimsAsDto(HttpContext.User.Claims);
+        var userId = GetAuthUserId();
+        return await base.GetById(userId);
     }
     
+    [SwaggerOperation("Updates the profile of the user from the provided bearer token")]
     [Authorize("All")]
     [HttpPut("profile")]
     public async Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
     {
-        return await ((WriteService as IUserService)!).UpdateProfile(update, HttpContext.User.Claims);
+        var userId = GetAuthUserId();
+        return await ((WriteService as IUserService)!).UpdateProfile(update, userId);
     }
 
+    [SwaggerOperation("Gets the profile image of the user from the provided bearer token")]
     [Authorize("All")]
     [HttpGet("profile/image")]
     public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage()
     {
-        return await ((WriteService as IUserService)!).GetProfileImage(HttpContext.User.Claims);
+        var userId = GetAuthUserId();
+        return await ((WriteService as IUserService)!).GetProfileImage(userId);
     }
     
+    [SwaggerOperation("Updates the profile image of the user from the provided bearer token")]
     [Authorize("All")]
     [HttpPut("profile/image")]
     public async Task<ActionResult<ImageDto>> UpdateProfileImage([FromBody] ImageInsertRequest update)
     {
-        return await ((WriteService as IUserService)!).UpdateProfileImage(update, HttpContext.User.Claims);
+        var userId = GetAuthUserId();
+        return await ((WriteService as IUserService)!).UpdateProfileImage(update, userId);
     }
 
+    [SwaggerOperation("Performs a user login with the provided credentials")]
     [HttpPost("login")]
     public async Task<ActionResult<UserLoginDto>> Login([FromBody] UserLoginRequest login)
     {
         return await ((WriteService as IUserService)!).Login(login);
     }
 
+    [SwaggerOperation("Refreshes the provided refresh token based on the user id")]
     [HttpGet("login/refresh")]
     public async Task<ActionResult<QueryResult<UserLoginDto>>> Refresh([FromQuery] int id)
     {
@@ -72,18 +82,22 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
         return await ((WriteService as IUserService)!).Refresh(bearerToken, id);
     }
 
+    [SwaggerOperation("Verifies whether the provided access token is still valid")]
     [HttpGet("login/verify")]
     public async Task<ActionResult<QueryResult<UserLoginDto>>> VerifyLogin()
     {
+        var userId = GetAuthUserId();
         var bearerToken = HttpContext.Request.Headers["Authorization"];
         
-        return await ((WriteService as IUserService)!).VerifyLogin(bearerToken, HttpContext.User.Claims);
+        return await ((WriteService as IUserService)!).VerifyLogin(bearerToken, userId);
     }
 
+    [SwaggerOperation("Toggles access for a user based on the provided userId and bearer token")]
     [Authorize("AdminOperations")]
-    [HttpPut("{id:int}/change-access")]
-    public async Task<ActionResult> ChangeAccess(int id, [FromBody] UserChangeAccessRequest changeAccess)
+    [HttpPut("{userId:int}/change-access")]
+    public async Task<ActionResult> ChangeAccess(int userId, [FromBody] UserChangeAccessRequest changeAccess)
     {
-        return await ((WriteService as IUserService)!).ChangeAccess(id, changeAccess, HttpContext.User.Claims);
+        var adminId = GetAuthUserId();
+        return await ((WriteService as IUserService)!).ChangeAccess(userId, changeAccess, adminId);
     }
 }

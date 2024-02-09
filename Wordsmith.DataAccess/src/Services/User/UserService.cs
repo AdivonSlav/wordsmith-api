@@ -1,5 +1,4 @@
 #nullable enable
-using System.Security.Claims;
 using System.Text.Json;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,6 @@ using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.MessageObjects;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.Image;
 using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
@@ -41,10 +39,8 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
     protected override async Task BeforeInsert(Db.Entities.User entity, UserInsertRequest insert)
     {
-        if (await AlreadyExists(insert))
-        {
-            throw new AppException("User with the provided username or email already exists");
-        }
+        await ValidateUsername(insert.Username);
+        await ValidateEmail(insert.Email);
 
         entity.RegistrationDate = DateTime.UtcNow;
         entity.Role = "user";
@@ -85,7 +81,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
         if (entity == null)
         {
-            throw new AppException("User does not exist");
+            throw new AppException("Wrong username!");
         }
 
         var clientSecret = "";
@@ -118,9 +114,12 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return new OkObjectResult(tokens);
     }
 
-    public async Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest request, IEnumerable<Claim> userClaims)
+    public async Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest request, int userId)
     {
-        var entity = await GetUserFromClaims(userClaims);
+        var entity = await UserExists(userId);
+
+        if (request.Username != null) await ValidateUsername(request.Username);
+        if (request.Email != null) await ValidateEmail(request.Email);
 
         Mapper.Map(request, entity);
 
@@ -152,9 +151,9 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return new OkObjectResult(Mapper.Map<UserDto>(entity));
     }
 
-    public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(IEnumerable<Claim> userClaims)
+    public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(int userId)
     {
-        var entity = await GetUserFromClaims(userClaims);
+        var entity = await UserExists(userId);
 
         await Context.Entry(entity).Reference(e => e.ProfileImage).LoadAsync(); // ProfileImage must be loaded in before 
         
@@ -171,9 +170,9 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return result;
     }
 
-    public async Task<ActionResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, IEnumerable<Claim> userClaims)
+    public async Task<ActionResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, int userId)
     {
-        var entity = await GetUserFromClaims(userClaims);
+        var entity = await UserExists(userId);
         
         await Context.Entry(entity).Reference(e => e.ProfileImage).LoadAsync(); // ProfileImage must be loaded in before 
 
@@ -215,15 +214,13 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return updatedImage;
     }
 
-    public async Task<ActionResult<QueryResult<UserLoginDto>>> Refresh(string? bearerToken, int id)
+    public async Task<ActionResult<QueryResult<UserLoginDto>>> Refresh(string? bearerToken, int userId)
     {
         var refreshToken = bearerToken?.Replace("Bearer", "").Trim();
 
         if (refreshToken == null) throw new AppException("No refresh token was passed");
 
-        var entity = await Context.Users.FindAsync(id);
-
-        if (entity == null) throw new AppException("User with the id passed was not found");
+        var entity = await UserExists(userId);
         
         var clientSecret = "";
         var clientId = "";
@@ -255,13 +252,13 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         });
     }
 
-    public async Task<ActionResult<QueryResult<UserLoginDto>>> VerifyLogin(string? bearerToken, IEnumerable<Claim> userClaims)
+    public async Task<ActionResult<QueryResult<UserLoginDto>>> VerifyLogin(string? bearerToken, int userId)
     {
         var accessToken = bearerToken?.Replace("Bearer", "").Trim();
 
         if (accessToken == null) throw new AppException("No refresh token was passed");
 
-        var entity = await GetUserFromClaims(userClaims);
+        var entity = await UserExists(userId);
         var clientSecret = "";
         var clientId = "";
 
@@ -292,16 +289,10 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         });
     }
 
-    public async Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, IEnumerable<Claim> userClaims)
+    public async Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, int adminId)
     {
-        var user = await Context.Users.FindAsync(userId);
-
-        if (user == null)
-        {
-            throw new AppException("The user does not exist!");
-        }
-
-        var admin = await GetUserFromClaims(userClaims);
+        var user = await UserExists(userId);
+        var admin = await UserExists(adminId);
 
         var alreadyRemovedAccess = await Context.UserBans.AnyAsync(userBan =>
             userBan.UserId == userId &&
@@ -366,9 +357,32 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return new OkResult();
     }
 
-    private async Task<bool> AlreadyExists(UserInsertRequest insert)
+    private async Task ValidateUsername(string username)
     {
-        return await Context.Users.AnyAsync(user => user.Username == insert.Username || user.Email == insert.Email);
+        if (await Context.Users.AnyAsync(u => u.Username == username))
+        {
+            throw new AppException("Username is taken!");
+        }
+    }
+
+    private async Task ValidateEmail(string email)
+    {
+        if (await Context.Users.AnyAsync(u => u.Email == email))
+        {
+            throw new AppException("Email is taken!");
+        }
+    }
+
+    private async Task<Db.Entities.User> UserExists(int userId)
+    {
+        var user = await Context.Users.FindAsync(userId);
+
+        if (user == null)
+        {
+            throw new AppException("User does not exist!");
+        }
+
+        return user;
     }
 
     private async Task<OperationStatusMessage> WaitForReply(EventWaitHandle autoResetEvent, string queue,
@@ -398,29 +412,5 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         }
 
         return response;
-    }
-
-    public async Task<Db.Entities.User> GetUserFromClaims(IEnumerable<Claim> userClaims)
-    {
-        var refId = userClaims.FirstOrDefault(c => c.Type == "user_ref_id")!.Value; // Should never be null unless tokens are misconfigured
-        
-        if (!int.TryParse(refId, out var userId))
-        {
-            throw new Exception($"User with ref id {refId} could not be parsed!");
-        }
-
-        var entity = await Context.Users.FindAsync(userId);
-
-        return entity ?? throw new AppException("User passed for auth does not exist!");
-    }
-
-    public async Task<QueryResult<UserDto>> GetUserFromClaimsAsDto(IEnumerable<Claim> userClaims)
-    {
-        var entity = await GetUserFromClaims(userClaims);
-
-        return new QueryResult<UserDto>()
-        {
-            Result = new List<UserDto>() { Mapper.Map<UserDto>(entity) }
-        };
     }
 }

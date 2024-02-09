@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using Wordsmith.DataAccess.Db.Entities;
-using Wordsmith.DataAccess.Services;
 using Wordsmith.DataAccess.Services.EBook;
 using Wordsmith.Models.DataTransferObjects;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.EBook;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Models.ValidationAttributes;
@@ -18,12 +17,14 @@ public class
 {
     public EBooksController(IEBookService eBookService) : base(eBookService) { }
 
+    [SwaggerOperation("Adds a new ebook")]
     [Authorize("All")]
     public override Task<ActionResult<EBookDto>> Insert([FromForm] EBookInsertRequest insert)
     {
         return base.Insert(insert);
     }
 
+    [SwaggerOperation("Parses an EPUB file and returns metadata information")]
     [Authorize("All")]
     [HttpPost("parse")]
     public async Task<ActionResult<EBookParseDto>> Parse([EpubFile] IFormFile file)
@@ -31,6 +32,7 @@ public class
         return await (WriteService as IEBookService)!.Parse(file);
     }
 
+    [SwaggerOperation("Downloads the EPUB file of an ebook")]
     [Authorize("All")]
     [HttpGet("{id:int}/download")]
     public async Task<IActionResult> Download(int id)

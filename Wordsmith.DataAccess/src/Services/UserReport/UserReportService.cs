@@ -1,20 +1,19 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.UserReport;
 
-public class UserReportService : WriteService<UserReportDto, UserReport, UserReportSearchObject,
+public class UserReportService : WriteService<UserReportDto, Db.Entities.UserReport, UserReportSearchObject,
     UserReportInsertRequest, UserReportUpdateRequest>, IUserReportService
 {
     public UserReportService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override IQueryable<UserReport> AddInclude(IQueryable<UserReport> query,
+    protected override IQueryable<Db.Entities.UserReport> AddInclude(IQueryable<Db.Entities.UserReport> query,
         UserReportSearchObject? search = null)
     {
         query = query.Include(report => report.ReportedUser)
@@ -26,7 +25,7 @@ public class UserReportService : WriteService<UserReportDto, UserReport, UserRep
         return query;
     }
 
-    protected override IQueryable<UserReport> AddFilter(IQueryable<UserReport> query,
+    protected override IQueryable<Db.Entities.UserReport> AddFilter(IQueryable<Db.Entities.UserReport> query,
         UserReportSearchObject? search = null)
     {
         if (search?.ReportedUserId != null)
@@ -54,7 +53,7 @@ public class UserReportService : WriteService<UserReportDto, UserReport, UserRep
         return query;
     }
 
-    protected override async Task BeforeInsert(UserReport entity, UserReportInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.UserReport entity, UserReportInsertRequest insert)
     {
         // The reporter should already exist here as it is checked within the controller claims call
         if (insert.ReporterUserId!.Value == insert.ReportedUserId)
@@ -73,7 +72,7 @@ public class UserReportService : WriteService<UserReportDto, UserReport, UserRep
         entity.ReportDetails.IsClosed = false;
     }
 
-    protected override async Task BeforeUpdate(UserReport entity, UserReportUpdateRequest update)
+    protected override async Task BeforeUpdate(Db.Entities.UserReport entity, UserReportUpdateRequest update)
     {
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
     }

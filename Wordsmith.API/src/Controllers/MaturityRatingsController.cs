@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Services;
+using Wordsmith.DataAccess.Services.MaturityRating;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.SearchObjects;
 

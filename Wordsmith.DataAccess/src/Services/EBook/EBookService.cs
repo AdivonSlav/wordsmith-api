@@ -12,13 +12,13 @@ using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.EBookFileHelper;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.EBook;
 
-public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBookInsertRequest, EBookUpdateRequest>, IEBookService
+public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearchObject, EBookInsertRequest, EBookUpdateRequest>, IEBookService
 {
     public EBookService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override async Task BeforeInsert(EBook entity, EBookInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.EBook entity, EBookInsertRequest insert)
     {
         await ValidateForeignKeys(insert);
         await HandleImage(entity, insert);
@@ -31,7 +31,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         entity.Path = fileName;
     }
 
-    protected override async Task AfterInsert(EBook entity, EBookInsertRequest insert)
+    protected override async Task AfterInsert(Db.Entities.EBook entity, EBookInsertRequest insert)
     {
         await HandleChapters(entity, insert);
         await HandleGenres(entity, insert);
@@ -41,7 +41,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         await Context.Entry(entity).Reference(e => e.Author).LoadAsync();
     }
 
-    protected override IQueryable<EBook> AddFilter(IQueryable<EBook> query, EBookSearchObject search = null)
+    protected override IQueryable<Db.Entities.EBook> AddFilter(IQueryable<Db.Entities.EBook> query, EBookSearchObject search = null)
     {
         if (search?.Title != null)
         {
@@ -61,7 +61,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         return query;
     }
 
-    protected override IQueryable<EBook> AddInclude(IQueryable<EBook> query, EBookSearchObject search = null)
+    protected override IQueryable<Db.Entities.EBook> AddInclude(IQueryable<Db.Entities.EBook> query, EBookSearchObject search = null)
     {
         query = query.Include(e => e.MaturityRating).Include(e => e.CoverArt).Include(e => e.Author);
 
@@ -110,7 +110,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         }
     }
 
-    private async Task HandleImage(EBook entity, EBookInsertRequest insert)
+    private async Task HandleImage(Db.Entities.EBook entity, EBookInsertRequest insert)
     {
         var savePath = Path.Combine("images", "ebooks", $"eBook-{Guid.NewGuid()}");
         var imageSaveInfo = ImageHelper.SaveFromBase64(insert.EncodedCoverArt, null, savePath);
@@ -125,7 +125,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         entity.CoverArt = newImage;
     }
 
-    private async Task HandleChapters(EBook entity, EBookInsertRequest insert)
+    private async Task HandleChapters(Db.Entities.EBook entity, EBookInsertRequest insert)
     {
         var chapters = new List<EBookChapter>();
         
@@ -145,7 +145,7 @@ public class EBookService : WriteService<EBookDto, EBook, EBookSearchObject, EBo
         entity.ChapterCount = chapters.Count;
     }
 
-    private async Task HandleGenres(EBook entity, EBookInsertRequest insert)
+    private async Task HandleGenres(Db.Entities.EBook entity, EBookInsertRequest insert)
     {
         var eBookGenres = new List<EBookGenre>();
 

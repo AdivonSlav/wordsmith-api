@@ -6,6 +6,15 @@ using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Services;
+using Wordsmith.DataAccess.Services.EBook;
+using Wordsmith.DataAccess.Services.EBookReport;
+using Wordsmith.DataAccess.Services.Genre;
+using Wordsmith.DataAccess.Services.MaturityRating;
+using Wordsmith.DataAccess.Services.ReportReason;
+using Wordsmith.DataAccess.Services.User;
+using Wordsmith.DataAccess.Services.UserLibrary;
+using Wordsmith.DataAccess.Services.UserLibraryCategory;
+using Wordsmith.DataAccess.Services.UserReport;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
 

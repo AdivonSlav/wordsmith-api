@@ -16,9 +16,9 @@ using Wordsmith.Utils;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.User;
 
-public class UserService : WriteService<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>, IUserService
+public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject, UserInsertRequest, UserUpdateRequest>, IUserService
 {
     private readonly IMessageProducer _messageProducer;
     private readonly IMessageListener _messageListener;
@@ -37,7 +37,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         _messageListener = messageListener;
     }
 
-    protected override async Task BeforeInsert(User entity, UserInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.User entity, UserInsertRequest insert)
     {
         if (await AlreadyExists(insert))
         {
@@ -64,7 +64,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         entity.ProfileImage = newImageEntity;
     }
 
-    protected override Task AfterInsert(User entity, UserInsertRequest insert)
+    protected override Task AfterInsert(Db.Entities.User entity, UserInsertRequest insert)
     {
         _messageProducer.SendMessage("user_insertion", new RegisterUserMessage()
         {
@@ -398,7 +398,7 @@ public class UserService : WriteService<UserDto, User, SearchObject, UserInsertR
         return response;
     }
 
-    public async Task<User> GetUserFromClaims(IEnumerable<Claim> userClaims)
+    public async Task<Db.Entities.User> GetUserFromClaims(IEnumerable<Claim> userClaims)
     {
         var refId = userClaims.FirstOrDefault(c => c.Type == "user_ref_id")!.Value; // Should never be null unless tokens are misconfigured
         

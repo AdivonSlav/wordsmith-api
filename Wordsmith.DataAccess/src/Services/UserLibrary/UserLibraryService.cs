@@ -1,20 +1,18 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.UserLibrary;
 
-public class UserLibraryService : WriteService<UserLibraryDto, UserLibrary, UserLibrarySearchObject, UserLibraryInsertRequest, UserLibraryUpdateRequest>, IUserLibraryService
+public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserLibrary, UserLibrarySearchObject, UserLibraryInsertRequest, UserLibraryUpdateRequest>, IUserLibraryService
 {
     public UserLibraryService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override async Task BeforeInsert(UserLibrary entity, UserLibraryInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert)
     {
         await ValidateInsertion(entity, insert);
         
@@ -23,7 +21,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, UserLibrary, User
         entity.LastPage = 0;
     }
 
-    protected override async Task AfterInsert(UserLibrary entity, UserLibraryInsertRequest insert)
+    protected override async Task AfterInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert)
     {
         await Context.Entry(entity).Reference(e => e.EBook).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
@@ -31,7 +29,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, UserLibrary, User
         await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
     }
 
-    private async Task ValidateInsertion(UserLibrary entity, UserLibraryInsertRequest insert)
+    private async Task ValidateInsertion(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert)
     {
         var ebook = await Context.EBooks.FindAsync(insert.EBookId);
         
@@ -48,7 +46,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, UserLibrary, User
         }
     }
 
-    protected override IQueryable<UserLibrary> AddInclude(IQueryable<UserLibrary> query, UserLibrarySearchObject search)
+    protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query, UserLibrarySearchObject search)
     {
         query = query
             .Include(e => e.EBook)
@@ -61,7 +59,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, UserLibrary, User
         return query;
     }
 
-    protected override IQueryable<UserLibrary> AddFilter(IQueryable<UserLibrary> query, UserLibrarySearchObject search)
+    protected override IQueryable<Db.Entities.UserLibrary> AddFilter(IQueryable<Db.Entities.UserLibrary> query, UserLibrarySearchObject search)
     {
         query = query.Where(e => e.UserId == search.UserId);
 

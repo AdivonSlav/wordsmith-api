@@ -1,11 +1,10 @@
-using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.UserReport;
 
-public interface IUserReportService : IWriteService<UserReportDto, UserReport, UserReportSearchObject,
+public interface IUserReportService : IWriteService<UserReportDto, Db.Entities.UserReport, UserReportSearchObject,
     UserReportInsertRequest, UserReportUpdateRequest>
 {
     

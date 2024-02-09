@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Services;
+using Wordsmith.DataAccess.Services.User;
+using Wordsmith.DataAccess.Services.UserReport;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;

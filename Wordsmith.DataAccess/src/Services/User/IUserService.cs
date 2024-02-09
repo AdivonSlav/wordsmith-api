@@ -1,14 +1,13 @@
 #nullable enable
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.User;
 
-public interface IUserService : IWriteService<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>
+public interface IUserService : IWriteService<UserDto, Db.Entities.User, SearchObject, UserInsertRequest, UserUpdateRequest>
 {
     public Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login);
     public Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update, IEnumerable<Claim> userClaims);
@@ -19,6 +18,6 @@ public interface IUserService : IWriteService<UserDto, User, SearchObject, UserI
         IEnumerable<Claim> userClaims);
     public Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess,
         IEnumerable<Claim> userClaims);
-    public Task<User> GetUserFromClaims(IEnumerable<Claim> userClaims);
+    public Task<Db.Entities.User> GetUserFromClaims(IEnumerable<Claim> userClaims);
     public Task<QueryResult<UserDto>> GetUserFromClaimsAsDto(IEnumerable<Claim> userClaims);
 }

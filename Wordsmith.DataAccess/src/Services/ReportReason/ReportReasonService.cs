@@ -1,16 +1,15 @@
 using AutoMapper;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.SearchObjects;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.ReportReason;
 
-public class ReportReasonService : ReadService<ReportReasonDto, ReportReason, ReportReasonSearch>, IReportReasonService
+public class ReportReasonService : ReadService<ReportReasonDto, Db.Entities.ReportReason, ReportReasonSearch>, IReportReasonService
 {
     public ReportReasonService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override IQueryable<ReportReason> AddFilter(IQueryable<ReportReason> query, ReportReasonSearch? search = null)
+    protected override IQueryable<Db.Entities.ReportReason> AddFilter(IQueryable<Db.Entities.ReportReason> query, ReportReasonSearch? search = null)
     {
         if (!string.IsNullOrEmpty(search?.Subject))
         {

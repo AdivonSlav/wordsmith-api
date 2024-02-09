@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Services;
+using Wordsmith.DataAccess.Services.EBookReport;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;

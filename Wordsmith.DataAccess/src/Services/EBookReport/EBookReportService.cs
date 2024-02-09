@@ -1,20 +1,19 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.SearchObjects;
 
-namespace Wordsmith.DataAccess.Services;
+namespace Wordsmith.DataAccess.Services.EBookReport;
 
-public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBookReportSearchObject, EBookReportInsertRequest, EBookReportUpdateRequest>, IEBookReportService
+public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBookReport, EBookReportSearchObject, EBookReportInsertRequest, EBookReportUpdateRequest>, IEBookReportService
 {
     public EBookReportService(DatabaseContext context, IMapper mapper)
         : base(context, mapper) {}
 
-    protected override IQueryable<EBookReport> AddInclude(IQueryable<EBookReport> query, EBookReportSearchObject? search = null)
+    protected override IQueryable<Db.Entities.EBookReport> AddInclude(IQueryable<Db.Entities.EBookReport> query, EBookReportSearchObject? search = null)
     {
         query = query.Include(report => report.ReportedEBook)
             .ThenInclude(eBook => eBook.CoverArt)
@@ -28,7 +27,7 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
         return query;
     }
 
-    protected override IQueryable<EBookReport> AddFilter(IQueryable<EBookReport> query, EBookReportSearchObject? search = null)
+    protected override IQueryable<Db.Entities.EBookReport> AddFilter(IQueryable<Db.Entities.EBookReport> query, EBookReportSearchObject? search = null)
     {
         if (search?.ReportedEBookId != null)
         {
@@ -55,7 +54,7 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
         return query;
     }
 
-    protected override async Task BeforeInsert(EBookReport entity, EBookReportInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.EBookReport entity, EBookReportInsertRequest insert)
     {
         if (!insert.ReporterUserId.HasValue) throw new AppException("The user making the report does not exist!");
 
@@ -70,7 +69,7 @@ public class EBookReportService : WriteService<EBookReportDto, EBookReport, EBoo
         entity.ReportDetails.IsClosed = false;
     }
 
-    protected override async Task BeforeUpdate(EBookReport entity, EBookReportUpdateRequest update)
+    protected override async Task BeforeUpdate(Db.Entities.EBookReport entity, EBookReportUpdateRequest update)
     {
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
     }

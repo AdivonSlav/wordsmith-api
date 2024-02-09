@@ -1,8 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
-using Wordsmith.DataAccess.Extensions;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
 

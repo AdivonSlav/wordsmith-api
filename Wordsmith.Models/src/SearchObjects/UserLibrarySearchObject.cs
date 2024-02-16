@@ -15,4 +15,7 @@ public class UserLibrarySearchObject : SearchObject
     
     [SwaggerParameter("Maturity rating ID of the book")]
     public int? MaturityRatingId { get; set; }
+    
+    [SwaggerParameter("The ID of the category that this entry belongs to")]
+    public int? UserLibraryCategoryId { get; set; }
 }

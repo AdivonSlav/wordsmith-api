@@ -38,6 +38,14 @@ public class UserLibrariesController : WriteController<UserLibraryDto, UserLibra
         
         return await base.Insert(insert);
     }
+
+    // [SwaggerOperation("Remove a a library entry's category")]
+    // [Authorize("All")]
+    // [HttpPut("category/{libraryId:int}")]
+    // public async Task<IActionResult> RemoveFromCategory(int libraryId)
+    // {
+    //     return await (WriteService as IUserLibraryService)!.RemoveFromCategory(libraryId);
+    // }
     
     [SwaggerOperation("Remove a library entry for a user")]
     [Authorize("All")]

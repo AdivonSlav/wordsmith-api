@@ -16,6 +16,8 @@ public class UserLibraryDto
     
     public string ReadProgress { get; set; }
     
+    public int? UserLibraryCategoryId { get; set; }
+    
     public int LastChapterId { get; set; }
     
     public int LastPage { get; set; }

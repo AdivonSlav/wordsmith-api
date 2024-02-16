@@ -1,9 +1,9 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.UserLibrary;
 using Wordsmith.Models.SearchObjects;
 
@@ -79,22 +79,38 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
             query = query.Where(e => e.EBookId == search.EBookId.Value);
         }
 
+        if (search.UserLibraryCategoryId.HasValue)
+        {
+            query = query.Where(e => e.UserLibraryCategoryId == search.UserLibraryCategoryId.Value);
+        }
+
         return query;
     }
+    
+    public async Task<IActionResult> RemoveFromCategory(int libraryId)
+    {
+        var libraryEntry = await LibraryEntryExists(libraryId);
 
-    // public async Task<ActionResult<QueryResult<UserLibraryDto>>> GetLibraryEntry(int userId, int eBookId)
-    // {
-    //     var userLibrary = await Context.UserLibraries.Where(e => e.UserId == userId && e.EBookId == eBookId).ToListAsync();
-    //     var queryResult = new QueryResult<UserLibraryDto>
-    //     {
-    //         Result = new List<UserLibraryDto>()
-    //     };
-    //
-    //     if (userLibrary != null)
-    //     {
-    //         queryResult.Result.Add(Mapper.Map<UserLibraryDto>(userLibrary));
-    //     }
-    //
-    //     return queryResult;
-    // }
+        if (libraryEntry.UserLibraryCategoryId == null)
+        {
+            throw new AppException("The library entry does not belong to any category!");
+        }
+
+        libraryEntry.UserLibraryCategoryId = null;
+        await Context.SaveChangesAsync();
+
+        return new OkObjectResult("Removed entry from the specified category");
+    }
+    
+    private async Task<Db.Entities.UserLibrary> LibraryEntryExists(int userLibraryId)
+    {
+        var libraryEntry = await Context.UserLibraries.FindAsync(userLibraryId);
+
+        if (libraryEntry == null)
+        {
+            throw new AppException("This book is not in your library!");
+        }
+
+        return libraryEntry;
+    }
 }

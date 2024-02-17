@@ -19,7 +19,7 @@ public class
 
     [SwaggerOperation("Adds a new ebook")]
     [Authorize("All")]
-    public override Task<ActionResult<EBookDto>> Insert([FromForm] EBookInsertRequest insert)
+    public override Task<ActionResult<EntityResult<EBookDto>>> Insert([FromForm] EBookInsertRequest insert)
     {
         return base.Insert(insert);
     }
@@ -27,9 +27,9 @@ public class
     [SwaggerOperation("Parses an EPUB file and returns metadata information")]
     [Authorize("All")]
     [HttpPost("parse")]
-    public async Task<ActionResult<EBookParseDto>> Parse([EpubFile] IFormFile file)
+    public async Task<ActionResult<EntityResult<EBookDto>>> Parse([EpubFile] IFormFile file)
     {
-        return await (WriteService as IEBookService)!.Parse(file);
+        return Ok(await (WriteService as IEBookService)!.Parse(file));
     }
 
     [SwaggerOperation("Downloads the EPUB file of an ebook")]
@@ -37,6 +37,8 @@ public class
     [HttpGet("{id:int}/download")]
     public async Task<IActionResult> Download(int id)
     {
-        return await (WriteService as IEBookService)!.Download(id);
+        var ebookFile = await (WriteService as IEBookService)!.Download(id);
+
+        return File(ebookFile.Bytes, ebookFile.MimeType, fileDownloadName: ebookFile.Filename);
     }
 }

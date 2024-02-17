@@ -31,14 +31,14 @@ public class EBookReportsController : WriteController<EBookReportDto, EBookRepor
 
     [SwaggerOperation("Adds a new ebook report")]
     [Authorize("All")]
-    public override Task<ActionResult<EBookReportDto>> Insert(EBookReportInsertRequest insert)
+    public override Task<ActionResult<EntityResult<EBookReportDto>>> Insert(EBookReportInsertRequest insert)
     {
         return base.Insert(insert);
     }
 
     [SwaggerOperation("Updates an ebook report")]
     [Authorize("AdminOperations")]
-    public override Task<ActionResult<EBookReportDto>> Update(int id, EBookReportUpdateRequest update)
+    public override Task<ActionResult<EntityResult<EBookReportDto>>> Update(int id, EBookReportUpdateRequest update)
     {
         return base.Update(id, update);
     }

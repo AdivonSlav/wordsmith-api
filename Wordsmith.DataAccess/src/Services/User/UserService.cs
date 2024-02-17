@@ -75,7 +75,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return Task.CompletedTask;
     }
 
-    public async Task<ActionResult<UserLoginDto>> Login(UserLoginRequest login)
+    public async Task<EntityResult<UserLoginDto>> Login(UserLoginRequest login)
     {
         var entity = await Context.Users.FirstOrDefaultAsync(user => user.Username == login.Username);
 
@@ -111,10 +111,14 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         
         Logger.LogDebug($"Created login session for user with id {entity.Id}");
 
-        return new OkObjectResult(tokens);
+        return new EntityResult<UserLoginDto>()
+        {
+            Message = "Created login session",
+            Result = tokens
+        };
     }
 
-    public async Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest request, int userId)
+    public async Task<EntityResult<UserDto>> UpdateProfile(UserUpdateRequest request, int userId)
     {
         var entity = await UserExists(userId);
 
@@ -147,11 +151,15 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         }
 
         await Context.SaveChangesAsync();
-        
-        return new OkObjectResult(Mapper.Map<UserDto>(entity));
+
+        return new EntityResult<UserDto>()
+        {
+            Message = "Updated profile",
+            Result = Mapper.Map<UserDto>(entity)
+        };
     }
 
-    public async Task<ActionResult<QueryResult<ImageDto>>> GetProfileImage(int userId)
+    public async Task<QueryResult<ImageDto>> GetProfileImage(int userId)
     {
         var entity = await UserExists(userId);
 
@@ -170,7 +178,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return result;
     }
 
-    public async Task<ActionResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, int userId)
+    public async Task<EntityResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, int userId)
     {
         var entity = await UserExists(userId);
         
@@ -211,10 +219,14 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         
         await Context.SaveChangesAsync();
 
-        return updatedImage;
+        return new EntityResult<ImageDto>()
+        {
+            Message = "Updated profile image",
+            Result = updatedImage
+        };
     }
 
-    public async Task<ActionResult<QueryResult<UserLoginDto>>> Refresh(string? bearerToken, int userId)
+    public async Task<QueryResult<UserLoginDto>> Refresh(string? bearerToken, int userId)
     {
         var refreshToken = bearerToken?.Replace("Bearer", "").Trim();
 
@@ -246,13 +258,13 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
         Logger.LogDebug($"Refreshed login session for user with id ${entity.Id}");
 
-        return new OkObjectResult(new QueryResult<UserLoginDto>()
+        return new QueryResult<UserLoginDto>()
         {
             Result = new List<UserLoginDto>() { tokens }
-        });
+        };
     }
 
-    public async Task<ActionResult<QueryResult<UserLoginDto>>> VerifyLogin(string? bearerToken, int userId)
+    public async Task<QueryResult<UserLoginDto>> VerifyLogin(string? bearerToken, int userId)
     {
         var accessToken = bearerToken?.Replace("Bearer", "").Trim();
 
@@ -283,13 +295,13 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         
         Logger.LogDebug($"Verified access token validity for user with id {entity.Id}");
 
-        return new OkObjectResult(new QueryResult<UserLoginDto>()
+        return new QueryResult<UserLoginDto>()
         {
             Result = new List<UserLoginDto>() { userLogin }
-        });
+        };
     }
 
-    public async Task<ActionResult> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, int adminId)
+    public async Task<EntityResult<UserDto>> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, int adminId)
     {
         var user = await UserExists(userId);
         var admin = await UserExists(adminId);
@@ -302,7 +314,11 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         if ((alreadyRemovedAccess && !changeAccess.AllowedAccess) ||
             (!alreadyRemovedAccess && changeAccess.AllowedAccess))
         {
-            return new OkResult();
+            return new EntityResult<UserDto>()
+            {
+                Message = "Access already changed",
+                Result = Mapper.Map<UserDto>(user)
+            };
         }
 
         if (!changeAccess.AllowedAccess)
@@ -354,7 +370,12 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         }
 
         await Context.SaveChangesAsync();
-        return new OkResult();
+
+        return new EntityResult<UserDto>()
+        {
+            Message = "Changed access for user",
+            Result = Mapper.Map<UserDto>(user)
+        };
     }
 
     private async Task ValidateUsername(string username)

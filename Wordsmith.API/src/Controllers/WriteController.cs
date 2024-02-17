@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Wordsmith.DataAccess.Services;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.API.Controllers;
@@ -22,15 +23,15 @@ public class WriteController<T, TDb, TSearch, TInsert, TUpdate> : ReadController
 
     [SwaggerOperation("Basic insert")]
     [HttpPost]
-    public virtual async Task<ActionResult<T>> Insert([FromBody] TInsert insert)
+    public virtual async Task<ActionResult<EntityResult<T>>> Insert([FromBody] TInsert insert)
     {
-        return await WriteService.Insert(insert);
+        return CreatedAtAction(nameof(Insert), await WriteService.Insert(insert));
     }
     
     [SwaggerOperation("Basic update")]
     [HttpPut("{id:int}")]
-    public virtual async Task<ActionResult<T>> Update(int id, [FromBody] TUpdate update)
+    public virtual async Task<ActionResult<EntityResult<T>>> Update(int id, [FromBody] TUpdate update)
     {
-        return await WriteService.Update(id, update);
+        return Ok(await WriteService.Update(id, update));
     }
 }

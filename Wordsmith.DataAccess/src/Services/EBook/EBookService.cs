@@ -1,13 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Net.Http.Headers;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.EBook;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
@@ -42,7 +39,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         await Context.Entry(entity).Reference(e => e.Author).LoadAsync();
     }
 
-    protected override IQueryable<Db.Entities.EBook> AddFilter(IQueryable<Db.Entities.EBook> query, EBookSearchObject search = null)
+    protected override IQueryable<Db.Entities.EBook> AddFilter(IQueryable<Db.Entities.EBook> query, EBookSearchObject search)
     {
         if (search?.Title != null)
         {
@@ -62,21 +59,21 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         return query;
     }
 
-    protected override IQueryable<Db.Entities.EBook> AddInclude(IQueryable<Db.Entities.EBook> query, EBookSearchObject search = null)
+    protected override IQueryable<Db.Entities.EBook> AddInclude(IQueryable<Db.Entities.EBook> query, EBookSearchObject search)
     {
         query = query.Include(e => e.MaturityRating).Include(e => e.CoverArt).Include(e => e.Author);
 
         return query;
     }
 
-    public async Task<ActionResult<EBookParseDto>> Parse(IFormFile file)
+    public async Task<EBookParseDto> Parse(IFormFile file)
     {
         var data = await EBookFileHelper.ParseEpub(file);
 
-        return new OkObjectResult(data);
+        return data;
     }
 
-    public async Task<IActionResult> Download(int id)
+    public async Task<EBookFile> Download(int id)
     {
         var entity = await Context.EBooks.FindAsync(id);
 
@@ -87,10 +84,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
 
         var ebookFile = await EBookFileHelper.GetFile(entity.Path);
 
-        return new FileContentResult(ebookFile.Bytes, MediaTypeHeaderValue.Parse("application/epub+zip"))
-        {
-            FileDownloadName = ebookFile.Filename
-        };
+        return ebookFile;
     }
 
     private async Task ValidateForeignKeys(EBookInsertRequest insert)

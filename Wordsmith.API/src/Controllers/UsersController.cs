@@ -19,13 +19,13 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
 
     [SwaggerOperation("Adds a new user")]
     [HttpPost("register")]
-    public override async Task<ActionResult<UserDto>> Insert([FromBody] UserInsertRequest insert)
+    public override async Task<ActionResult<EntityResult<UserDto>>> Insert([FromBody] UserInsertRequest insert)
     {
         return await base.Insert(insert);
     }
 
     [NonAction]
-    public override async Task<ActionResult<UserDto>> Update(int id, UserUpdateRequest update)
+    public override async Task<ActionResult<EntityResult<UserDto>>> Update(int id, UserUpdateRequest update)
     {
         return await base.Update(id, update);
     }
@@ -42,10 +42,12 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
     [SwaggerOperation("Updates the profile of the user from the provided bearer token")]
     [Authorize("All")]
     [HttpPut("profile")]
-    public async Task<ActionResult<UserDto>> UpdateProfile(UserUpdateRequest update)
+    public async Task<ActionResult<EntityResult<UserDto>>> UpdateProfile(UserUpdateRequest update)
     {
         var userId = GetAuthUserId();
-        return await ((WriteService as IUserService)!).UpdateProfile(update, userId);
+        var result = await ((WriteService as IUserService)!).UpdateProfile(update, userId);
+        
+        return Ok(result);
     }
 
     [SwaggerOperation("Gets the profile image of the user from the provided bearer token")]
@@ -63,14 +65,16 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
     public async Task<ActionResult<ImageDto>> UpdateProfileImage([FromBody] ImageInsertRequest update)
     {
         var userId = GetAuthUserId();
-        return await ((WriteService as IUserService)!).UpdateProfileImage(update, userId);
+        var result = await ((WriteService as IUserService)!).UpdateProfileImage(update, userId);
+        return Ok(result);
     }
 
     [SwaggerOperation("Performs a user login with the provided credentials")]
     [HttpPost("login")]
     public async Task<ActionResult<UserLoginDto>> Login([FromBody] UserLoginRequest login)
     {
-        return await ((WriteService as IUserService)!).Login(login);
+        var result = await ((WriteService as IUserService)!).Login(login);
+        return Ok(result);
     }
 
     [SwaggerOperation("Refreshes the provided refresh token based on the user id")]
@@ -95,9 +99,10 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
     [SwaggerOperation("Toggles access for a user based on the provided userId and bearer token")]
     [Authorize("AdminOperations")]
     [HttpPut("{userId:int}/change-access")]
-    public async Task<ActionResult> ChangeAccess(int userId, [FromBody] UserChangeAccessRequest changeAccess)
+    public async Task<ActionResult<EntityResult<UserDto>>> ChangeAccess(int userId, [FromBody] UserChangeAccessRequest changeAccess)
     {
         var adminId = GetAuthUserId();
-        return await ((WriteService as IUserService)!).ChangeAccess(userId, changeAccess, adminId);
+        var result = await ((WriteService as IUserService)!).ChangeAccess(userId, changeAccess, adminId);
+        return Ok(result);
     }
 }

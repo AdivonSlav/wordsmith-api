@@ -20,7 +20,7 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
 
     [SwaggerOperation("Get user reports based on a search criteria")]
     [Authorize("AdminOperations")]
-    public override async Task<ActionResult<QueryResult<UserReportDto>>> Get(UserReportSearchObject? search)
+    public override async Task<ActionResult<QueryResult<UserReportDto>>> Get(UserReportSearchObject search)
     {
         return await base.Get(search);
     }
@@ -34,15 +34,16 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
 
     [SwaggerOperation("Add a new user report")]
     [Authorize("All")]
-    public override async Task<ActionResult<UserReportDto>> Insert(UserReportInsertRequest insert)
+    public override async Task<ActionResult<EntityResult<UserReportDto>>> Insert(UserReportInsertRequest insert)
     {
         insert.ReporterUserId = GetAuthUserId();   
+        
         return await base.Insert(insert);
     }
 
     [SwaggerOperation("Update an existing user report")]
     [Authorize("AdminOperations")]
-    public override async Task<ActionResult<UserReportDto>> Update(int id, UserReportUpdateRequest update)
+    public override async Task<ActionResult<EntityResult<UserReportDto>>> Update(int id, UserReportUpdateRequest update)
     {
         return await base.Update(id, update);
     }

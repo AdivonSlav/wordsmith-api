@@ -32,16 +32,16 @@ public class UserLibrariesController : WriteController<UserLibraryDto, UserLibra
 
     [SwaggerOperation("Add a new library entry for a user")]
     [Authorize("All")]
-    public override async Task<ActionResult<UserLibraryDto>> Insert(UserLibraryInsertRequest insert)
+    public override async Task<ActionResult<EntityResult<UserLibraryDto>>> Insert(UserLibraryInsertRequest insert)
     {
         insert.UserId = GetAuthUserId();
         
         return await base.Insert(insert);
     }
 
-    // [SwaggerOperation("Remove a a library entry's category")]
+    // [SwaggerOperation("Remove the categories of library entries")]
     // [Authorize("All")]
-    // [HttpPut("category/{libraryId:int}")]
+    // [HttpPut("category")]
     // public async Task<IActionResult> RemoveFromCategory(int libraryId)
     // {
     //     return await (WriteService as IUserLibraryService)!.RemoveFromCategory(libraryId);
@@ -50,8 +50,8 @@ public class UserLibrariesController : WriteController<UserLibraryDto, UserLibra
     [SwaggerOperation("Remove a library entry for a user")]
     [Authorize("All")]
     [HttpDelete("{id:int}")]
-    public async Task<ActionResult<string>> Delete(int id)
+    public async Task<ActionResult<EntityResult<UserLibraryDto>>> Delete(int id)
     {
-        return await WriteService.Delete(id);
+        return Ok(await WriteService.Delete(id));
     }
 }

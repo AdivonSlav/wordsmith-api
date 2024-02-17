@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
 
@@ -19,7 +20,7 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
     public WriteService(DatabaseContext context, IMapper mapper)
         : base(context, mapper) { }
 
-    public virtual async Task<ActionResult<T>> Insert(TInsert insert)
+    public virtual async Task<EntityResult<T>> Insert(TInsert insert)
     {
         var set = Context.Set<TDb>();
         var entity = Mapper.Map<TDb>(insert);
@@ -40,11 +41,15 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
             await transaction.RollbackAsync();
             throw;
         }
-        
-        return new CreatedAtActionResult(null, null, null, Mapper.Map<T>(entity));
+
+        return new EntityResult<T>()
+        {
+            Message = "Successfully created",
+            Result = Mapper.Map<T>(entity)
+        };
     }
 
-    public virtual async Task<ActionResult<T>> Update(int id, TUpdate update)
+    public virtual async Task<EntityResult<T>> Update(int id, TUpdate update)
     {
         var set = Context.Set<TDb>();
         var entity = await set.FindAsync(id);
@@ -71,10 +76,14 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
             throw;
         }
         
-        return new OkObjectResult(Mapper.Map<T>(entity));
+        return new EntityResult<T>()
+        {
+            Message = "Successfully updated",
+            Result = Mapper.Map<T>(entity)
+        };
     }
 
-    public virtual async Task<ActionResult<string>> Delete(params int[] ids)
+    public virtual async Task<EntityResult<T>> Delete(params int[] ids)
     {
         var set = Context.Set<TDb>();
         var entity = await set.FindAsync(ids.Select(i => (object)i).ToArray());
@@ -101,7 +110,10 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
             throw;
         }
 
-        return new OkObjectResult("Entity successfully deleted");
+        return new EntityResult<T>()
+        {
+            Message = "Successfully deleted"
+        };
     }
 
     // A task that needs to be done before a DB add operation is finalized

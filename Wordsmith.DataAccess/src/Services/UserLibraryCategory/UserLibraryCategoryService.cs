@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.DataTransferObjects;
@@ -15,17 +14,20 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
     {
     }
     
-    public async Task<ActionResult<UserLibraryCategoryDto>> AddToCategory(UserLibraryCategoryInsertRequest insertRequest)
+    public async Task<EntityResult<UserLibraryCategoryDto>> AddToCategory(UserLibraryCategoryInsertRequest insertRequest)
     {
         await ValidateCategoryAdd(insertRequest);
+
+        var result = new EntityResult<UserLibraryCategoryDto>();
 
         if (insertRequest.UserLibraryCategoryId.HasValue)
         {
             var category = await LibraryEntryCategoryExists(insertRequest.UserLibraryCategoryId.Value);
             
             await AssignCategoryToLibraryEntries(insertRequest.UserLibraryIds, category);
-            
-            return new OkObjectResult(Mapper.Map<UserLibraryCategoryDto>(category));
+
+            result.Message = "Added the entries to the category";
+            result.Result = Mapper.Map<UserLibraryCategoryDto>(category);
         }
         else if (!string.IsNullOrEmpty(insertRequest.NewCategoryName))
         {
@@ -42,10 +44,11 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
 
             await AssignCategoryToLibraryEntries(insertRequest.UserLibraryIds, newCategory);
 
-            return new OkObjectResult(Mapper.Map<UserLibraryCategoryDto>(newCategory));
+            result.Message = "Created a new category and added the requested entries";
+            result.Result = Mapper.Map<UserLibraryCategoryDto>(newCategory);
         }
 
-        return new OkResult();
+        return result;
     }
     
     private async Task ValidateCategoryAdd(UserLibraryCategoryInsertRequest insertRequest)

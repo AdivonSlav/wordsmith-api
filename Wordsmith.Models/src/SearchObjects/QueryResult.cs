@@ -1,6 +1,6 @@
 namespace Wordsmith.Models.SearchObjects;
 
-public class QueryResult<T>
+public class QueryResult<T> where T : class
 {
     public List<T> Result { get; set; }
     public int? Page { get; set; }

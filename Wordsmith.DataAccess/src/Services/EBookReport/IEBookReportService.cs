@@ -1,5 +1,4 @@
 using Wordsmith.Models.DataTransferObjects;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.EBookReport;
 using Wordsmith.Models.SearchObjects;
 

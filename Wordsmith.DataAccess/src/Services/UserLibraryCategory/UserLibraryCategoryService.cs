@@ -53,6 +53,7 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
 
     public async Task<EntityResult<UserLibraryCategoryDto>> RemoveFromCategory(UserLibraryCategoryRemoveRequest removeRequest)
     {
+        await ValidateRemoveFromCategory(removeRequest);
         await RemoveCategoryFromEntries(removeRequest.UserLibraryIds, removeRequest.UserId);
 
         return new EntityResult<UserLibraryCategoryDto>()
@@ -76,21 +77,38 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
                 throw new AppException("Category with the same name already exists!");
             }
         }
+
+        var libraryEntryCount = await Context.UserLibraries.CountAsync(e => insertRequest.UserLibraryIds.Contains(e.Id));
+
+        if (libraryEntryCount != insertRequest.UserLibraryIds.Count)
+        {
+            throw new AppException("Some of the library entries don't exist!");
+        }
+    }
+
+    private async Task ValidateRemoveFromCategory(UserLibraryCategoryRemoveRequest removeRequest)
+    {
+        var libraryEntryCount = await Context.UserLibraries.CountAsync(e => removeRequest.UserLibraryIds.Contains(e.Id));
+        
+        if (libraryEntryCount != removeRequest.UserLibraryIds.Count)
+        {
+            throw new AppException("Some of the library entries don't exist!");
+        }
     }
 
     private async Task AssignCategoryToLibraryEntries(IEnumerable<int> libraryEntries,
         Db.Entities.UserLibraryCategory category, int userId)
     {
-        foreach (var libraryId in libraryEntries)
+        var entries = await Context.UserLibraries.Where(e => libraryEntries.Contains(e.Id)).ToListAsync();
+        
+        foreach (var entry in entries)
         {
-            var libraryEntry = await LibraryEntryExists(libraryId);
-
-            if (userId != libraryEntry.UserId)
+            if (userId != entry.UserId)
             {
                 throw new AppException("Cannot change categories for library entries that you do not own!");
             }
             
-            libraryEntry.UserLibraryCategory = category;
+            entry.UserLibraryCategory = category;
         }
 
         await Context.SaveChangesAsync();
@@ -98,16 +116,16 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
 
     private async Task RemoveCategoryFromEntries(IEnumerable<int> libraryEntries, int userId)
     {
-        foreach (var libraryId in libraryEntries)
+        var entries = await Context.UserLibraries.Where(e => libraryEntries.Contains(e.Id)).ToListAsync();
+        
+        foreach (var entry in entries)
         {
-            var libraryEntry = await LibraryEntryExists(libraryId);
-
-            if (userId != libraryEntry.UserId)
+            if (userId != entry.UserId)
             {
                 throw new AppException("Cannot change categories for library entries that you do not own!");
             }
 
-            libraryEntry.UserLibraryCategoryId = null;
+            entry.UserLibraryCategoryId = null;
         }
 
         await Context.SaveChangesAsync();
@@ -117,23 +135,6 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
     {
         var category = await Context.UserLibraryCategories.FindAsync(categoryId);
 
-        if (category == null)
-        {
-            throw new AppException("This category does not exist!");
-        }
-
-        return category;
-    }
-    
-    private async Task<Db.Entities.UserLibrary> LibraryEntryExists(int userLibraryId)
-    {
-        var libraryEntry = await Context.UserLibraries.FindAsync(userLibraryId);
-
-        if (libraryEntry == null)
-        {
-            throw new AppException("This book is not in your library!");
-        }
-
-        return libraryEntry;
+        return category ?? throw new AppException("This category does not exist!");
     }
 }

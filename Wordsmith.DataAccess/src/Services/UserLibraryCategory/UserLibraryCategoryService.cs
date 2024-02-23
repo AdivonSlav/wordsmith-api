@@ -24,7 +24,7 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
         {
             var category = await LibraryEntryCategoryExists(insertRequest.UserLibraryCategoryId.Value);
             
-            await AssignCategoryToLibraryEntries(insertRequest.UserLibraryIds, category);
+            await AssignCategoryToLibraryEntries(insertRequest.UserLibraryIds, category, insertRequest.UserId);
 
             result.Message = "Added the entries to the category";
             result.Result = Mapper.Map<UserLibraryCategoryDto>(category);
@@ -42,7 +42,7 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
                 UserId = insertRequest.UserId
             };
 
-            await AssignCategoryToLibraryEntries(insertRequest.UserLibraryIds, newCategory);
+            await AssignCategoryToLibraryEntries(insertRequest.UserLibraryIds, newCategory, insertRequest.UserId);
 
             result.Message = "Created a new category and added the requested entries";
             result.Result = Mapper.Map<UserLibraryCategoryDto>(newCategory);
@@ -50,7 +50,17 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
 
         return result;
     }
-    
+
+    public async Task<EntityResult<UserLibraryCategoryDto>> RemoveFromCategory(UserLibraryCategoryRemoveRequest removeRequest)
+    {
+        await RemoveCategoryFromEntries(removeRequest.UserLibraryIds, removeRequest.UserId);
+
+        return new EntityResult<UserLibraryCategoryDto>()
+        {
+            Message = "Successfully removed category from entries!"
+        };
+    }
+
     private async Task ValidateCategoryAdd(UserLibraryCategoryInsertRequest insertRequest)
     {
         if (insertRequest.UserLibraryCategoryId == null && string.IsNullOrEmpty(insertRequest.NewCategoryName))
@@ -67,15 +77,37 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
             }
         }
     }
-    
+
     private async Task AssignCategoryToLibraryEntries(IEnumerable<int> libraryEntries,
-        Db.Entities.UserLibraryCategory category)
+        Db.Entities.UserLibraryCategory category, int userId)
     {
         foreach (var libraryId in libraryEntries)
         {
             var libraryEntry = await LibraryEntryExists(libraryId);
 
+            if (userId != libraryEntry.UserId)
+            {
+                throw new AppException("Cannot change categories for library entries that you do not own!");
+            }
+            
             libraryEntry.UserLibraryCategory = category;
+        }
+
+        await Context.SaveChangesAsync();
+    }
+
+    private async Task RemoveCategoryFromEntries(IEnumerable<int> libraryEntries, int userId)
+    {
+        foreach (var libraryId in libraryEntries)
+        {
+            var libraryEntry = await LibraryEntryExists(libraryId);
+
+            if (userId != libraryEntry.UserId)
+            {
+                throw new AppException("Cannot change categories for library entries that you do not own!");
+            }
+
+            libraryEntry.UserLibraryCategoryId = null;
         }
 
         await Context.SaveChangesAsync();

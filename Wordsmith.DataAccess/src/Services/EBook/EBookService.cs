@@ -66,11 +66,15 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         return query;
     }
 
-    public async Task<EBookParseDto> Parse(IFormFile file)
+    public async Task<EntityResult<EBookParseDto>> Parse(IFormFile file)
     {
         var data = await EBookFileHelper.ParseEpub(file);
 
-        return data;
+        return new EntityResult<EBookParseDto>()
+        {
+            Message = "Parsed eBook",
+            Result = data
+        };
     }
 
     public async Task<EBookFile> Download(int id)

@@ -25,6 +25,17 @@ public class UserLibraryCategoriesController : WriteController<UserLibraryCatego
 
         return Ok(result);
     }
+    
+    [SwaggerOperation("Remove the categories of library entries")]
+    [Authorize("All")]
+    [HttpPut]
+    public async Task<IActionResult> RemoveFromCategory(UserLibraryCategoryRemoveRequest remove)
+    {
+        remove.UserId = GetAuthUserId();
+        var result = await (WriteService as IUserLibraryCategoryService)!.RemoveFromCategory(remove);
+        
+        return Ok(result);
+    }
 
     [NonAction]
     public override Task<ActionResult<EntityResult<UserLibraryCategoryDto>>> Insert(UserLibraryCategoryInsertRequest insert)

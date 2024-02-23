@@ -8,6 +8,6 @@ namespace Wordsmith.DataAccess.Services.EBook;
 
 public interface IEBookService : IWriteService<EBookDto, Db.Entities.EBook, EBookSearchObject, EBookInsertRequest, EBookUpdateRequest>
 {
-    public Task<EBookParseDto> Parse(IFormFile file);
+    public Task<EntityResult<EBookParseDto>> Parse(IFormFile file);
     public Task<EBookFile> Download(int id);
 }

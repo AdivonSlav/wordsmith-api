@@ -1,0 +1,32 @@
+name: Build and analize with Qodana
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies (API)
+      run: dotnet restore Wordsmith.API/Wordsmith.API.csproj
+
+    - name: Restore dependencies (IdentityServer)
+      run: dotnet restore Wordsmith.IdentityServer/Wordsmith.IdentityServer.csproj
+      
+    - name: Build (API)
+      run: dotnet build --no-restore Wordsmith.API/Wordsmith.API.csproj
+
+    - name: Build (IdentityServer)
+      run: dotnet build --no-restore Wordsmith.IdentityServer/Wordsmith.IdentityServer.csproj

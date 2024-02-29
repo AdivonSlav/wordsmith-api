@@ -31,9 +31,10 @@ public class ReadController<T, TSearch> : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves the user what made the request based on the provided authorization header
+    /// Retrieves the user that made the request based on the provided authorization header
     /// </summary>
     /// <returns>The ID of the user that made the request or -1 if no user claims were found</returns>
+    [NonAction]
     protected int GetAuthUserId()
     {
         var userRefId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "user_ref_id");

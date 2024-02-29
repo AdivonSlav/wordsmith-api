@@ -37,6 +37,17 @@ public class UserLibraryCategoriesController : WriteController<UserLibraryCatego
         return Ok(result);
     }
 
+    [SwaggerOperation("Delete a category")]
+    [Authorize("All")]
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId = GetAuthUserId();
+        var result = await (WriteService as IUserLibraryCategoryService)!.Delete(userId, id);
+        
+        return Ok(result);
+    }
+    
     [NonAction]
     public override Task<ActionResult<EntityResult<UserLibraryCategoryDto>>> Insert(UserLibraryCategoryInsertRequest insert)
     {

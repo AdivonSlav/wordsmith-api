@@ -44,6 +44,8 @@ public class UserLibrariesController : WriteController<UserLibraryDto, UserLibra
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<EntityResult<UserLibraryDto>>> Delete(int id)
     {
-        return Ok(await WriteService.Delete(id));
+        var userId = GetAuthUserId();
+        
+        return Ok(await WriteService.Delete(userId, id));
     }
 }

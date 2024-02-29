@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Wordsmith.Models.DataTransferObjects;
 
 namespace Wordsmith.DataAccess.Services;
@@ -12,5 +11,5 @@ public interface IWriteService<T, TDb, TSearch, TInsert, TUpdate> : IReadService
 {
     Task<EntityResult<T>> Insert(TInsert insert);
     Task<EntityResult<T>> Update(int id, TUpdate update);
-    Task<EntityResult<T>> Delete(params int[] ids);
+    Task<EntityResult<T>> Delete(int userId, params int[] ids);
 }

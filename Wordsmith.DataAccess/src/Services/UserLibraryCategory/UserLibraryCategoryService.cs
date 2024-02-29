@@ -13,7 +13,17 @@ public class UserLibraryCategoryService : WriteService<UserLibraryCategoryDto, D
     public UserLibraryCategoryService(DatabaseContext context, IMapper mapper) : base(context, mapper)
     {
     }
-    
+
+    protected override Task BeforeDeletion(int userId, Db.Entities.UserLibraryCategory entity)
+    {
+        if (entity.UserId != userId)
+        {
+            throw new AppException("Cannot delete a category that's not owned by you");
+        }
+
+        return Task.CompletedTask;
+    }
+
     public async Task<EntityResult<UserLibraryCategoryDto>> AddToCategory(UserLibraryCategoryInsertRequest insertRequest)
     {
         await ValidateCategoryAdd(insertRequest);

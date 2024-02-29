@@ -83,7 +83,7 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         };
     }
 
-    public virtual async Task<EntityResult<T>> Delete(params int[] ids)
+    public virtual async Task<EntityResult<T>> Delete(int userId, params int[] ids)
     {
         var set = Context.Set<TDb>();
         var entity = await set.FindAsync(ids.Select(i => (object)i).ToArray());
@@ -99,9 +99,9 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         {
             set.Remove(entity);
 
-            await BeforeDeletion(entity);
+            await BeforeDeletion(userId, entity);
             await Context.SaveChangesAsync();
-            await AfterDeletion(entity);
+            await AfterDeletion(userId, entity);
             await transaction.CommitAsync();
         }
         catch
@@ -129,8 +129,8 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
     protected virtual async Task AfterUpdate(TDb entity, TUpdate update) { }
     
     // A task that needs to be done before a DB delete operation is finalized
-    protected virtual async Task BeforeDeletion(TDb entity) { }
+    protected virtual async Task BeforeDeletion(int userId, TDb entity) { }
 
     // A task that needs to be done after a DB delete operation is finalized
-    protected virtual async Task AfterDeletion(TDb entity) { }
+    protected virtual async Task AfterDeletion(int userId, TDb entity) { }
 }

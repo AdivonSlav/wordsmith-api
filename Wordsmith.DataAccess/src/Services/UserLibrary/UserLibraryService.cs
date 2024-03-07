@@ -20,6 +20,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         entity.IsRead = false;
         entity.SyncDate = DateTime.UtcNow;
         entity.LastPage = 0;
+        entity.ReadProgress = "0%";
     }
 
     protected override async Task AfterInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert)

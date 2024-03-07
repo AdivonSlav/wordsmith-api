@@ -10,11 +10,11 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="13.0.1" />
         <PackageReference Include="Duende.IdentityServer" Version="6.3.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.15">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.16">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.15">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.16">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 #pragma warning disable CA1825
 

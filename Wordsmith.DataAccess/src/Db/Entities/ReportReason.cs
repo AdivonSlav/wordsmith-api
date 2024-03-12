@@ -12,7 +12,9 @@ public class ReportReason : IEntity
 {
     [Key] public int Id { get; set; }
 
+    [StringLength(100)]
     public string Reason { get; set; }
     
+    [StringLength(100)]
     public string Subject { get; set; }
 }

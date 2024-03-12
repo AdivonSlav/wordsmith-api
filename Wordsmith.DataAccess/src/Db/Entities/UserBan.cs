@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 namespace Wordsmith.DataAccess.Db.Entities;
 

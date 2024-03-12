@@ -16,7 +16,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.15")
+                .HasAnnotation("ProductVersion", "7.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.AppReport", b =>
@@ -26,7 +26,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
 
                     b.Property<bool>("IsClosed")
                         .HasColumnType("tinyint(1)");
@@ -43,13 +44,19 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.AuthorFollow", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
                     b.Property<int>("AuthorUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("AuthorUserId", "UserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorUserId");
 
                     b.HasIndex("UserId");
 
@@ -63,7 +70,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime(6)");
@@ -103,10 +111,12 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(800)
+                        .HasColumnType("varchar(800)");
 
                     b.Property<string>("Genres")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(4000)
+                        .HasColumnType("varchar(4000)");
 
                     b.Property<DateTime?>("HiddenDate")
                         .HasColumnType("datetime(6)");
@@ -118,7 +128,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Path")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
 
                     b.Property<decimal?>("Price")
                         .HasPrecision(10, 2)
@@ -131,7 +142,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("double");
 
                     b.Property<string>("Title")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime(6)");
@@ -154,7 +166,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
                     b.HasIndex("UpdatedDate");
 
-                    b.ToTable("ebook");
+                    b.ToTable("ebooks");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookChapter", b =>
@@ -164,7 +176,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ChapterName")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
 
                     b.Property<int>("ChapterNumber")
                         .HasColumnType("int");
@@ -181,13 +194,19 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookGenre", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
                     b.Property<int>("EBookId")
                         .HasColumnType("int");
 
                     b.Property<int>("GenreId")
                         .HasColumnType("int");
 
-                    b.HasKey("EBookId", "GenreId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("EBookId");
 
                     b.HasIndex("GenreId");
 
@@ -277,7 +296,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.ToTable("ebook_reports");
                 });
 
-            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookSale", b =>
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.FavoriteEBook", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -286,38 +305,12 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<int>("EBookId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Price")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EBookId");
-
-                    b.HasIndex("Price");
-
-                    b.HasIndex("PurchaseDate");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ebook_sales");
-                });
-
-            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.FavoriteEBook", b =>
-                {
-                    b.Property<int>("EBookId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EBookId", "UserId");
 
                     b.HasIndex("UserId");
 
@@ -331,7 +324,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
 
                     b.HasKey("Id");
 
@@ -550,10 +544,12 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Format")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(15)
+                        .HasColumnType("varchar(15)");
 
                     b.Property<string>("Path")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
 
                     b.Property<int>("Size")
                         .HasColumnType("int");
@@ -570,10 +566,12 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
 
                     b.Property<string>("ShortName")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(5)
+                        .HasColumnType("varchar(5)");
 
                     b.HasKey("Id");
 
@@ -616,7 +614,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
 
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime(6)");
@@ -639,6 +638,57 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.ToTable("notes");
                 });
 
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EBookId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EBookTitle")
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("OrderId")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int?>("PayeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PayeePayPalEmail")
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<int?>("PayerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PayerPayPalEmail")
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<decimal>("PaymentAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EBookId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("PayeeId");
+
+                    b.HasIndex("PayerId");
+
+                    b.ToTable("orders");
+                });
+
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.ReportDetails", b =>
                 {
                     b.Property<int>("Id")
@@ -646,7 +696,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.Property<bool>("IsClosed")
                         .HasColumnType("tinyint(1)");
@@ -676,10 +727,12 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Subject")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
 
@@ -696,10 +749,16 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("About")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("PayPalEmail")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<int?>("ProfileImageId")
                         .HasColumnType("int");
@@ -708,10 +767,12 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Role")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Username")
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.HasKey("Id");
 
@@ -772,7 +833,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ReadProgress")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
 
                     b.Property<DateTime>("SyncDate")
                         .HasColumnType("datetime(6)");
@@ -805,6 +867,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
                     b.Property<int>("UserId")
@@ -995,25 +1058,6 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Navigation("ReportedEBook");
                 });
 
-            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBookSale", b =>
-                {
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
-                        .WithMany()
-                        .HasForeignKey("EBookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EBook");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.FavoriteEBook", b =>
                 {
                     b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
@@ -1050,6 +1094,30 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Navigation("Chapter");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Order", b =>
+                {
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
+                        .WithMany()
+                        .HasForeignKey("EBookId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "Payee")
+                        .WithMany()
+                        .HasForeignKey("PayeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "Payer")
+                        .WithMany()
+                        .HasForeignKey("PayerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("EBook");
+
+                    b.Navigation("Payee");
+
+                    b.Navigation("Payer");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.ReportDetails", b =>

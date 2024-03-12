@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db.Entities;
+using Wordsmith.DataAccess.Db.ValueConverters;
 
 namespace Wordsmith.DataAccess.Db;
 
@@ -19,7 +20,6 @@ public class DatabaseContext : DbContext
     public virtual DbSet<EBookRating> EBookRatings { get; set; }
     public virtual DbSet<EBookReport> EBookReports { get; set; }
     public virtual DbSet<EBookGenre> EBookGenres { get; set; }
-    public virtual DbSet<EBookSale> EBookSales { get; set; }
     public virtual DbSet<FavoriteEBook> FavoriteEBooks { get; set; }
     public virtual DbSet<Genre> Genres { get; set; }
     public virtual DbSet<Image> Images { get; set; }
@@ -32,16 +32,19 @@ public class DatabaseContext : DbContext
     public virtual DbSet<UserLibrary> UserLibraries { get; set; }
     public virtual DbSet<UserLibraryCategory> UserLibraryCategories { get; set; }
     public virtual DbSet<UserReport> UserReports { get; set; }
+    public virtual DbSet<Order> Orders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AuthorFollow>().HasKey(e => new { e.AuthorUserId, e.UserId });
-        modelBuilder.Entity<FavoriteEBook>().HasKey(e => new { e.EBookId, e.UserId });
-        modelBuilder.Entity<EBookGenre>().HasKey(e => new { e.EBookId, e.GenreId });
-
         modelBuilder.Entity<Genre>().HasData(DatabaseSeeds.CreateGenres());
         modelBuilder.Entity<MaturityRating>().HasData(DatabaseSeeds.CreateMaturityRatings());
         
         base.OnModelCreating(modelBuilder);
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion(typeof(UtcValueConverter));
+    }
 }
+

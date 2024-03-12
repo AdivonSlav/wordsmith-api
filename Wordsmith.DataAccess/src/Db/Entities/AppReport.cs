@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 #pragma warning disable CA1825
 
@@ -10,6 +11,7 @@ public class AppReport : IEntity
 {
     [Key] public int Id { get; set; }
 
+    [StringLength(400)]
     public string Content { get; set; }
 
     public bool IsClosed { get; set; }

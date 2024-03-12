@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 #pragma warning disable CA1825
 
 namespace Wordsmith.DataAccess.Db.Entities;
 
-[Table("ebook")]
+[Table("ebooks")]
 [Index(nameof(Title))]
 [Index(nameof(Price))]
 [Index(nameof(PublishedDate))]
@@ -16,8 +17,10 @@ public class EBook : IEntity
 {
     [Key] public int Id { get; set; }
     
+    [StringLength(40)]
     public string Title { get; set; }
     
+    [StringLength(800)]
     public string Description { get; set; }
     
     public double? RatingAverage { get; set; }
@@ -30,6 +33,7 @@ public class EBook : IEntity
     
     public int ChapterCount { get; set; }
     
+    [StringLength(400)]
     public string Path { get; set; }
     
     public bool IsHidden { get; set; }
@@ -40,6 +44,7 @@ public class EBook : IEntity
     
     public int CoverArtId { get; set; }
     
+    [StringLength(4000)]
     public string Genres { get; set; }
     
     public int MaturityRatingId { get; set; }

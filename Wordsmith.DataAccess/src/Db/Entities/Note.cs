@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 namespace Wordsmith.DataAccess.Db.Entities;
 
@@ -14,6 +15,7 @@ public class Note : IEntity
     
     public int CharEnd { get; set; }
     
+    [StringLength(400)]
     public string Content { get; set; }
     
     public DateTime DateAdded { get; set; }

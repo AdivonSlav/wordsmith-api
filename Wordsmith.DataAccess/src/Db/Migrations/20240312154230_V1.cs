@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class V1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,7 +23,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Name = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -38,9 +38,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Path = table.Column<string>(type: "longtext", nullable: true)
+                    Path = table.Column<string>(type: "varchar(400)", maxLength: 400, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Format = table.Column<string>(type: "longtext", nullable: true)
+                    Format = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Size = table.Column<int>(type: "int", nullable: false)
                 },
@@ -56,9 +56,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Name = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ShortName = table.Column<string>(type: "longtext", nullable: true)
+                    ShortName = table.Column<string>(type: "varchar(5)", maxLength: 5, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -73,9 +73,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Reason = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Reason = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Subject = table.Column<string>(type: "longtext", nullable: true)
+                    Subject = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -90,16 +90,18 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Username = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Username = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    About = table.Column<string>(type: "longtext", nullable: true)
+                    About = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RegistrationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Role = table.Column<string>(type: "longtext", nullable: true)
+                    Role = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProfileImageId = table.Column<int>(type: "int", nullable: true)
+                    ProfileImageId = table.Column<int>(type: "int", nullable: true),
+                    PayPalEmail = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -118,7 +120,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Content = table.Column<string>(type: "longtext", nullable: true)
+                    Content = table.Column<string>(type: "varchar(400)", maxLength: 400, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsClosed = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
@@ -139,12 +141,14 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 name: "author_follows",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     AuthorUserId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_author_follows", x => new { x.AuthorUserId, x.UserId });
+                    table.PrimaryKey("PK_author_follows", x => x.Id);
                     table.ForeignKey(
                         name: "FK_author_follows_users_AuthorUserId",
                         column: x => x.AuthorUserId,
@@ -166,7 +170,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Content = table.Column<string>(type: "longtext", nullable: true)
+                    Content = table.Column<string>(type: "varchar(400)", maxLength: 400, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DateAdded = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsShown = table.Column<bool>(type: "tinyint(1)", nullable: false),
@@ -187,47 +191,47 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ebook",
+                name: "ebooks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Title = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Title = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: true)
+                    Description = table.Column<string>(type: "varchar(800)", maxLength: 800, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RatingAverage = table.Column<double>(type: "double", nullable: true),
                     PublishedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true),
                     ChapterCount = table.Column<int>(type: "int", nullable: false),
-                    Path = table.Column<string>(type: "longtext", nullable: true)
+                    Path = table.Column<string>(type: "varchar(400)", maxLength: 400, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsHidden = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     HiddenDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     AuthorId = table.Column<int>(type: "int", nullable: false),
                     CoverArtId = table.Column<int>(type: "int", nullable: false),
-                    Genres = table.Column<string>(type: "longtext", nullable: true)
+                    Genres = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     MaturityRatingId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ebook", x => x.Id);
+                    table.PrimaryKey("PK_ebooks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ebook_images_CoverArtId",
+                        name: "FK_ebooks_images_CoverArtId",
                         column: x => x.CoverArtId,
                         principalTable: "images",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ebook_maturity_ratings_MaturityRatingId",
+                        name: "FK_ebooks_maturity_ratings_MaturityRatingId",
                         column: x => x.MaturityRatingId,
                         principalTable: "maturity_ratings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ebook_users_AuthorId",
+                        name: "FK_ebooks_users_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "users",
                         principalColumn: "Id",
@@ -241,7 +245,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Content = table.Column<string>(type: "longtext", nullable: true)
+                    Content = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     SubmissionDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsClosed = table.Column<bool>(type: "tinyint(1)", nullable: false),
@@ -301,7 +305,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(255)", nullable: true)
+                    Name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -323,7 +327,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ChapterName = table.Column<string>(type: "longtext", nullable: true)
+                    ChapterName = table.Column<string>(type: "varchar(60)", maxLength: 60, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ChapterNumber = table.Column<int>(type: "int", nullable: false),
                     EBookId = table.Column<int>(type: "int", nullable: false)
@@ -332,9 +336,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     table.PrimaryKey("PK_ebook_chapters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ebook_chapters_ebook_EBookId",
+                        name: "FK_ebook_chapters_ebooks_EBookId",
                         column: x => x.EBookId,
-                        principalTable: "ebook",
+                        principalTable: "ebooks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -344,16 +348,18 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 name: "ebook_genres",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EBookId = table.Column<int>(type: "int", nullable: false),
                     GenreId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ebook_genres", x => new { x.EBookId, x.GenreId });
+                    table.PrimaryKey("PK_ebook_genres", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ebook_genres_ebook_EBookId",
+                        name: "FK_ebook_genres_ebooks_EBookId",
                         column: x => x.EBookId,
-                        principalTable: "ebook",
+                        principalTable: "ebooks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -382,9 +388,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     table.PrimaryKey("PK_ebook_promotions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ebook_promotions_ebook_EBookId",
+                        name: "FK_ebook_promotions_ebooks_EBookId",
                         column: x => x.EBookId,
-                        principalTable: "ebook",
+                        principalTable: "ebooks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -411,9 +417,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     table.PrimaryKey("PK_ebook_ratings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ebook_ratings_ebook_EBookId",
+                        name: "FK_ebook_ratings_ebooks_EBookId",
                         column: x => x.EBookId,
-                        principalTable: "ebook",
+                        principalTable: "ebooks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -426,48 +432,21 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ebook_sales",
+                name: "favorite_ebooks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    PurchaseDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     EBookId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ebook_sales", x => x.Id);
+                    table.PrimaryKey("PK_favorite_ebooks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ebook_sales_ebook_EBookId",
+                        name: "FK_favorite_ebooks_ebooks_EBookId",
                         column: x => x.EBookId,
-                        principalTable: "ebook",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ebook_sales_users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "favorite_ebooks",
-                columns: table => new
-                {
-                    EBookId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_favorite_ebooks", x => new { x.EBookId, x.UserId });
-                    table.ForeignKey(
-                        name: "FK_favorite_ebooks_ebook_EBookId",
-                        column: x => x.EBookId,
-                        principalTable: "ebook",
+                        principalTable: "ebooks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -476,6 +455,50 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    OrderId = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PayerId = table.Column<int>(type: "int", nullable: true),
+                    PayerPayPalEmail = table.Column<string>(type: "varchar(60)", maxLength: 60, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PayeeId = table.Column<int>(type: "int", nullable: true),
+                    PayeePayPalEmail = table.Column<string>(type: "varchar(60)", maxLength: 60, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EBookId = table.Column<int>(type: "int", nullable: true),
+                    EBookTitle = table.Column<string>(type: "varchar(40)", maxLength: 40, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PaymentDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    PaymentAmount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_orders_ebooks_EBookId",
+                        column: x => x.EBookId,
+                        principalTable: "ebooks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_orders_users_PayeeId",
+                        column: x => x.PayeeId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_orders_users_PayerId",
+                        column: x => x.PayerId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -492,9 +515,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     table.PrimaryKey("PK_ebook_reports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ebook_reports_ebook_EBookId",
+                        name: "FK_ebook_reports_ebooks_EBookId",
                         column: x => x.EBookId,
-                        principalTable: "ebook",
+                        principalTable: "ebooks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -542,7 +565,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     Page = table.Column<int>(type: "int", nullable: false),
                     CharBegin = table.Column<int>(type: "int", nullable: false),
                     CharEnd = table.Column<int>(type: "int", nullable: false),
-                    Content = table.Column<string>(type: "longtext", nullable: true)
+                    Content = table.Column<string>(type: "varchar(400)", maxLength: 400, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DateAdded = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EBookChapterId = table.Column<int>(type: "int", nullable: false),
@@ -576,7 +599,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     SyncDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsRead = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ReadProgress = table.Column<string>(type: "longtext", nullable: true)
+                    ReadProgress = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     LastChapterId = table.Column<int>(type: "int", nullable: true),
                     LastPage = table.Column<int>(type: "int", nullable: false),
@@ -586,16 +609,16 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 {
                     table.PrimaryKey("PK_user_libraries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_user_libraries_ebook_EBookId",
-                        column: x => x.EBookId,
-                        principalTable: "ebook",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_user_libraries_ebook_chapters_LastChapterId",
                         column: x => x.LastChapterId,
                         principalTable: "ebook_chapters",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_user_libraries_ebooks_EBookId",
+                        column: x => x.EBookId,
+                        principalTable: "ebooks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_user_libraries_user_library_categories_UserLibraryCategoryId",
                         column: x => x.UserLibraryCategoryId,
@@ -674,6 +697,11 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_author_follows_AuthorUserId",
+                table: "author_follows",
+                column: "AuthorUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_author_follows_UserId",
                 table: "author_follows",
                 column: "UserId");
@@ -684,48 +712,13 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ebook_AuthorId",
-                table: "ebook",
-                column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ebook_CoverArtId",
-                table: "ebook",
-                column: "CoverArtId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ebook_MaturityRatingId",
-                table: "ebook",
-                column: "MaturityRatingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ebook_Price",
-                table: "ebook",
-                column: "Price");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ebook_PublishedDate",
-                table: "ebook",
-                column: "PublishedDate");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ebook_RatingAverage",
-                table: "ebook",
-                column: "RatingAverage");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ebook_Title",
-                table: "ebook",
-                column: "Title");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ebook_UpdatedDate",
-                table: "ebook",
-                column: "UpdatedDate");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ebook_chapters_EBookId",
                 table: "ebook_chapters",
+                column: "EBookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ebook_genres_EBookId",
+                table: "ebook_genres",
                 column: "EBookId");
 
             migrationBuilder.CreateIndex(
@@ -769,24 +762,49 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 column: "ReportDetailsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ebook_sales_EBookId",
-                table: "ebook_sales",
-                column: "EBookId");
+                name: "IX_ebooks_AuthorId",
+                table: "ebooks",
+                column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ebook_sales_Price",
-                table: "ebook_sales",
+                name: "IX_ebooks_CoverArtId",
+                table: "ebooks",
+                column: "CoverArtId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ebooks_MaturityRatingId",
+                table: "ebooks",
+                column: "MaturityRatingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ebooks_Price",
+                table: "ebooks",
                 column: "Price");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ebook_sales_PurchaseDate",
-                table: "ebook_sales",
-                column: "PurchaseDate");
+                name: "IX_ebooks_PublishedDate",
+                table: "ebooks",
+                column: "PublishedDate");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ebook_sales_UserId",
-                table: "ebook_sales",
-                column: "UserId");
+                name: "IX_ebooks_RatingAverage",
+                table: "ebooks",
+                column: "RatingAverage");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ebooks_Title",
+                table: "ebooks",
+                column: "Title");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ebooks_UpdatedDate",
+                table: "ebooks",
+                column: "UpdatedDate");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_favorite_ebooks_EBookId",
+                table: "favorite_ebooks",
+                column: "EBookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_favorite_ebooks_UserId",
@@ -814,6 +832,26 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 name: "IX_notes_UserId",
                 table: "notes",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_EBookId",
+                table: "orders",
+                column: "EBookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_OrderId",
+                table: "orders",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_PayeeId",
+                table: "orders",
+                column: "PayeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_orders_PayerId",
+                table: "orders",
+                column: "PayerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_report_details_ReportReasonId",
@@ -929,13 +967,13 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 name: "ebook_reports");
 
             migrationBuilder.DropTable(
-                name: "ebook_sales");
-
-            migrationBuilder.DropTable(
                 name: "favorite_ebooks");
 
             migrationBuilder.DropTable(
                 name: "notes");
+
+            migrationBuilder.DropTable(
+                name: "orders");
 
             migrationBuilder.DropTable(
                 name: "user_bans");
@@ -959,7 +997,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                 name: "report_details");
 
             migrationBuilder.DropTable(
-                name: "ebook");
+                name: "ebooks");
 
             migrationBuilder.DropTable(
                 name: "report_reasons");

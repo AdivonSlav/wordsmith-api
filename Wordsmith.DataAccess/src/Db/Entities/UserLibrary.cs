@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 #pragma warning disable CA1825
 
@@ -21,6 +22,7 @@ public class UserLibrary : IEntity
     
     public bool IsRead { get; set; }
     
+    [StringLength(10)]
     public string ReadProgress { get; set; }
     
     public int? LastChapterId { get; set; }

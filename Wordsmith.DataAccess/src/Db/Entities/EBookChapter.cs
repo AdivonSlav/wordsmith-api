@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 namespace Wordsmith.DataAccess.Db.Entities;
 
@@ -8,6 +9,7 @@ public class EBookChapter : IEntity
 {
     [Key] public int Id { get; set; }
     
+    [StringLength(60)]
     public string ChapterName { get; set; }
     
     public int ChapterNumber { get; set; }

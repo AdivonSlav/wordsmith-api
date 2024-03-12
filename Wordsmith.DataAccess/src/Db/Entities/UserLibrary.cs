@@ -8,7 +8,7 @@ namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("user_libraries")]
 [Index(nameof(IsRead))]
-public class UserLibrary
+public class UserLibrary : IEntity
 {
     [Key]
     public int Id { get; set; }

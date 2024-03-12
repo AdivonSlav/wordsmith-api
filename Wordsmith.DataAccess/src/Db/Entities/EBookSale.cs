@@ -9,7 +9,7 @@ namespace Wordsmith.DataAccess.Db.Entities;
 [Table("ebook_sales")]
 [Index(nameof(Price))]
 [Index(nameof(PurchaseDate))]
-public class EBookSale
+public class EBookSale : IEntity
 {
     [Key] public int Id { get; set; }
     

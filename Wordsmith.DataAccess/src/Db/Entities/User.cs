@@ -9,7 +9,7 @@ namespace Wordsmith.DataAccess.Db.Entities;
 [Table("users")]
 [Index(nameof(Username), IsUnique = true)]
 [Index(nameof(Email), IsUnique = true)]
-public class User
+public class User : IEntity
 {
     [Key] public int Id { get; set; }
     

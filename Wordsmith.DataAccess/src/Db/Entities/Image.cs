@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("images")]
-public class Image
+public class Image : IEntity
 {
     [Key] public int Id { get; set; }
     

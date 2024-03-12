@@ -13,15 +13,14 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
 {
     public UserReportService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override IQueryable<Db.Entities.UserReport> AddInclude(IQueryable<Db.Entities.UserReport> query,
-        UserReportSearchObject search)
+    protected override IQueryable<Db.Entities.UserReport> AddInclude(IQueryable<Db.Entities.UserReport> query)
     {
         query = query.Include(report => report.ReportedUser)
             .Include(report => report.ReportDetails)
             .ThenInclude(details => details.Reporter)
             .Include(report => report.ReportDetails)
             .ThenInclude(details => details.ReportReason);
-
+    
         return query;
     }
 

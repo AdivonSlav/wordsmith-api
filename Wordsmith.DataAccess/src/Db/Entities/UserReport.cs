@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("user_reports")]
-public class UserReport
+public class UserReport : IEntity
 {
     [Key] public int Id { get; set; }
 

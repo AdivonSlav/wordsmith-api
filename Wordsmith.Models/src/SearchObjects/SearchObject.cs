@@ -7,12 +7,15 @@ public class SearchObject
 {
     [SwaggerParameter("The requested page")]
     [DefaultValue(1)]
-    public int Page { get; set; } = 1;
+    public int Page { get; } = 1;
 
     [SwaggerParameter("The item count that a page should have")]
     [DefaultValue(100)]
-    public int PageSize { get; set; } = 100;
+    public int PageSize { get; } = 100;
     
     [SwaggerParameter("Whether the result should be ordered by a specific property, e.g. PropertyA:asc")]
     public string? OrderBy { get; set; }
+    
+    [SwaggerParameter("A list of properties to include with the query")]
+    public IEnumerable<string>? Includes { get; set; }
 }

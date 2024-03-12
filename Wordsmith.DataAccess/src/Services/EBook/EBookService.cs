@@ -59,13 +59,13 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         return query;
     }
 
-    protected override IQueryable<Db.Entities.EBook> AddInclude(IQueryable<Db.Entities.EBook> query, EBookSearchObject search)
+    protected override IQueryable<Db.Entities.EBook> AddInclude(IQueryable<Db.Entities.EBook> query)
     {
         query = query.Include(e => e.MaturityRating).Include(e => e.CoverArt).Include(e => e.Author);
-
+    
         return query;
     }
-
+    
     public async Task<EntityResult<EBookParseDto>> Parse(IFormFile file)
     {
         var data = await EBookFileHelper.ParseEpub(file);

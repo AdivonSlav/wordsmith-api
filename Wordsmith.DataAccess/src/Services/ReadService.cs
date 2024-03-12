@@ -1,6 +1,8 @@
+#nullable enable
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Extensions;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
@@ -9,7 +11,7 @@ using Wordsmith.Utils;
 namespace Wordsmith.DataAccess.Services;
 
 public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
-    where TDb : class
+    where TDb : class, IEntity
     where T : class
     where TSearch : SearchObject
 {
@@ -27,7 +29,7 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         var query = Context.Set<TDb>().AsQueryable();
         var result = new QueryResult<T>();
 
-        query = AddInclude(query, search);
+        query = AddInclude(query);
         query = AddFilter(query, search);
 
         if (search?.OrderBy != null)
@@ -59,7 +61,7 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         result.TotalCount = await query.CountAsync();
         query = query.Skip((search!.Page - 1) * search.PageSize).Take(search.PageSize);
         result.Page = search.Page;
-        result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / (double)search.PageSize);
+        result.TotalPages = (int)Math.Ceiling((double)result.TotalCount / search.PageSize);
 
         try
         {
@@ -83,16 +85,34 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
 
     public virtual async Task<QueryResult<T>> GetById(int id)
     {
-        var entity = await Context.Set<TDb>().FindAsync(id);
-        var result = new QueryResult<T>()
-        {
-            Result = new List<T>() { Mapper.Map<T>(entity) }
-        };
+        var query = Context.Set<TDb>().AsQueryable();
+        var result = new QueryResult<T>();
+
+        query = AddInclude(query);
         
+        try
+        {
+            var entity = await query.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (entity != null)
+            {
+                result.Result.Add(Mapper.Map<T>(entity));
+            }
+        }
+        catch (AppException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Failed to process query", e);
+            throw;
+        }
+
         return result;
     }
 
-    protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, TSearch search)
+    protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query)
     {
         return query;
     }

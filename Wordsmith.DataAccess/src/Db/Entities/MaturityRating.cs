@@ -8,7 +8,7 @@ namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("maturity_ratings")]
 [Index(nameof(Name), IsUnique = true)]
-public class MaturityRating
+public class MaturityRating : IEntity
 {
     [Key] public int Id { get; set; }
     

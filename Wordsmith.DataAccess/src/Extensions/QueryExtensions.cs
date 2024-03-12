@@ -1,11 +1,13 @@
 using System.Linq.Expressions;
-using Wordsmith.Models.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using Wordsmith.DataAccess.Db.Entities;
 
 namespace Wordsmith.DataAccess.Extensions;
 
 public static class QueryExtensions
 {
-    public static IQueryable<T> OrderByProperty<T>(this IQueryable<T> source, string propertyName, bool ascending = true)
+    public static IQueryable<T> OrderByProperty<T>(this IQueryable<T> query, string propertyName, bool ascending = true)
+        where T : class, IEntity
     {
         var entityType = typeof(T);
         var properties = propertyName.Split(".");
@@ -29,10 +31,10 @@ public static class QueryExtensions
             typeof(Queryable),
             methodName,
             new[] { typeof(T), propertyAccess.Type },
-            source.Expression,
+            query.Expression,
             Expression.Quote(lambda)
         );
 
-        return source.Provider.CreateQuery<T>(methodCallExpression);
+        return query.Provider.CreateQuery<T>(methodCallExpression);
     }
 }

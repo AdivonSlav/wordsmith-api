@@ -14,19 +14,19 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
     public EBookReportService(DatabaseContext context, IMapper mapper)
         : base(context, mapper) {}
 
-    protected override IQueryable<Db.Entities.EBookReport> AddInclude(IQueryable<Db.Entities.EBookReport> query, EBookReportSearchObject? search = null)
-    {
-        query = query.Include(report => report.ReportedEBook)
-            .ThenInclude(eBook => eBook.CoverArt)
-            .Include(report => report.ReportedEBook)
-            .ThenInclude(eBook => eBook.MaturityRating)
-            .Include(report => report.ReportDetails)
-            .ThenInclude(details => details.Reporter)
-            .Include(report => report.ReportDetails)
-            .ThenInclude(details => details.ReportReason);
-
-        return query;
-    }
+    // protected override IQueryable<Db.Entities.EBookReport> AddInclude(IQueryable<Db.Entities.EBookReport> query, EBookReportSearchObject? search = null)
+    // {
+    //     query = query.Include(report => report.ReportedEBook)
+    //         .ThenInclude(eBook => eBook.CoverArt)
+    //         .Include(report => report.ReportedEBook)
+    //         .ThenInclude(eBook => eBook.MaturityRating)
+    //         .Include(report => report.ReportDetails)
+    //         .ThenInclude(details => details.Reporter)
+    //         .Include(report => report.ReportDetails)
+    //         .ThenInclude(details => details.ReportReason);
+    //
+    //     return query;
+    // }
 
     protected override IQueryable<Db.Entities.EBookReport> AddFilter(IQueryable<Db.Entities.EBookReport> query, EBookReportSearchObject? search = null)
     {

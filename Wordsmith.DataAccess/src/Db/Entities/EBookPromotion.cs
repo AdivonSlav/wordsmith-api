@@ -8,7 +8,7 @@ namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("ebook_promotions")]
 [Index(nameof(IsInProgress))]
-public class EBookPromotion
+public class EBookPromotion : IEntity
 {
     [Key] public int Id { get; set; }
     

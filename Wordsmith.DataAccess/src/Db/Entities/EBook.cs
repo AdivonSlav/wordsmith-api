@@ -12,7 +12,7 @@ namespace Wordsmith.DataAccess.Db.Entities;
 [Index(nameof(PublishedDate))]
 [Index(nameof(UpdatedDate))]
 [Index(nameof(RatingAverage))]
-public class EBook
+public class EBook : IEntity
 {
     [Key] public int Id { get; set; }
     

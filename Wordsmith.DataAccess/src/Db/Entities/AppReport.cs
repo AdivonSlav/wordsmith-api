@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("app_reports")]
-public class AppReport
+public class AppReport : IEntity
 {
     [Key] public int Id { get; set; }
 

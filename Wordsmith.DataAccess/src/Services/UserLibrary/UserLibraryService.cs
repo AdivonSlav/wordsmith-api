@@ -48,7 +48,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         }
     }
 
-    protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query, UserLibrarySearchObject search)
+    protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query)
     {
         query = query
             .Include(e => e.EBook)
@@ -57,7 +57,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
             .ThenInclude(b => b.CoverArt)
             .Include(e => e.EBook)
             .ThenInclude(b => b.MaturityRating);
-
+    
         return query;
     }
 

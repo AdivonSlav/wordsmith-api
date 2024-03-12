@@ -1,6 +1,6 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
@@ -12,7 +12,7 @@ namespace Wordsmith.DataAccess.Services;
 
 public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TDb, TSearch>, IWriteService<T, TDb, TSearch, TInsert, TUpdate>
     where T : class
-    where TDb : class
+    where TDb : class, IEntity
     where TSearch : SearchObject
     where TInsert : class
     where TUpdate : class

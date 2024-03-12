@@ -6,7 +6,7 @@ namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("user_library_categories")]
 [Index(nameof(Name))]
-public class UserLibraryCategory
+public class UserLibraryCategory : IEntity
 {
     [Key]
     public int Id { get; set; }

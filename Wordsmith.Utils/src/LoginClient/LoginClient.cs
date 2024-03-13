@@ -1,7 +1,6 @@
 using IdentityModel.Client;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.User;
 
 namespace Wordsmith.Utils.LoginClient;

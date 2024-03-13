@@ -9,11 +9,13 @@ using Wordsmith.DataAccess.Services.EBook;
 using Wordsmith.DataAccess.Services.EBookReport;
 using Wordsmith.DataAccess.Services.Genre;
 using Wordsmith.DataAccess.Services.MaturityRating;
+using Wordsmith.DataAccess.Services.Order;
 using Wordsmith.DataAccess.Services.ReportReason;
 using Wordsmith.DataAccess.Services.User;
 using Wordsmith.DataAccess.Services.UserLibrary;
 using Wordsmith.DataAccess.Services.UserLibraryCategory;
 using Wordsmith.DataAccess.Services.UserReport;
+using Wordsmith.Integration.PayPal;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
 
@@ -65,6 +67,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<IGenreService, GenreService>();
         services.AddTransient<IUserLibraryService, UserLibraryService>();
         services.AddTransient<IUserLibraryCategoryService, UserLibraryCategoryService>();
+        services.AddTransient<IOrderService, OrderService>();
         
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();
@@ -80,6 +83,19 @@ public static class DependencyInjectionSetup
             var identityServerAddress = $"https://{identityServerHost}:{identityServerPort}";
 
             return new LoginClient(identityServerAddress, clientFactory!);
+        });
+        services.AddScoped<IPayPalService, PayPalService>(provider =>
+        {
+            var clientFactory = provider.GetService<IHttpClientFactory>();
+            var clientId = configuration["PayPalClientId"];
+            var clientSecret = configuration["PayPalClientSecret"];
+
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+            {
+                throw new Exception("PayPal clientId or clientSecret not configured!");
+            }
+
+            return new PayPalService(clientId, clientSecret, clientFactory!);
         });
 
         // Registers the HttpClientFactory to be used for managing client instances

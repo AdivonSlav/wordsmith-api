@@ -1,0 +1,29 @@
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using Wordsmith.DataAccess.Db.Entities;
+using Wordsmith.DataAccess.Services.Order;
+using Wordsmith.Models.DataTransferObjects;
+using Wordsmith.Models.RequestObjects.Order;
+using Wordsmith.Models.SearchObjects;
+
+namespace Wordsmith.API.Controllers;
+
+[ApiController]
+[Route("orders")]
+public class OrdersController : WriteController<OrderDto, Order, OrderSearchObject, OrderInsertRequest, OrderUpdateRequest>
+{
+    public OrdersController(IOrderService orderService) : base(orderService) { }
+
+    [SwaggerOperation("Create a new order for an ebook")]
+    [HttpPost]
+    public override Task<ActionResult<EntityResult<OrderDto>>> Insert(OrderInsertRequest insert)
+    {
+        return base.Insert(insert);
+    }
+
+    [NonAction]
+    public override Task<ActionResult<EntityResult<OrderDto>>> Update(int id, OrderUpdateRequest update)
+    {
+        return base.Update(id, update);
+    }
+}

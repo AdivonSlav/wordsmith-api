@@ -22,6 +22,8 @@ public class GlobalExceptionHandler : IMiddleware
             {
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 exceptionType = "Bad request error";
+                
+                Logger.LogError("Bad request error", e);
             }
             else
             {

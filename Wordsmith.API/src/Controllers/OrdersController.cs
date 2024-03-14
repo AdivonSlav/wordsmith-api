@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Wordsmith.DataAccess.Db.Entities;
@@ -15,13 +16,16 @@ public class OrdersController : WriteController<OrderDto, Order, OrderSearchObje
     public OrdersController(IOrderService orderService) : base(orderService) { }
 
     [SwaggerOperation("Create a new order for an ebook")]
+    [Authorize("All")]
     [HttpPost]
     public override Task<ActionResult<EntityResult<OrderDto>>> Insert(OrderInsertRequest insert)
     {
+        insert.UserId = GetAuthUserId();
         return base.Insert(insert);
     }
 
     [SwaggerOperation("Capture payment for an order")]
+    [Authorize("All")]
     [HttpPost("{id:int}/capture")]
     public async Task<ActionResult<EntityResult<OrderDto>>> CapturePayment(int id)
     {

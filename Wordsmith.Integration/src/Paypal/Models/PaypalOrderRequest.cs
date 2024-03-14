@@ -1,15 +1,16 @@
 using System.Text.Json.Serialization;
+using Wordsmith.Integration.Paypal.Enums;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalOrderRequest
+public class PaypalOrderRequest
 {
     [JsonPropertyName("intent")]
-    public string Intent { get; set; }
+    public PaypalIntent Intent { get; set; }
     
     [JsonPropertyName("purchase_units")]
     public IEnumerable<PaypalPurchaseUnit> PurchaseUnits { get; set; }
     
     [JsonPropertyName("payment_source")]
-    public PayPalPaymentSource PaymentSource { get; set; }
+    public PaypalPaymentSource PaymentSource { get; set; }
 }

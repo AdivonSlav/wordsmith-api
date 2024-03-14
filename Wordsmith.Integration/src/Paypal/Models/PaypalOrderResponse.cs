@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalOrderResponse
+public class PaypalOrderResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }
@@ -17,5 +17,5 @@ public class PayPalOrderResponse
     public IEnumerable<PaypalPurchaseUnit> PurchaseUnits { get; set; }
     
     [JsonPropertyName("links")]
-    public IEnumerable<PayPalLink> Links { get; set; }
+    public IEnumerable<PaypalLink> Links { get; set; }
 }

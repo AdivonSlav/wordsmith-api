@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wordsmith.DataAccess.Db;
 
@@ -10,9 +11,11 @@ using Wordsmith.DataAccess.Db;
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240314185246_V5")]
+    partial class V5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -654,15 +657,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<DateTime>("OrderCreationDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("PayPalCaptureId")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
                     b.Property<string>("PayPalOrderId")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("PayPalRefundId")
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
@@ -698,9 +693,6 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<string>("ReferenceId")
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
-
-                    b.Property<DateTime?>("RefundDate")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Status")
                         .IsRequired()

@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalDisplayData
+public class PaypalDisplayData
 {
     [JsonPropertyName("brand_name")]
     public string BrandName { get; set; }

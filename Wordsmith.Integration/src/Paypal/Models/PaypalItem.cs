@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalItem
+public class PaypalItem
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }
@@ -14,5 +14,5 @@ public class PayPalItem
     public string Quantity { get; set; }
     
     [JsonPropertyName("unit_amount")]
-    public PayPalUnitAmount UnitAmount { get; set; }
+    public PaypalUnitAmount UnitAmount { get; set; }
 }

@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalExperienceContext
+public class PaypalExperienceContext
 {
     [JsonPropertyName("payment_method_preference")]
     public string PaymentMethodPreference { get; set; }

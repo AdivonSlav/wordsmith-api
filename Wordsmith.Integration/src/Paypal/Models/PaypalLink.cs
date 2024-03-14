@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalLink
+public class PaypalLink
 {
     [JsonPropertyName("href")]
     public string Href { get; set; }

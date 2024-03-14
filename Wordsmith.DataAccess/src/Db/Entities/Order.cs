@@ -12,7 +12,8 @@ public class Order : IEntity
     public enum OrderStatus
     {
         Pending,
-        Completed
+        Completed,
+        Refunded
     }
     
     [Key] public int Id { get; set; }
@@ -22,6 +23,12 @@ public class Order : IEntity
     
     [StringLength(50)]
     public string PayPalOrderId { get; set; }
+    
+    [StringLength(50)]
+    public string PayPalCaptureId { get; set; }
+    
+    [StringLength(50)]
+    public string PayPalRefundId { get; set; }
     
     [StringLength(40)]
     public OrderStatus Status { get; set; }
@@ -48,8 +55,13 @@ public class Order : IEntity
     
     public DateTime? PaymentDate { get; set; }
     
+    public DateTime? RefundDate { get; set; }
+    
     [Precision(10, 2)]
     public decimal PaymentAmount { get; set; }
+    
+    [StringLength(100)]
+    public string PaymentUrl { get; set; }
 
     [ForeignKey(nameof(PayerId))]
     [DeleteBehavior(DeleteBehavior.SetNull)]

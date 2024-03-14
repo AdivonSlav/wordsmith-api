@@ -21,6 +21,13 @@ public class OrdersController : WriteController<OrderDto, Order, OrderSearchObje
         return base.Insert(insert);
     }
 
+    [SwaggerOperation("Capture payment for an order")]
+    [HttpPost("{id:int}/capture")]
+    public async Task<ActionResult<EntityResult<OrderDto>>> CapturePayment(int id)
+    {
+        return await (WriteService as IOrderService)!.CapturePayment(id);
+    }
+
     [NonAction]
     public override Task<ActionResult<EntityResult<OrderDto>>> Update(int id, OrderUpdateRequest update)
     {

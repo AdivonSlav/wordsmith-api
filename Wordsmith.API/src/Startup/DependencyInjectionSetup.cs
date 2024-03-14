@@ -15,7 +15,7 @@ using Wordsmith.DataAccess.Services.User;
 using Wordsmith.DataAccess.Services.UserLibrary;
 using Wordsmith.DataAccess.Services.UserLibraryCategory;
 using Wordsmith.DataAccess.Services.UserReport;
-using Wordsmith.Integration.PayPal;
+using Wordsmith.Integration.Paypal;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
 
@@ -84,7 +84,7 @@ public static class DependencyInjectionSetup
 
             return new LoginClient(identityServerAddress, clientFactory!);
         });
-        services.AddScoped<IPayPalService, PayPalService>(provider =>
+        services.AddScoped<IPaypalService, PaypalService>(provider =>
         {
             var clientFactory = provider.GetService<IHttpClientFactory>();
             var clientId = configuration["PayPalClientId"];
@@ -95,7 +95,7 @@ public static class DependencyInjectionSetup
                 throw new Exception("PayPal clientId or clientSecret not configured!");
             }
 
-            return new PayPalService(clientId, clientSecret, clientFactory!);
+            return new PaypalService(clientId, clientSecret, clientFactory!);
         });
 
         // Registers the HttpClientFactory to be used for managing client instances

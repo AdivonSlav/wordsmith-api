@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalPayee
+public class PaypalPayee
 {
     [JsonPropertyName("email_address")]
     public string EmailAddress { get; set; }
@@ -11,5 +11,5 @@ public class PayPalPayee
     public string MerchantId { get; set; }
     
     [JsonPropertyName("display_data")]
-    public PayPalDisplayData DisplayData { get; set; }
+    public PaypalDisplayData DisplayData { get; set; }
 }

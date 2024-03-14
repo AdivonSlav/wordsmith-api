@@ -6,5 +6,5 @@ namespace Wordsmith.DataAccess.Services.Order;
 
 public interface IOrderService : IWriteService<OrderDto, Db.Entities.Order, OrderSearchObject, OrderInsertRequest, OrderUpdateRequest>
 {
-    
+    Task<EntityResult<OrderDto>> CapturePayment(int id);
 }

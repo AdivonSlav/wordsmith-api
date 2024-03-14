@@ -1,15 +1,18 @@
 using System.Text.Json.Serialization;
 
-namespace Wordsmith.Integration.PayPal.Models;
+namespace Wordsmith.Integration.Paypal.Models;
 
-public class PayPalAmount
+public class PaypalAmount
 {
     [JsonPropertyName("currency_code")]
     public string CurrencyCode { get; set; }
+    
+    [JsonPropertyName("currency")]
+    public string Currency { get; set; }
     
     [JsonPropertyName("value")]
     public string Value { get; set; }
     
     [JsonPropertyName("breakdown")]
-    public PayPalBreakdown Breakdown { get; set; }
+    public PaypalBreakdown Breakdown { get; set; }
 }

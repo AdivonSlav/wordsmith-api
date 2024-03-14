@@ -1,5 +1,5 @@
 # Wordsmith API
-REST API service for a Flutter eBook reader and marketplace application. It is built with ASP.NET Core 6.0 and utilizes MySQL and RabbitMQ.
+REST API service for a Flutter eBook reader and marketplace application. It is built with .NET 6.0 and utilizes MySQL and RabbitMQ.
 
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)

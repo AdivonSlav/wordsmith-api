@@ -46,6 +46,20 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         {
             throw new AppException("Book is already added to your library");
         }
+
+        if (ebook.Price.HasValue)
+        {
+            var order = await Context.Orders.FirstOrDefaultAsync(e => e.ReferenceId == insert.OrderReferenceId);
+
+            if (order != null)
+            {
+                if (order.EBookId != ebook.Id || order.PayerId != insert.UserId ||
+                    order.Status != Db.Entities.Order.OrderStatus.Completed)
+                {
+                    throw new AppException("You have not purchased the ebook!");
+                }
+            }
+        }
     }
 
     protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query)

@@ -150,12 +150,15 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
 
             order.PayPalRefundId = refundResponse.Id;
             order.RefundDate = DateTime.UtcNow;
+            order.Status = Db.Entities.Order.OrderStatus.Refunded;
+
+            await Context.SaveChangesAsync();
             
             throw new Exception(
                 $"Could not process order with ID {order.Id}. Refund of payment with capture ID ${capture.Id} completed");
         }
     }
-
+    
     private Db.Entities.Order MapNewOrderEntity(Db.Entities.Order order, Db.Entities.User user, Db.Entities.EBook ebook,
         PaypalOrderResponse orderResponse)
     {

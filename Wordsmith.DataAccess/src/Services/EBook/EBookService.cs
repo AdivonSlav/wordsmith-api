@@ -108,7 +108,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
             if (!genreExists) throw new AppException("The genre for this eBook was not found!");
         }
     }
-
+    
     private async Task HandleImage(Db.Entities.EBook entity, EBookInsertRequest insert)
     {
         var savePath = Path.Combine("images", "ebooks", $"eBook-{Guid.NewGuid()}");

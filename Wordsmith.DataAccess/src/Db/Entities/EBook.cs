@@ -20,7 +20,7 @@ public class EBook : IEntity
     [StringLength(40)]
     public string Title { get; set; }
     
-    [StringLength(800)]
+    [StringLength(3200)]
     public string Description { get; set; }
     
     public double? RatingAverage { get; set; }

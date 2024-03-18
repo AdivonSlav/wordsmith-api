@@ -9,5 +9,5 @@ public class UserLibraryInsertRequest
     [Required]
     public int EBookId { get; set; }
     
-    public string OrderReferenceId { get; set; }
+    public string? OrderReferenceId { get; set; }
 }

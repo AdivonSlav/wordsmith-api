@@ -34,7 +34,7 @@ public static class DependencyInjectionSetup
                                     $"Database={mysqlDetails["Database"]};";
         var mysqlVersion = ServerVersion.AutoDetect(mysqlConnectionString);
         var migrationsAssembly = typeof(DatabaseContext).Assembly.GetName().Name;
-
+        
         services.AddDbContext<DatabaseContext>(options =>
         {
             options.UseMySql(mysqlConnectionString, mysqlVersion,
@@ -44,7 +44,7 @@ public static class DependencyInjectionSetup
                     optionsBuilder.EnableStringComparisonTranslations();
                 });
         });
-
+        
         services.AddAutoMapper(config =>
         {
             var dataAccessAssembly = Assembly.GetAssembly(typeof(DatabaseContext));

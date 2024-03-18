@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Db.ValueConverters;
 
@@ -8,8 +9,10 @@ public class DatabaseContext : DbContext
 {
     public DatabaseContext() { }
 
-    public DatabaseContext(DbContextOptions<DatabaseContext> options)
-        : base(options) { }
+    public DatabaseContext(DbContextOptions<DatabaseContext> options, IConfiguration configuration)
+        : base(options)
+    {
+    }
 
     public virtual DbSet<AppReport> AppReports { get; set; }
     public virtual DbSet<AuthorFollow> AuthorFollows { get; set; }
@@ -36,9 +39,6 @@ public class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Genre>().HasData(DatabaseSeeds.CreateGenres());
-        modelBuilder.Entity<MaturityRating>().HasData(DatabaseSeeds.CreateMaturityRatings());
-
         modelBuilder.Entity<Order>().Property(e => e.Status)
             .HasConversion(
                 v => v.ToString(),

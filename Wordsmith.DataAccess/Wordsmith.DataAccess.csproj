@@ -30,6 +30,8 @@
     <ItemGroup>
       <Folder Include="src\Db\Migrations\" />
     </ItemGroup>
-
-
+    
+    <ItemGroup>
+        <None Include="src\Db\Seeds\SeedLists\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Link="SeedLists\%(RecursiveDir)\%(Filename)%(Extension)" />
+    </ItemGroup>
 </Project>

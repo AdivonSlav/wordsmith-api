@@ -1,4 +1,5 @@
 using Wordsmith.API.Startup;
+using Wordsmith.DataAccess.Db.Seeds;
 using Wordsmith.Utils;
 
 #pragma warning disable IDE0058
@@ -9,6 +10,7 @@ try
     builder.Configuration.AddEnvironmentVariables(prefix: "WORDSMITH_");
     
     UtilitySetup.Init(builder.Configuration, builder.Environment);
+    DatabaseSeeds.Init(builder.Configuration, builder.Environment);
     
     builder.Services.RegisterStandardServices(builder.Configuration);
     builder.Services.RegisterAuthServices(builder.Configuration);

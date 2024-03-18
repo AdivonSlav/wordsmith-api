@@ -44,5 +44,4 @@
         <None Include="appsettings.Production.json" CopyToPublishDirectory="Always" />
         <None Include="certs/*" CopyToPublishDirectory="Always" />
     </ItemGroup>
-
 </Project>

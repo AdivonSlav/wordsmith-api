@@ -20,7 +20,6 @@ try
 
     app.ConfigureDatabase();
     app.RegisterMiddleware();
-    app.EnsureSeedData(builder.Configuration);
 
     Logger.LogInfo("Up and running");
     

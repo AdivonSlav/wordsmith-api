@@ -15,7 +15,8 @@ public static class DatabaseSetup
 
         Logger.LogInfo("Checking for any pending database migrations...");
         context.Database.Migrate();
-        DatabaseSeeds.CreateUsers(context, configuration);
+        
+        DatabaseSeeds.EnsureSeedData(context);
 
         return app;
     }

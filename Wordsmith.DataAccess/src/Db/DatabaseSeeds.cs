@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Utils;
 
@@ -6,43 +5,62 @@ namespace Wordsmith.DataAccess.Db;
 
 public static class DatabaseSeeds
 {
-    public static void CreateUsers(DatabaseContext context, IConfiguration configuration)
+    public static void EnsureSeedData(DatabaseContext context)
     {
-        if (context.Users.Any()) return;
-        
-        var adminToCreate = configuration["DefaultAdmin"];
-        var userToCreate = configuration["DefaultUser"];
-        var createdUsers = new List<User>();
+        Logger.LogInfo("Checking whether seeding is necessary...");
 
-        if (adminToCreate != null)
+        CreateUsers(context);
+        
+        context.SaveChanges();
+    }
+    
+    private static void CreateUsers(DatabaseContext context)
+    {
+        if (context.Users.Any())
         {
-            createdUsers.Add(new User
+            return;
+        }
+        
+        var users = new List<User>
+        {
+            new()
             {
                 Id = 1,
-                Username = adminToCreate,
-                Email = $"{adminToCreate}@example.com",
+                Username = "orwell47",
+                Email = "orwell47@personal.com",
+                PayPalEmail = "orwell47@personal.com", 
+                Role = "admin",
                 RegistrationDate = DateTime.UtcNow,
                 About = "Just an admin",
-                Role = "admin",
-            });
-        }
-        
-        if (userToCreate != null)
-        {
-            createdUsers.Add(new User
+            },
+            new()
             {
                 Id = 2,
-                Username = userToCreate,
-                Email = $"{userToCreate}@example.com",
+                Username = "john_doe1",
+                Email = "john_doe1@personal.com",
+                PayPalEmail = "john_doe1@personal.com",
+                Role = "user",
                 RegistrationDate = DateTime.UtcNow,
                 About = "Just a user",
+            },
+            new()
+            {
+                Id = 3,
+                Username = "jane_doe2",
+                Email = "jane_doe2@personal.com",
+                PayPalEmail = "jane_doe2@personal.com",
                 Role = "user",
-            });
+                RegistrationDate = DateTime.UtcNow,
+                About = "Just a seller",
+            }
+        };
+
+        foreach (var user in users.Where(user => context.Users.FirstOrDefault(u => u.Username == user.Username && u.Id == user.Id) == null))
+        {
+            context.Users.Add(user);
         }
         
-        context.Users.AddRange(createdUsers);
-        context.SaveChanges();
-        Logger.LogInfo("Created default users!");
+        Logger.LogInfo("Seeded users to the database");
     }
     
     public static IEnumerable<MaturityRating> CreateMaturityRatings()

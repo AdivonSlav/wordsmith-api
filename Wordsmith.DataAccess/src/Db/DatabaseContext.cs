@@ -39,9 +39,6 @@ public class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Genre>().HasData(DatabaseSeeds.CreateGenres());
-        modelBuilder.Entity<MaturityRating>().HasData(DatabaseSeeds.CreateMaturityRatings());
-
         modelBuilder.Entity<Order>().Property(e => e.Status)
             .HasConversion(
                 v => v.ToString(),

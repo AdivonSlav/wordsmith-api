@@ -10,6 +10,8 @@ public static class DatabaseSeeds
         Logger.LogInfo("Checking whether seeding is necessary...");
 
         CreateUsers(context);
+        CreateMaturityRatings(context);
+        CreateGenres(context);
         
         context.SaveChanges();
     }
@@ -63,21 +65,42 @@ public static class DatabaseSeeds
         Logger.LogInfo("Seeded users to the database");
     }
     
-    public static IEnumerable<MaturityRating> CreateMaturityRatings()
+    private static void CreateMaturityRatings(DatabaseContext context)
     {
         var ratings = GetMaturityRatings();
+        var hasSeeded = false;
+        
+        foreach (var rating in ratings)
+        {
+            var ratingName = rating.Split(";")[0];
+            var ratingShortName = rating.Split(";")[1];
 
-        return ratings.Select((rating, i) => new MaturityRating() { Id = i + 1, Name = rating.Split(";")[0], ShortName = rating.Split(";")[1] }).ToList();
+            if (context.MaturityRatings.Any(e => e.Name == ratingName && e.ShortName == ratingShortName)) continue;
+
+            context.MaturityRatings.Add(new MaturityRating() { Name = ratingName, ShortName = ratingShortName });
+            hasSeeded = true;
+        }
+        
+        if (hasSeeded) Logger.LogInfo("Seeded new maturity ratings");
     }
     
-    public static IEnumerable<Genre> CreateGenres()
+    private static void CreateGenres(DatabaseContext context)
     {
         var genres = GetGenres();
+        var hasSeeded = false;
 
-        return genres.Select((genre, i) => new Genre() { Id = i + 1, Name = genre }).ToList();
+        foreach (var genre in genres)
+        {
+            if (context.Genres.Any(e => e.Name == genre)) continue;
+
+            context.Genres.Add(new Genre() { Name = genre });
+            hasSeeded = true;
+        }
+        
+        if (hasSeeded) Logger.LogInfo("Seeded new genres");
     }
     
-    private static List<string> GetMaturityRatings()
+    private static IEnumerable<string> GetMaturityRatings()
     {
         return new List<string>()
         {
@@ -87,7 +110,7 @@ public static class DatabaseSeeds
         };
     }
 
-    private static List<string> GetGenres()
+    private static IEnumerable<string> GetGenres()
     {
         return new List<string>()
         {

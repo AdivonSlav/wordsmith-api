@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Db.Seeds;
 using Wordsmith.Utils;
 
 namespace Wordsmith.API.Startup;
@@ -15,6 +16,8 @@ public static class DatabaseSetup
 
         Logger.LogInfo("Checking for any pending database migrations...");
         context.Database.Migrate();
+ 
+        DatabaseSeeds.EnsureSeedData(context);
         
         return app;
     }

@@ -26,6 +26,31 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         entity.IsShown = true;
     }
 
+    protected override IQueryable<Db.Entities.Comment> AddFilter(IQueryable<Db.Entities.Comment> query, CommentSearchObject search)
+    {
+        if (search.EBookId.HasValue)
+        {
+            query = query.Where(e => e.EBookId == search.EBookId.Value);
+        }
+
+        if (search.UserId.HasValue)
+        {
+            query = query.Where(e => e.UserId == search.UserId);
+        }
+
+        if (search.IsShown.HasValue)
+        {
+            query = query.Where(e => e.IsShown == search.IsShown);
+        }
+
+        if (search.EBookChapterId.HasValue)
+        {
+            query = query.Where(e => e.EBookChapterId == search.EBookChapterId.Value);
+        }
+
+        return query;
+    }
+
     private async Task ValidateInsertion(Db.Entities.Comment comment, CommentInsertRequest insert)
     {
         if (!await Context.EBooks.AnyAsync(e => e.Id == insert.EBookId))

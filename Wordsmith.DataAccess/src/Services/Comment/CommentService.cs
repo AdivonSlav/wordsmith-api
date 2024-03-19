@@ -22,6 +22,8 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
     protected override async Task BeforeInsert(Db.Entities.Comment entity, CommentInsertRequest insert)
     {
         await ValidateInsertion(entity, insert);
+        entity.DateAdded = DateTime.UtcNow;
+        entity.IsShown = true;
     }
 
     private async Task ValidateInsertion(Db.Entities.Comment comment, CommentInsertRequest insert)
@@ -34,6 +36,11 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         if (!await Context.Users.AnyAsync(e => e.Id == insert.UserId))
         {
             throw new AppException("The user trying to comment does not exist!");
+        }
+
+        if (!await Context.UserLibraries.AnyAsync(e => e.EBookId == insert.EBookId && e.UserId == insert.UserId))
+        {
+            throw new AppException("You cannot comment on an ebook you do not have in your library!");
         }
 
         if (insert.EBookChapterId.HasValue &&

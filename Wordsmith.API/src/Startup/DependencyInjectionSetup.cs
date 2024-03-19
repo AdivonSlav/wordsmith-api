@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Services.EBook;
+using Wordsmith.DataAccess.Services.EBookRating;
 using Wordsmith.DataAccess.Services.EBookReport;
 using Wordsmith.DataAccess.Services.Genre;
 using Wordsmith.DataAccess.Services.MaturityRating;
@@ -68,6 +69,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<IUserLibraryService, UserLibraryService>();
         services.AddTransient<IUserLibraryCategoryService, UserLibraryCategoryService>();
         services.AddTransient<IOrderService, OrderService>();
+        services.AddTransient<IEBookRatingService, EBookRatingService>();
         
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();

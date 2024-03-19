@@ -24,6 +24,26 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
         await CalculateRatingAverage(entity);
     }
 
+    protected override IQueryable<Db.Entities.EBookRating> AddFilter(IQueryable<Db.Entities.EBookRating> query, EBookRatingSearchObject search)
+    {
+        if (search.Rating.HasValue)
+        {
+            query = query.Where(e => e.Rating == search.Rating.Value);
+        }
+
+        if (search.EBookId.HasValue)
+        {
+            query = query.Where(e => e.EBookId == search.EBookId.Value);
+        }
+
+        if (search.UserId.HasValue)
+        {
+            query = query.Where(e => e.UserId == search.UserId);
+        }
+
+        return query;
+    }
+
     private async Task ValidateInsertion(int eBookId, int userId)
     {
         if (!await Context.EBooks.AnyAsync(e => e.Id == eBookId))

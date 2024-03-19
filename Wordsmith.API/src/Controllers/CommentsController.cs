@@ -29,4 +29,13 @@ public class CommentsController : WriteController<CommentDto, Comment, CommentSe
     {
         return base.Update(id, update);
     }
+
+    [SwaggerOperation("Delete a comment")]
+    [Authorize("All")]
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<EntityResult<CommentDto>>> Delete(int id)
+    {
+        var userId = GetAuthUserId();
+        return await (WriteService as ICommentService)!.Delete(userId, id);
+    }
 }

@@ -26,6 +26,11 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         entity.IsShown = true;
     }
 
+    protected override async Task BeforeDeletion(int userId, Db.Entities.Comment entity)
+    {
+        await ValidateDeletion(userId, entity);
+    }
+
     protected override IQueryable<Db.Entities.Comment> AddFilter(IQueryable<Db.Entities.Comment> query, CommentSearchObject search)
     {
         if (search.EBookId.HasValue)
@@ -77,6 +82,14 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         if (_profanityDetector.ContainsProfanity(comment.Content))
         {
             comment.Content = _profanityDetector.Censor(comment.Content);
+        }
+    }
+
+    private async Task ValidateDeletion(int userId, Db.Entities.Comment comment)
+    {
+        if (comment.UserId != userId)
+        {
+            throw new AppException("You cannot delete a comment you did not post!");
         }
     }
 }

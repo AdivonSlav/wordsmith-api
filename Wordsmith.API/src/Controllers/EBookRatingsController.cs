@@ -19,6 +19,7 @@ public class EBookRatingsController : WriteController<EBookRatingDto, EBookRatin
     [Authorize("All")]
     public override Task<ActionResult<EntityResult<EBookRatingDto>>> Insert(EBookRatingInsertRequest insert)
     {
+        insert.UserId = GetAuthUserId();
         return base.Insert(insert);
     }
 

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Services.Comment;
 using Wordsmith.DataAccess.Services.EBook;
 using Wordsmith.DataAccess.Services.EBookRating;
 using Wordsmith.DataAccess.Services.EBookReport;
@@ -18,6 +19,7 @@ using Wordsmith.DataAccess.Services.UserLibraryCategory;
 using Wordsmith.DataAccess.Services.UserReport;
 using Wordsmith.Integration.Paypal;
 using Wordsmith.Utils.LoginClient;
+using Wordsmith.Utils.ProfanityDetector;
 using Wordsmith.Utils.RabbitMQ;
 
 namespace Wordsmith.API.Startup;
@@ -70,7 +72,9 @@ public static class DependencyInjectionSetup
         services.AddTransient<IUserLibraryCategoryService, UserLibraryCategoryService>();
         services.AddTransient<IOrderService, OrderService>();
         services.AddTransient<IEBookRatingService, EBookRatingService>();
-        
+        services.AddTransient<ICommentService, CommentService>();
+
+        services.AddScoped<IProfanityDetector, ProfanityDetector>();
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();
         services.AddScoped<ILoginClient, LoginClient>(provider =>

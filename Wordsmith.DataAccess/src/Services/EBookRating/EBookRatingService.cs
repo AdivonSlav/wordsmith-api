@@ -44,6 +44,36 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
         return query;
     }
 
+    public async Task<QueryResult<EBookRatingStatisticsDto>> GetStatistics(int eBookId)
+    {
+        await ValidateGetStatistics(eBookId);
+
+        var ebook = await Context.EBooks.FirstAsync(e => e.Id == eBookId);
+        var ratingCounts = await Context.EBookRatings
+            .GroupBy(e => e.Rating)
+            .Select(e => new { Rating = e.Key, Count = e.Count() })
+            .OrderBy(e => e.Rating)
+            .ToListAsync();
+        
+        var statistics = new EBookRatingStatisticsDto
+        {
+            EBookId = eBookId,
+            RatingAverage = ebook.RatingAverage,
+            TotalRatingCount = ratingCounts.Sum(e => e.Count),
+            RatingCounts = new Dictionary<int, int>(),
+        };
+        
+        foreach (var ratingCount in ratingCounts)
+        {
+            statistics.RatingCounts.Add(ratingCount.Rating, ratingCount.Count);
+        }
+
+        return new QueryResult<EBookRatingStatisticsDto>()
+        {
+            Result = new List<EBookRatingStatisticsDto>() { statistics }
+        };
+    }
+    
     private async Task ValidateInsertion(int eBookId, int userId)
     {
         if (!await Context.EBooks.AnyAsync(e => e.Id == eBookId))
@@ -67,6 +97,14 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
         }
     }
 
+    private async Task ValidateGetStatistics(int eBookId)
+    {
+        if (!await Context.EBooks.AnyAsync(e => e.Id == eBookId))
+        {
+            throw new AppException("The ebook does not exist!");
+        }
+    }
+
     private async Task CalculateRatingAverage(Db.Entities.EBookRating rating)
     {
         var ebook = await Context.EBooks.FirstAsync(e => e.Id == rating.EBookId);
@@ -75,4 +113,5 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
         ebook.RatingAverage = Math.Round(newRatingAverage, 2);
         await Context.SaveChangesAsync();
     }
+
 }

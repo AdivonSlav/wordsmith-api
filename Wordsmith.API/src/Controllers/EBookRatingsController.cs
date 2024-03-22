@@ -23,16 +23,18 @@ public class EBookRatingsController : WriteController<EBookRatingDto, EBookRatin
         return base.Insert(insert);
     }
 
+    [SwaggerOperation("Update an existing ebook rating")]
+    [Authorize("All")]
+    public override Task<ActionResult<EntityResult<EBookRatingDto>>> Update(int id, EBookRatingUpdateRequest update)
+    {
+        update.UserId = GetAuthUserId();
+        return base.Update(id, update);
+    }
+    
     [SwaggerOperation("Get rating statistics for a given ebook ID")]
     [HttpGet("statistics/{eBookId:int}")]
     public async Task<ActionResult<QueryResult<EBookRatingStatisticsDto>>> GetStatistics([FromRoute] int eBookId)
     {
         return await (WriteService as IEBookRatingService)!.GetStatistics(eBookId);
-    }
-    
-    [NonAction]
-    public override Task<ActionResult<EntityResult<EBookRatingDto>>> Update(int id, EBookRatingUpdateRequest update)
-    {
-        return base.Update(id, update);
     }
 }

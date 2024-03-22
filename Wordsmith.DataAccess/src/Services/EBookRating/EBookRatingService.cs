@@ -24,6 +24,17 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
         await CalculateRatingAverage(entity);
     }
 
+    protected override async Task BeforeUpdate(Db.Entities.EBookRating entity, EBookRatingUpdateRequest update)
+    {
+        await ValidateUpdate(entity.Id, update.UserId);
+        entity.RatingDate = DateTime.UtcNow;
+    }
+
+    protected override async Task AfterUpdate(Db.Entities.EBookRating entity, EBookRatingUpdateRequest update)
+    {
+        await CalculateRatingAverage(entity);
+    }
+
     protected override IQueryable<Db.Entities.EBookRating> AddFilter(IQueryable<Db.Entities.EBookRating> query, EBookRatingSearchObject search)
     {
         if (search.Rating.HasValue)
@@ -102,6 +113,14 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
         if (await Context.EBookRatings.AnyAsync(e => e.EBookId == eBookId && e.UserId == userId))
         {
             throw new AppException("You have already rated this ebook!");
+        }
+    }
+
+    private async Task ValidateUpdate(int ratingId, int userId)
+    {
+        if (!await Context.EBookRatings.AnyAsync(e => e.Id == ratingId && e.UserId == userId))
+        {
+            throw new AppException("You can only update your own rating!");
         }
     }
 

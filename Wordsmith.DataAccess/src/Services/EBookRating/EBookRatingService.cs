@@ -50,6 +50,7 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
 
         var ebook = await Context.EBooks.FirstAsync(e => e.Id == eBookId);
         var ratingCounts = await Context.EBookRatings
+            .Where(e => e.EBookId == eBookId)
             .GroupBy(e => e.Rating)
             .Select(e => new { Rating = e.Key, Count = e.Count() })
             .OrderBy(e => e.Rating)
@@ -60,12 +61,19 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
             EBookId = eBookId,
             RatingAverage = ebook.RatingAverage,
             TotalRatingCount = ratingCounts.Sum(e => e.Count),
-            RatingCounts = new Dictionary<int, int>(),
+            RatingCounts = new Dictionary<int, int>()
+            {
+                { 1, 0 },
+                { 2, 0 },
+                { 3, 0 },
+                { 4, 0 },
+                { 5, 0 }
+            },
         };
         
         foreach (var ratingCount in ratingCounts)
         {
-            statistics.RatingCounts.Add(ratingCount.Rating, ratingCount.Count);
+            statistics.RatingCounts[ratingCount.Rating] = ratingCount.Count;
         }
 
         return new QueryResult<EBookRatingStatisticsDto>()

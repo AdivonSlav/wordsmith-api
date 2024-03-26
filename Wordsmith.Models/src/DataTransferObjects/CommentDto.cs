@@ -23,7 +23,7 @@ public class CommentDto
     public int EBookId { get; set; }
     
     [SwaggerSchema("ID of the user who made the comment")]
-    public int UserId { get; set; }
+    public UserDto User { get; set; } 
     
     [SwaggerSchema("Whether the user who requested this response liked the comment or not")]
     public bool HasLiked { get; set; }

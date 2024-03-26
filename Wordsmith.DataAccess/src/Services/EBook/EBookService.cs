@@ -39,7 +39,8 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         await Context.Entry(entity).Reference(e => e.Author).LoadAsync();
     }
 
-    protected override IQueryable<Db.Entities.EBook> AddFilter(IQueryable<Db.Entities.EBook> query, EBookSearchObject search)
+    protected override IQueryable<Db.Entities.EBook> AddFilter(IQueryable<Db.Entities.EBook> query,
+        EBookSearchObject search, int userId)
     {
         if (search?.Title != null)
         {
@@ -59,7 +60,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         return query;
     }
 
-    protected override IQueryable<Db.Entities.EBook> AddInclude(IQueryable<Db.Entities.EBook> query)
+    protected override IQueryable<Db.Entities.EBook> AddInclude(IQueryable<Db.Entities.EBook> query, int userId)
     {
         query = query.Include(e => e.MaturityRating).Include(e => e.CoverArt).Include(e => e.Author);
     

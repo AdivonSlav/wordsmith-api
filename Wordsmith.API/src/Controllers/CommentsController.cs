@@ -36,6 +36,24 @@ public class CommentsController : WriteController<CommentDto, Comment, CommentSe
     public async Task<ActionResult<EntityResult<CommentDto>>> Delete(int id)
     {
         var userId = GetAuthUserId();
-        return await (WriteService as ICommentService)!.Delete(userId, id);
+        return Ok(await (WriteService as ICommentService)!.Delete(userId, id));
+    }
+
+    [SwaggerOperation("Like a comment")]
+    [Authorize("All")]
+    [HttpPost("{id:int}/like")]
+    public async Task<ActionResult<EntityResult<CommentDto>>> Like(int id)
+    {
+        var userId = GetAuthUserId();
+        return Ok(await (WriteService as ICommentService)!.Like(id, userId));
+    }
+
+    [SwaggerOperation("Remove a like from a comment")]
+    [Authorize("All")]
+    [HttpDelete("{id:int}/like")]
+    public async Task<ActionResult<EntityResult<CommentDto>>> RemoveLike(int id)
+    {
+        var userId = GetAuthUserId();
+        return Ok(await (WriteService as ICommentService)!.RemoveLike(id, userId));
     }
 }

@@ -28,7 +28,8 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
     //     return query;
     // }
 
-    protected override IQueryable<Db.Entities.EBookReport> AddFilter(IQueryable<Db.Entities.EBookReport> query, EBookReportSearchObject? search = null)
+    protected override IQueryable<Db.Entities.EBookReport> AddFilter(IQueryable<Db.Entities.EBookReport> query,
+        EBookReportSearchObject search, int userId)
     {
         if (search?.ReportedEBookId != null)
         {

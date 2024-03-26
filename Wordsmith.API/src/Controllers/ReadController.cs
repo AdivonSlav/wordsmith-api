@@ -20,14 +20,16 @@ public class ReadController<T, TSearch> : ControllerBase
     [HttpGet()]
     public virtual async Task<ActionResult<QueryResult<T>>> Get([FromQuery] TSearch search)
     {
-        return Ok(await ReadService.Get(search));
+        var userId = GetAuthUserId();
+        return Ok(await ReadService.Get(search, userId));
     }
 
     [SwaggerOperation("Search by ID")]
     [HttpGet("{id:int}")]
     public virtual async Task<ActionResult<QueryResult<T>>> GetById(int id)
     {
-        return Ok(await ReadService.GetById(id));
+        var userId = GetAuthUserId();
+        return Ok(await ReadService.GetById(id, userId));
     }
 
     /// <summary>

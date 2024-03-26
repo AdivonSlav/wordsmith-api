@@ -62,7 +62,8 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         }
     }
 
-    protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query)
+    protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query,
+        int userId)
     {
         query = query
             .Include(e => e.EBook)
@@ -75,7 +76,8 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         return query;
     }
 
-    protected override IQueryable<Db.Entities.UserLibrary> AddFilter(IQueryable<Db.Entities.UserLibrary> query, UserLibrarySearchObject search)
+    protected override IQueryable<Db.Entities.UserLibrary> AddFilter(IQueryable<Db.Entities.UserLibrary> query,
+        UserLibrarySearchObject search, int userId)
     {
         query = query.Where(e => e.UserId == search.UserId);
 

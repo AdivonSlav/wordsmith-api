@@ -9,7 +9,8 @@ public class ReportReasonService : ReadService<ReportReasonDto, Db.Entities.Repo
 {
     public ReportReasonService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override IQueryable<Db.Entities.ReportReason> AddFilter(IQueryable<Db.Entities.ReportReason> query, ReportReasonSearch? search = null)
+    protected override IQueryable<Db.Entities.ReportReason> AddFilter(IQueryable<Db.Entities.ReportReason> query,
+        ReportReasonSearch search, int userId)
     {
         if (!string.IsNullOrEmpty(search?.Subject))
         {

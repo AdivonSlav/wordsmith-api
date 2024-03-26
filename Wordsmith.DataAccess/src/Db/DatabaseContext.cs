@@ -36,6 +36,7 @@ public class DatabaseContext : DbContext
     public virtual DbSet<UserLibraryCategory> UserLibraryCategories { get; set; }
     public virtual DbSet<UserReport> UserReports { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
+    public virtual DbSet<CommentLike> CommentLikes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

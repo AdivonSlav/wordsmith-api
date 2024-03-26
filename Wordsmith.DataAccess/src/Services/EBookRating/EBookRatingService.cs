@@ -35,7 +35,8 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
         await CalculateRatingAverage(entity);
     }
 
-    protected override IQueryable<Db.Entities.EBookRating> AddFilter(IQueryable<Db.Entities.EBookRating> query, EBookRatingSearchObject search)
+    protected override IQueryable<Db.Entities.EBookRating> AddFilter(IQueryable<Db.Entities.EBookRating> query,
+        EBookRatingSearchObject search, int userId)
     {
         if (search.Rating.HasValue)
         {

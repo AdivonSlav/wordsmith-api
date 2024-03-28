@@ -26,7 +26,7 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         entity.DateAdded = DateTime.UtcNow;
         entity.IsShown = true;
     }
-
+    
     protected override Task BeforeDeletion(int userId, Db.Entities.Comment entity)
     {
         ValidateDeletion(userId, entity);
@@ -56,6 +56,13 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         {
             query = query.Where(e => e.EBookChapterId == search.EBookChapterId.Value);
         }
+
+        return query;
+    }
+
+    protected override IQueryable<Db.Entities.Comment> AddInclude(IQueryable<Db.Entities.Comment> query, int userId)
+    {
+        query = query.Include(e => e.User);
 
         return query;
     }

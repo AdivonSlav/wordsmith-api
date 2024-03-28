@@ -70,7 +70,6 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
     protected override async Task<CommentDto> EditGetResponse(CommentDto dto, int userId)
     {
         dto.HasLiked = await Context.CommentLikes.AnyAsync(e => e.UserId == userId && e.CommentId == dto.Id);
-        dto.LikeCount = await Context.CommentLikes.CountAsync(e => e.CommentId == dto.Id);
 
         return dto;
     }
@@ -79,7 +78,7 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
     {
         await ValidateLike(id, userId);
 
-        var comment = await Context.Comments.FirstAsync(e => e.Id == id);
+        var comment = await Context.Comments.Include(e => e.User).FirstAsync(e => e.Id == id);
         var newCommentLike = new CommentLike()
         {
             UserId = userId,
@@ -88,11 +87,11 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         };
         
         await Context.CommentLikes.AddAsync(newCommentLike);
+        comment.LikeCount++;
         await Context.SaveChangesAsync();
 
         var dto = Mapper.Map<CommentDto>(comment);
         dto.HasLiked = true;
-        dto.LikeCount = await Context.CommentLikes.CountAsync(e => e.CommentId == id);
 
         return new EntityResult<CommentDto>()
         {
@@ -105,13 +104,20 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
     {
         await ValidateRemoveLike(id, userId);
 
+        var comment = await Context.Comments.Include(e => e.User).FirstAsync(e => e.Id == id);
         var like = await Context.CommentLikes.FirstAsync(e => e.CommentId == id && e.UserId == userId);
+        
         Context.CommentLikes.Remove(like);
+        comment.LikeCount--;
         await Context.SaveChangesAsync();
 
+        var dto = Mapper.Map<CommentDto>(comment);
+        dto.HasLiked = false;
+        
         return new EntityResult<CommentDto>()
         {
-            Message = "Successfully deleted like for comment"
+            Message = "Successfully deleted like for comment",
+            Result = dto
         };
     }
 

@@ -43,7 +43,9 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<Order>().Property(e => e.Status)
             .HasConversion(
                 v => v.ToString(),
-                v => (Order.OrderStatus)Enum.Parse(typeof(Order.OrderStatus), v)); 
+                v => (Order.OrderStatus)Enum.Parse(typeof(Order.OrderStatus), v));
+
+        modelBuilder.Entity<Comment>().Property(e => e.LikeCount).HasDefaultValue(0);
         
         base.OnModelCreating(modelBuilder);
     }

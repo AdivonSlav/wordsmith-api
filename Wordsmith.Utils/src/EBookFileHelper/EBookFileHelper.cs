@@ -68,7 +68,7 @@ public static class EBookFileHelper
         await ParseChapters(ebookData, file);
 
         var htmlEncodedFilename = HttpUtility.HtmlEncode(file.FileName);
-        Logger.LogDebug($"Parsed {htmlEncodedFilename} successfully", additionalArg: ebookData);
+        Logger.LogDebug($"Parsed {htmlEncodedFilename} successfully");
         
         
         return ebookData;
@@ -101,8 +101,11 @@ public static class EBookFileHelper
         };
         
         epub.Dispose();
+
+        await ParseCoverArt(ebookData, filepath);
+        await ParseChapters(ebookData, filepath);
         
-        Logger.LogDebug($"Parsed {filepath} successfully", additionalArg: ebookData);
+        Logger.LogDebug($"Parsed {filepath} successfully");
 
         return ebookData;
     }
@@ -121,6 +124,23 @@ public static class EBookFileHelper
         await file.CopyToAsync(stream);
 
         Logger.LogDebug($"Saved {filePath}");
+
+        return randomFilename;
+    }
+    
+    /// <summary>
+    /// Saves the EPUB file to the designated save path. Primarily used for seeding
+    /// </summary>
+    /// <param name="filepath">Path to the EPUB file</param>
+    /// <returns>The new filename of the EPUB file</returns>
+    public static string SaveFile(string filepath)
+    {
+        var randomFilename = $"eBook-{Guid.NewGuid()}.epub";
+        var savePath = Path.Combine(_savePath, randomFilename);
+        
+        File.Copy(filepath, savePath, overwrite: true);
+
+        Logger.LogDebug($"Saved {savePath}");
 
         return randomFilename;
     }

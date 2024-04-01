@@ -32,6 +32,6 @@
     </ItemGroup>
     
     <ItemGroup>
-        <None Include="src\Db\Seeds\SeedLists\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Link="SeedLists\%(RecursiveDir)\%(Filename)%(Extension)" />
+        <None Include="src\Db\Seeds\SeedData\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Link="SeedData\%(RecursiveDir)\%(Filename)%(Extension)" />
     </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ public class EBookChapter : IEntity
 {
     [Key] public int Id { get; set; }
     
-    [StringLength(60)]
+    [StringLength(400)]
     public string ChapterName { get; set; }
     
     public int ChapterNumber { get; set; }

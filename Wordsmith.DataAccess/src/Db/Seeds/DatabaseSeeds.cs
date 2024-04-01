@@ -1,30 +1,19 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Wordsmith.DataAccess.Db.Entities;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.SeedObjects;
 using Wordsmith.Utils;
+using Wordsmith.Utils.EBookFileHelper;
 
 namespace Wordsmith.DataAccess.Db.Seeds;
 
 public static class DatabaseSeeds
 {
-    private static string _webRootPath;
-    private static string _ebookImagesPath;
-    private static string _ebookFilepath;
-    private static string _seedListsPath;
+    private static readonly string SeedDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedData");
     
     private const string DefaultAuthorUsername = "jane_doe2";
 
-    public static void Init(IConfiguration configuration, IWebHostEnvironment environment)
-    {
-        _webRootPath = environment.WebRootPath;
-        _seedListsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedLists");
-        _ebookImagesPath = Path.Combine("images", "ebooks");
-        _ebookFilepath = configuration["EBookSettings:SavePath"];
-    }
-    
     public static async Task EnsureSeedData(DatabaseContext context)
     {
         Logger.LogInfo("Checking whether seeding is necessary...");
@@ -126,8 +115,7 @@ public static class DatabaseSeeds
 
     private static async Task CreateEbooks(DatabaseContext context)
     {
-        var booksPath = Path.Combine(_seedListsPath, "Books");
-        var bookListPath = Path.Combine(booksPath, "books.json");
+        var bookListPath = Path.Combine(SeedDataPath, "books.json");
         var author = await context.Users.FirstOrDefaultAsync(e => e.Username == DefaultAuthorUsername);
 
         if (!File.Exists(bookListPath))
@@ -149,8 +137,7 @@ public static class DatabaseSeeds
         {
             if (await context.EBooks.AnyAsync(e => e.Title == seed.Title)) continue;
 
-            var pathToEpub = Path.Combine(booksPath, seed.BookFilename);
-            var pathToCoverArt = Path.Combine(booksPath, seed.ImageFilename);
+            var pathToEpub = Path.Combine(SeedDataPath, seed.BookFilename);
             
             if (!File.Exists(pathToEpub))
             {
@@ -158,16 +145,9 @@ public static class DatabaseSeeds
                 continue;
             }
 
-            if (!File.Exists(pathToCoverArt))
-            {
-                Logger.LogWarn($"Referenced book seed cover art {seed.ImageFilename} was not found, skipping...");
-                continue;
-            }
-
-            var image = await CreateImage(pathToCoverArt, seed.ImageFilename, context);
-            
-            var copiedPathToEpub = Path.Combine(_ebookFilepath, seed.BookFilename);
-            File.Copy(pathToEpub, copiedPathToEpub, true);
+            var parsedInfo = await EBookFileHelper.ParseEpub(pathToEpub);
+            var image = await CreateEBookImage(parsedInfo, context);
+            var newPathToEpub = EBookFileHelper.SaveFile(pathToEpub);
 
             var random = new Random();
             var randomNumberOfDays = random.Next(-365, 0);
@@ -179,8 +159,8 @@ public static class DatabaseSeeds
                 RatingAverage = seed.RatingAverage,
                 Author = author,
                 Price = seed.Price,
-                ChapterCount = seed.ChapterCount,
-                Path = seed.BookFilename,
+                ChapterCount = 0,
+                Path = newPathToEpub,
                 Genres = "",
                 MaturityRating = await context.MaturityRatings.FirstAsync(e => e.ShortName == seed.MaturityRating),
                 PublishedDate = bookDate,
@@ -189,27 +169,22 @@ public static class DatabaseSeeds
                 CoverArt = image,
             };
             
-            await CreateChapters(ebook, context);
+            await CreateChapters(ebook, parsedInfo, context);
             await CreateEbookGenres(ebook, context, seed.Genres);
             
-            context.EBooks.Add(ebook);
+            await context.EBooks.AddAsync(ebook);
             seedCount++;
         }
         
         if (seedCount != 0) Logger.LogInfo($"Seeded {seedCount} new ebooks");
     }
 
-    private static async Task CreateChapters(EBook ebook, DatabaseContext context)
+    private static async Task CreateChapters(EBook ebook, EBookParseDto parsedInfo, DatabaseContext context)
     {
-        for (var i = 1; i <= ebook.ChapterCount; i++)
-        {
-            await context.EBookChapters.AddAsync(new EBookChapter()
-            {
-                ChapterName = $"Chapter {i}",
-                ChapterNumber = i,
-                EBook = ebook
-            });
-        }
+        var chapters = parsedInfo.Chapters.Select((t, i) => new EBookChapter() { ChapterName = t, ChapterNumber = i, EBook = ebook, }).ToList();
+
+        await context.EBookChapters.AddRangeAsync(chapters);
+        ebook.ChapterCount = chapters.Count;
     }
 
     private static async Task CreateEbookGenres(EBook ebook, DatabaseContext context, string genres)
@@ -236,20 +211,16 @@ public static class DatabaseSeeds
         }
     }
 
-    private static async Task<Image> CreateImage(string imageFilepath, string imageFilename, DatabaseContext context)
+    private static async Task<Image> CreateEBookImage(EBookParseDto parsedInfo, DatabaseContext context)
     {
-        var existingImage = await context.Images.FirstOrDefaultAsync(e => e.Path == Path.Combine(_ebookImagesPath, imageFilename));
-        
-        if (existingImage != null) return existingImage;
-        
-        var newFilepath = Path.Combine(_webRootPath, _ebookImagesPath, imageFilename);
-        File.Copy(imageFilepath, newFilepath, true);
+        var newFilepath = Path.Combine("images", "ebooks", $"eBook-{Guid.NewGuid()}");
+        var saveInfo = ImageHelper.SaveFromBase64(parsedInfo.EncodedCoverArt, null, newFilepath);
 
         var image = new Image()
         {
-            Format = Path.GetExtension(newFilepath).Replace(".", ""),
-            Size = (int)new FileInfo(newFilepath).Length, // Please don't overflow
-            Path = Path.Combine(_ebookImagesPath, imageFilename)
+            Format = saveInfo.Format,
+            Size = saveInfo.Size,
+            Path = saveInfo.Path
         };
         
         await context.Images.AddAsync(image);

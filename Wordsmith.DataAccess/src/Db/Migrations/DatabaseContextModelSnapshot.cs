@@ -207,8 +207,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ChapterName")
-                        .HasMaxLength(60)
-                        .HasColumnType("varchar(60)");
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
 
                     b.Property<int>("ChapterNumber")
                         .HasColumnType("int");

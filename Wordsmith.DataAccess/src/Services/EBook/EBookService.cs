@@ -42,17 +42,17 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
     protected override IQueryable<Db.Entities.EBook> AddFilter(IQueryable<Db.Entities.EBook> query,
         EBookSearchObject search, int userId)
     {
-        if (search?.Title != null)
+        if (search.Title != null)
         {
             query = query.Where(e => e.Title.Contains(search.Title, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        if (search?.Genres != null)
+        if (search.Genres != null)
         {
             query = query.Where(e => e.EBookGenres.Any(g => search.Genres.Contains(g.GenreId)));
         }
 
-        if (search?.MaturityRatingId != null)
+        if (search.MaturityRatingId != null)
         {
             query = query.Where(e => e.MaturityRatingId == search.MaturityRatingId.Value);
         }
@@ -127,11 +127,11 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
 
     private async Task HandleChapters(Db.Entities.EBook entity, EBookInsertRequest insert)
     {
-        var chapters = new List<EBookChapter>();
+        var chapters = new List<Db.Entities.EBookChapter>();
         
         for (var i = 0; i < insert.Chapters.Count; i++)
         {
-            var newChapter = new EBookChapter()
+            var newChapter = new Db.Entities.EBookChapter()
             {
                 ChapterName = insert.Chapters[i],
                 ChapterNumber = i,

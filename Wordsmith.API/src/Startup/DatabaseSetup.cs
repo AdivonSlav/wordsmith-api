@@ -17,7 +17,7 @@ public static class DatabaseSetup
         Logger.LogInfo("Checking for any pending database migrations...");
         await context.Database.MigrateAsync();
  
-        DatabaseSeeds.EnsureSeedData(context);
+        await DatabaseSeeds.EnsureSeedData(context);
         
         return app;
     }

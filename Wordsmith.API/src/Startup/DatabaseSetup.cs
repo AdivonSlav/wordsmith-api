@@ -7,7 +7,7 @@ namespace Wordsmith.API.Startup;
 
 public static class DatabaseSetup
 {
-    public static IApplicationBuilder ConfigureDatabase(this IApplicationBuilder app, IConfiguration configuration)
+    public static async Task<IApplicationBuilder> ConfigureDatabase(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
         var context = scope.ServiceProvider.GetService<DatabaseContext>();
@@ -15,7 +15,7 @@ public static class DatabaseSetup
         if (context == null) throw new Exception("DatabaseContext is not registered as a service!");
 
         Logger.LogInfo("Checking for any pending database migrations...");
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
  
         DatabaseSeeds.EnsureSeedData(context);
         

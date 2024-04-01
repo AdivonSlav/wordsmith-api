@@ -18,7 +18,7 @@ try
 
     var app = builder.Build();
     
-    app.ConfigureDatabase(builder.Configuration);
+    await app.ConfigureDatabase();
     app.ConfigureSwagger();
     app.RegisterMiddleware();
     app.MapControllers();

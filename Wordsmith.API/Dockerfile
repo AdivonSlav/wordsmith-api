@@ -12,7 +12,6 @@ ENV WORDSMITH_Connection__IdentityServer__Port=443
 ENV WORDSMITH_EBookSettings__SavePath=/app/books
 ENV WORDSMITH_Logging__NLog__LogLevel=Info
 
-
 # Build stage (Using .NET6 SDK on Ubuntu 22.04)
 FROM mcr.microsoft.com/dotnet/sdk:6.0-jammy-amd64 AS build
 WORKDIR /src

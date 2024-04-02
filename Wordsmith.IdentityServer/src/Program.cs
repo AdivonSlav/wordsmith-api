@@ -1,3 +1,4 @@
+using Microsoft.IdentityModel.Logging;
 using Wordsmith.IdentityServer.Startup;
 using Wordsmith.Utils;
 using Wordsmith.Utils.RabbitMQ;
@@ -6,6 +7,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Configuration.AddEnvironmentVariables(prefix: "WORDSMITH_");
+    IdentityModelEventSource.ShowPII = true;
     
     Logger.Init(builder.Configuration["Logging:NLog:LogLevel"] ?? "Debug");
     RabbitService.Init(

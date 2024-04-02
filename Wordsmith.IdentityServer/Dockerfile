@@ -9,6 +9,7 @@ ENV ASPNETCORE_HTTPS_PORT=443
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/identity_server.crt
 ENV ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/https/identity_server.key
 ENV WORDSMITH_Connection__IdentityServer__Port=443
+ENV WORDSMITH_Logging__NLog__LogLevel=Info
 
 # Build stage (Using .NET6 SDK on Ubuntu 22.04)
 FROM mcr.microsoft.com/dotnet/sdk:6.0-jammy-amd64 AS build

@@ -1,70 +1,77 @@
 # For environment variables see the README.md
 
-version: '3.2'
-
 networks:
   wordsmith:
     driver: bridge
 
 volumes:
-    wwwroot:
-    mysql:
-    rabbitmq-data:
-    rabbitmq-log:
+  wwwroot:
+  book-storage:
+  mysql-data:
+  rabbitmq-data:
+  rabbitmq-logs:
+
 
 services:
-  wordsmith_api:
-    container_name: wordsmith_api
-    hostname: wordsmith_api
-    image: wordsmith/wordsmith_api:latest
+  wordsmith-api:
+    container_name: wordsmith-api
+    hostname: wordsmith-api
+    image: wordsmith/wordsmith-api:latest
+    build:
+      context: .
+      dockerfile: Wordsmith.API/Dockerfile
     restart: unless-stopped
     depends_on:
-      - wordsmith_identityserver
-      - wordsmith_db
-      - wordsmith_rabbitmq
+      - wordsmith-identityserver
+      - wordsmith-db
+      - wordsmith-rabbitmq
     ports:
       - 6443:443 # HTTPS
     environment:
-      - WORDSMITH_Connection__IdentityServer__Host=wordsmith_identityserver
-      - WORDSMITH_Connection__MySQL__Host=wordsmith_db
+      - WORDSMITH_Connection__IdentityServer__Host=wordsmith-identityserver
+      - WORDSMITH_Connection__MySQL__Host=wordsmith-db
       - WORDSMITH_Connection__MySQL__Port=3306
       - WORDSMITH_Connection__MySQL__User=wordsmith_user
       - WORDSMITH_Connection__MySQL__Password=wordsmith_user
       - WORDSMITH_Connection__MySQL__Database=wordsmith
-      - WORDSMITH_Connection__RabbitMQ__Host=wordsmith_rabbitmq
+      - WORDSMITH_Connection__RabbitMQ__Host=wordsmith-rabbitmq
       - WORDSMITH_Connection__RabbitMQ__User=wordsmith_user
       - WORDSMITH_Connection__RabbitMQ__Password=wordsmith_user
     networks:
       - wordsmith
     volumes:
       - wwwroot:/wwwroot
+      - book-storage:/app/books
 
-  wordsmith_identityserver:
-    container_name: wordsmith_identityserver
-    hostname: wordsmith_identityserver
-    image: wordsmith/wordsmith_identityserver:latest
+  wordsmith-identityserver:
+    container_name: wordsmith-identityserver
+    hostname: wordsmith-identityserver
+    image: wordsmith/wordsmith-identityserver:latest
+    build:
+      context: .
+      dockerfile: Wordsmith.IdentityServer/Dockerfile
     restart: unless-stopped
     depends_on:
-      - wordsmith_db
-      - wordsmith_rabbitmq
+      - wordsmith-db
+      - wordsmith-rabbitmq
     ports:
       - 7443:443 # HTTPS
     environment:
-      - WORDSMITH_Connection__IdentityServer__Host=wordsmith_identityserver
-      - WORDSMITH_Connection__MySQL__Host=wordsmith_db
+      - WORDSMITH_Connection__IdentityServer__Host=wordsmith-identityserver
+      - WORDSMITH_Connection__MySQL__Host=wordsmith-db
       - WORDSMITH_Connection__MySQL__Port=3306
       - WORDSMITH_Connection__MySQL__User=wordsmith_user
       - WORDSMITH_Connection__MySQL__Password=wordsmith_user
       - WORDSMITH_Connection__MySQL__Database=wordsmith
-      - WORDSMITH_Connection__RabbitMQ__Host=wordsmith_rabbitmq
+      - WORDSMITH_Connection__RabbitMQ__Host=wordsmith-rabbitmq
       - WORDSMITH_Connection__RabbitMQ__User=wordsmith_user
       - WORDSMITH_Connection__RabbitMQ__Password=wordsmith_user
     networks:
       - wordsmith
 
-  wordsmith_db:
-    container_name: wordsmith_db
-    hostname: wordsmith_db
+  wordsmith-db:
+    container_name: wordsmith-db
+    hostname: wordsmith-db
     image: mysql:latest
     restart: unless-stopped
     ports:
@@ -77,11 +84,11 @@ services:
     networks:
       - wordsmith
     volumes:
-      - mysql:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
 
-  wordsmith_rabbitmq:
-    container_name: wordsmith_rabbitmq
-    hostname: wordsmith_rabbitmq
+  wordsmith-rabbitmq:
+    container_name: wordsmith-rabbitmq
+    hostname: wordsmith-rabbitmq
     image: rabbitmq:3-management-alpine
     restart: unless-stopped
     ports:
@@ -94,7 +101,4 @@ services:
       - wordsmith
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
-      - rabbitmq-log:/var/log/rabbitmq
-
-    
-
+      - rabbitmq-logs:/var/log/rabbitmq

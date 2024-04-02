@@ -9,6 +9,9 @@ ENV ASPNETCORE_HTTPS_PORT=443
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/api.crt
 ENV ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/https/api.key
 ENV WORDSMITH_Connection__IdentityServer__Port=443
+ENV WORDSMITH_EBookSettings__SavePath=/app/books
+ENV WORDSMITH_Logging__NLog__LogLevel=Info
+
 
 # Build stage (Using .NET6 SDK on Ubuntu 22.04)
 FROM mcr.microsoft.com/dotnet/sdk:6.0-jammy-amd64 AS build
@@ -16,6 +19,7 @@ WORKDIR /src
 COPY ["Wordsmith.API/Wordsmith.API.csproj", "Wordsmith.API/"]
 COPY ["Wordsmith.DataAccess/Wordsmith.DataAccess.csproj", "Wordsmith.DataAccess/"]
 COPY ["Wordsmith.Models/Wordsmith.Models.csproj", "Wordsmith.Models/"]
+COPY ["Wordsmith.Integration/Wordsmith.Integration.csproj", "Wordsmith.Integration/"]
 COPY ["Wordsmith.Utils/Wordsmith.Utils.csproj", "Wordsmith.Utils/"]
 RUN dotnet restore "Wordsmith.API/Wordsmith.API.csproj"
 COPY . .

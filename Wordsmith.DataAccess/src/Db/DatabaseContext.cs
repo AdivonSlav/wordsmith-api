@@ -36,13 +36,16 @@ public class DatabaseContext : DbContext
     public virtual DbSet<UserLibraryCategory> UserLibraryCategories { get; set; }
     public virtual DbSet<UserReport> UserReports { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
+    public virtual DbSet<CommentLike> CommentLikes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Order>().Property(e => e.Status)
             .HasConversion(
                 v => v.ToString(),
-                v => (Order.OrderStatus)Enum.Parse(typeof(Order.OrderStatus), v)); 
+                v => (Order.OrderStatus)Enum.Parse(typeof(Order.OrderStatus), v));
+
+        modelBuilder.Entity<Comment>().Property(e => e.LikeCount).HasDefaultValue(0);
         
         base.OnModelCreating(modelBuilder);
     }

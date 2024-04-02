@@ -85,14 +85,47 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<bool>("IsShown")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<long>("LikeCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EBookChapterId");
+
+                    b.HasIndex("EBookId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("comments");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.CommentLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LikeDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("comment_likes");
                 });
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.EBook", b =>
@@ -176,8 +209,8 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ChapterName")
-                        .HasMaxLength(60)
-                        .HasColumnType("varchar(60)");
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
 
                     b.Property<int>("ChapterNumber")
                         .HasColumnType("int");
@@ -744,11 +777,44 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Comment", b =>
                 {
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBookChapter", "EBookChapter")
+                        .WithMany()
+                        .HasForeignKey("EBookChapterId");
+
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
+                        .WithMany()
+                        .HasForeignKey("EBookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("EBook");
+
+                    b.Navigation("EBookChapter");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.CommentLike", b =>
+                {
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.Comment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
 
                     b.Navigation("User");
                 });

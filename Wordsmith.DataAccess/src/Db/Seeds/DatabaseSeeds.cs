@@ -1,44 +1,34 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db.Entities;
+using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.SeedObjects;
 using Wordsmith.Utils;
+using Wordsmith.Utils.EBookFileHelper;
 
 namespace Wordsmith.DataAccess.Db.Seeds;
 
 public static class DatabaseSeeds
 {
-    private static string _webRootPath;
-    private static string _ebookImagesPath;
-    private static string _ebookFilepath;
-    private static string _seedListsPath;
+    private static readonly string SeedDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedData");
     
     private const string DefaultAuthorUsername = "jane_doe2";
 
-    public static void Init(IConfiguration configuration, IWebHostEnvironment environment)
-    {
-        _webRootPath = environment.WebRootPath;
-        _seedListsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedLists");
-        _ebookImagesPath = Path.Combine("images", "ebooks");
-        _ebookFilepath = configuration["EBookSettings:SavePath"];
-    }
-    
-    public static void EnsureSeedData(DatabaseContext context)
+    public static async Task EnsureSeedData(DatabaseContext context)
     {
         Logger.LogInfo("Checking whether seeding is necessary...");
 
-        CreateUsers(context);
-        CreateMaturityRatings(context);
-        CreateGenres(context);
-        CreateEbooks(context);
+        await CreateUsers(context);
+        await CreateMaturityRatings(context);
+        await CreateGenres(context);
+        await CreateEbooks(context);
         
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
     
-    private static void CreateUsers(DatabaseContext context)
+    private static async Task CreateUsers(DatabaseContext context)
     {
-        if (context.Users.Any())
+        if (await context.Users.AnyAsync())
         {
             return;
         }
@@ -77,15 +67,18 @@ public static class DatabaseSeeds
             }
         };
 
-        foreach (var user in users.Where(user => context.Users.FirstOrDefault(u => u.Username == user.Username && u.Id == user.Id) == null))
+        foreach (var user in users)
         {
-            context.Users.Add(user);
+            if (!await context.Users.AnyAsync(e => e.Id == user.Id && e.Username == user.Username))
+            {
+                await context.Users.AddAsync(user);
+            }    
         }
         
         Logger.LogInfo("Seeded users to the database");
     }
     
-    private static void CreateMaturityRatings(DatabaseContext context)
+    private static async Task CreateMaturityRatings(DatabaseContext context)
     {
         var ratings = GetMaturityRatings();
         var hasSeeded = false;
@@ -95,36 +88,35 @@ public static class DatabaseSeeds
             var ratingName = rating.Split(";")[0];
             var ratingShortName = rating.Split(";")[1];
 
-            if (context.MaturityRatings.Any(e => e.Name == ratingName && e.ShortName == ratingShortName)) continue;
+            if (await context.MaturityRatings.AnyAsync(e => e.Name == ratingName && e.ShortName == ratingShortName)) continue;
 
-            context.MaturityRatings.Add(new MaturityRating() { Name = ratingName, ShortName = ratingShortName });
+            await context.MaturityRatings.AddAsync(new MaturityRating() { Name = ratingName, ShortName = ratingShortName });
             hasSeeded = true;
         }
         
         if (hasSeeded) Logger.LogInfo("Seeded new maturity ratings");
     }
     
-    private static void CreateGenres(DatabaseContext context)
+    private static async Task CreateGenres(DatabaseContext context)
     {
         var genres = GetGenres();
         var hasSeeded = false;
 
         foreach (var genre in genres)
         {
-            if (context.Genres.Any(e => e.Name == genre)) continue;
+            if (await context.Genres.AnyAsync(e => e.Name == genre)) continue;
 
-            context.Genres.Add(new Genre() { Name = genre });
+            await context.Genres.AddAsync(new Genre() { Name = genre });
             hasSeeded = true;
         }
         
         if (hasSeeded) Logger.LogInfo("Seeded new genres");
     }
 
-    private static void CreateEbooks(DatabaseContext context)
+    private static async Task CreateEbooks(DatabaseContext context)
     {
-        var booksPath = Path.Combine(_seedListsPath, "Books");
-        var bookListPath = Path.Combine(booksPath, "books.json");
-        var author = context.Users.FirstOrDefault(e => e.Username == DefaultAuthorUsername);
+        var bookListPath = Path.Combine(SeedDataPath, "books.json");
+        var author = await context.Users.FirstOrDefaultAsync(e => e.Username == DefaultAuthorUsername);
 
         if (!File.Exists(bookListPath))
         {
@@ -143,10 +135,9 @@ public static class DatabaseSeeds
 
         foreach (var seed in bookSeeds)
         {
-            if (context.EBooks.Any(e => e.Title == seed.Title)) continue;
+            if (await context.EBooks.AnyAsync(e => e.Title == seed.Title)) continue;
 
-            var pathToEpub = Path.Combine(booksPath, seed.BookFilename);
-            var pathToCoverArt = Path.Combine(booksPath, seed.ImageFilename);
+            var pathToEpub = Path.Combine(SeedDataPath, seed.BookFilename);
             
             if (!File.Exists(pathToEpub))
             {
@@ -154,16 +145,9 @@ public static class DatabaseSeeds
                 continue;
             }
 
-            if (!File.Exists(pathToCoverArt))
-            {
-                Logger.LogWarn($"Referenced book seed cover art {seed.ImageFilename} was not found, skipping...");
-                continue;
-            }
-
-            var image = CreateImage(pathToCoverArt, seed.ImageFilename, context);
-            
-            var copiedPathToEpub = Path.Combine(_ebookFilepath, seed.BookFilename);
-            File.Copy(pathToEpub, copiedPathToEpub, true);
+            var parsedInfo = await EBookFileHelper.ParseEpub(pathToEpub);
+            var image = await CreateEBookImage(parsedInfo, context);
+            var newPathToEpub = EBookFileHelper.SaveFile(pathToEpub);
 
             var random = new Random();
             var randomNumberOfDays = random.Next(-365, 0);
@@ -175,40 +159,35 @@ public static class DatabaseSeeds
                 RatingAverage = seed.RatingAverage,
                 Author = author,
                 Price = seed.Price,
-                ChapterCount = seed.ChapterCount,
-                Path = seed.BookFilename,
+                ChapterCount = 0,
+                Path = newPathToEpub,
                 Genres = "",
-                MaturityRating = context.MaturityRatings.First(e => e.ShortName == seed.MaturityRating),
+                MaturityRating = await context.MaturityRatings.FirstAsync(e => e.ShortName == seed.MaturityRating),
                 PublishedDate = bookDate,
                 UpdatedDate = bookDate,
                 IsHidden = false,
                 CoverArt = image,
             };
             
-            CreateChapters(ebook, context);
-            CreateEbookGenres(ebook, context, seed.Genres);
+            await CreateChapters(ebook, parsedInfo, context);
+            await CreateEbookGenres(ebook, context, seed.Genres);
             
-            context.EBooks.Add(ebook);
+            await context.EBooks.AddAsync(ebook);
             seedCount++;
         }
         
         if (seedCount != 0) Logger.LogInfo($"Seeded {seedCount} new ebooks");
     }
 
-    private static void CreateChapters(EBook ebook, DatabaseContext context)
+    private static async Task CreateChapters(EBook ebook, EBookParseDto parsedInfo, DatabaseContext context)
     {
-        for (var i = 1; i <= ebook.ChapterCount; i++)
-        {
-            context.EBookChapters.Add(new EBookChapter()
-            {
-                ChapterName = $"Chapter {i}",
-                ChapterNumber = i,
-                EBook = ebook
-            });
-        }
+        var chapters = parsedInfo.Chapters.Select((t, i) => new EBookChapter() { ChapterName = t, ChapterNumber = i, EBook = ebook, }).ToList();
+
+        await context.EBookChapters.AddRangeAsync(chapters);
+        ebook.ChapterCount = chapters.Count;
     }
 
-    private static void CreateEbookGenres(EBook ebook, DatabaseContext context, string genres)
+    private static async Task CreateEbookGenres(EBook ebook, DatabaseContext context, string genres)
     {
         var genreArray = genres.Split(";");
 
@@ -222,7 +201,7 @@ public static class DatabaseSeeds
                 continue;
             }
             
-            context.EBookGenres.Add(new EBookGenre()
+            await context.EBookGenres.AddAsync(new EBookGenre()
             {
                 EBook = ebook,
                 Genre = genre,
@@ -232,23 +211,19 @@ public static class DatabaseSeeds
         }
     }
 
-    private static Image CreateImage(string imageFilepath, string imageFilename, DatabaseContext context)
+    private static async Task<Image> CreateEBookImage(EBookParseDto parsedInfo, DatabaseContext context)
     {
-        var existingImage = context.Images.FirstOrDefault(e => e.Path == Path.Combine(_ebookImagesPath, imageFilename));
-        
-        if (existingImage != null) return existingImage;
-        
-        var newFilepath = Path.Combine(_webRootPath, _ebookImagesPath, imageFilename);
-        File.Copy(imageFilepath, newFilepath, true);
+        var newFilepath = Path.Combine("images", "ebooks", $"eBook-{Guid.NewGuid()}");
+        var saveInfo = ImageHelper.SaveFromBase64(parsedInfo.EncodedCoverArt, null, newFilepath);
 
         var image = new Image()
         {
-            Format = Path.GetExtension(newFilepath).Replace(".", ""),
-            Size = (int)new FileInfo(newFilepath).Length, // Please don't overflow
-            Path = Path.Combine(_ebookImagesPath, imageFilename)
+            Format = saveInfo.Format,
+            Size = saveInfo.Size,
+            Path = saveInfo.Path
         };
         
-        context.Images.Add(image);
+        await context.Images.AddAsync(image);
 
         return image;
     }

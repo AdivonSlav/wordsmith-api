@@ -1,5 +1,6 @@
 #nullable enable
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
@@ -24,15 +25,15 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         Mapper = mapper;
     }
 
-    public virtual async Task<QueryResult<T>> Get(TSearch search)
+    public virtual async Task<QueryResult<T>> Get(TSearch search, int userId)
     {
         var query = Context.Set<TDb>().AsQueryable();
         var result = new QueryResult<T>();
 
-        query = AddInclude(query);
-        query = AddFilter(query, search);
+        query = AddInclude(query, userId);
+        query = AddFilter(query, search, userId);
 
-        if (search?.OrderBy != null)
+        if (search.OrderBy != null)
         {
             var orderByParts = search.OrderBy.Split(":");
 
@@ -68,6 +69,11 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
             var list = await query.ToListAsync();
             var tmp = Mapper.Map<List<T>>(list);
 
+            for (var i = 0; i < tmp.Count; i++)
+            {
+                tmp[i] = await EditGetResponse(tmp[i], userId);
+            }
+            
             result.Result = tmp;
         }
         catch (AppException)
@@ -83,12 +89,12 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         return result;
     }
 
-    public virtual async Task<QueryResult<T>> GetById(int id)
+    public virtual async Task<QueryResult<T>> GetById(int id, int userId)
     {
         var query = Context.Set<TDb>().AsQueryable();
         var result = new QueryResult<T>();
 
-        query = AddInclude(query);
+        query = AddInclude(query, userId);
         
         try
         {
@@ -96,7 +102,9 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
 
             if (entity != null)
             {
-                result.Result.Add(Mapper.Map<T>(entity));
+                var tmp = Mapper.Map<T>(entity);
+                tmp = await EditGetResponse(tmp, userId);
+                result.Result.Add(tmp);
             }
         }
         catch (AppException)
@@ -112,13 +120,18 @@ public class ReadService<T, TDb, TSearch> : IReadService<T, TSearch>
         return result;
     }
 
-    protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query)
+    protected virtual IQueryable<TDb> AddInclude(IQueryable<TDb> query, int userId)
     {
         return query;
     }
 
-    protected virtual IQueryable<TDb> AddFilter(IQueryable<TDb> query, TSearch search)
+    protected virtual IQueryable<TDb> AddFilter(IQueryable<TDb> query, TSearch search, int userId)
     {
         return query;
+    }
+
+    protected virtual Task<T> EditGetResponse(T dto, int userId)
+    {
+        return Task.FromResult(dto);
     }
 }

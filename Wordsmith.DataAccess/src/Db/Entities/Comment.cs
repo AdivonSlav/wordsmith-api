@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
@@ -17,10 +18,16 @@ public class Comment : IEntity
     public bool IsShown { get; set; }
     
     public int? EBookChapterId { get; set; }
+
+    public long LikeCount { get; set; }
     
     public int EBookId { get; set; }
     
     public int UserId { get; set; }
     
     [ForeignKey(nameof(UserId))] public virtual User User { get; set; }
+    
+    [ForeignKey(nameof(EBookId))] public virtual EBook EBook { get; set; }
+    
+    [ForeignKey(nameof(EBookChapterId))] public virtual EBookChapter EBookChapter { get; set; }
 }

@@ -13,7 +13,8 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
 {
     public UserReportService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override IQueryable<Db.Entities.UserReport> AddInclude(IQueryable<Db.Entities.UserReport> query)
+    protected override IQueryable<Db.Entities.UserReport> AddInclude(IQueryable<Db.Entities.UserReport> query,
+        int userId)
     {
         query = query.Include(report => report.ReportedUser)
             .Include(report => report.ReportDetails)
@@ -25,7 +26,7 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
     }
 
     protected override IQueryable<Db.Entities.UserReport> AddFilter(IQueryable<Db.Entities.UserReport> query,
-        UserReportSearchObject search)
+        UserReportSearchObject search, int userId)
     {
         if (search?.ReportedUserId != null)
         {

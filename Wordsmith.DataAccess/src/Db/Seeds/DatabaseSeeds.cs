@@ -21,8 +21,9 @@ public static class DatabaseSeeds
         await CreateUsers(context);
         await CreateMaturityRatings(context);
         await CreateGenres(context);
-        await CreateEbooks(context);
         
+        await context.SaveChangesAsync();
+        await CreateEbooks(context);
         await context.SaveChangesAsync();
     }
     
@@ -116,7 +117,7 @@ public static class DatabaseSeeds
     private static async Task CreateEbooks(DatabaseContext context)
     {
         var bookListPath = Path.Combine(SeedDataPath, "books.json");
-        var author = await context.Users.FirstOrDefaultAsync(e => e.Username == DefaultAuthorUsername);
+        var author = await context.Users.SingleOrDefaultAsync(e => e.Username == DefaultAuthorUsername);
 
         if (!File.Exists(bookListPath))
         {

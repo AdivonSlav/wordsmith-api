@@ -19,6 +19,9 @@ public class CommentDto
     [SwaggerSchema("The ID of the chapter this comment refers to, if any")]
     public int? EBookChapterId { get; set; }
     
+    [SwaggerSchema("The chapter this comment refers to, if any")]
+    public EBookChapterDto EBookChapter { get; set; }
+    
     [SwaggerSchema("The ebook that this comment refers to")]
     public int EBookId { get; set; }
     

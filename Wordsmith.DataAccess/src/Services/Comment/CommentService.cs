@@ -62,7 +62,7 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
 
     protected override IQueryable<Db.Entities.Comment> AddInclude(IQueryable<Db.Entities.Comment> query, int userId)
     {
-        query = query.Include(e => e.User);
+        query = query.Include(e => e.User).Include(e => e.EBookChapter);
 
         return query;
     }
@@ -78,7 +78,10 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
     {
         await ValidateLike(id, userId);
 
-        var comment = await Context.Comments.Include(e => e.User).FirstAsync(e => e.Id == id);
+        var comment = await Context.Comments
+            .Include(e => e.User)
+            .Include(e => e.EBookChapter)
+            .FirstAsync(e => e.Id == id);
         var newCommentLike = new CommentLike()
         {
             UserId = userId,
@@ -104,7 +107,10 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
     {
         await ValidateRemoveLike(id, userId);
 
-        var comment = await Context.Comments.Include(e => e.User).FirstAsync(e => e.Id == id);
+        var comment = await Context.Comments
+            .Include(e => e.User)
+            .Include(e => e.EBookChapter)
+            .FirstAsync(e => e.Id == id);
         var like = await Context.CommentLikes.FirstAsync(e => e.CommentId == id && e.UserId == userId);
         
         Context.CommentLikes.Remove(like);

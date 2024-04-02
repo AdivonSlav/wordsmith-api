@@ -28,4 +28,6 @@ public class Comment : IEntity
     [ForeignKey(nameof(UserId))] public virtual User User { get; set; }
     
     [ForeignKey(nameof(EBookId))] public virtual EBook EBook { get; set; }
+    
+    [ForeignKey(nameof(EBookChapterId))] public virtual EBookChapter EBookChapter { get; set; }
 }

@@ -1,6 +1,7 @@
 #nullable enable
 using System.Text.Json;
 using AutoMapper;
+using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -84,21 +85,21 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             throw new AppException("Wrong username!");
         }
 
-        var clientSecret = "";
         var clientId = "";
+        var clientSecret = "";
         var scopes = "";
 
         if (string.Equals(entity.Role, "admin", StringComparison.OrdinalIgnoreCase))
         {
             clientSecret = _configuration["IdentityServer:Secrets:Admin"];
-            clientId = "admin.client";
             scopes = "offline_access wordsmith_api.full_access";
+            clientId = string.IsNullOrEmpty(login.ClientId) ? "admin.client" : login.ClientId;
         }
         else if (string.Equals(entity.Role, "user", StringComparison.OrdinalIgnoreCase))
         {
             clientSecret = _configuration["IdentityServer:Secrets:User"];
-            clientId = "user.client";
             scopes = "offline_access wordsmith_api.read wordsmith_api.write";
+            clientId = string.IsNullOrEmpty(login.ClientId) ? "user.client" : login.ClientId;
         }
 
         if (string.IsNullOrEmpty(clientSecret))

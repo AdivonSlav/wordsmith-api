@@ -9,4 +9,6 @@ public class UserLoginRequest
     
     [Required]
     public string Password { get; set; }
+    
+    public string? ClientId { get; set; }
 }

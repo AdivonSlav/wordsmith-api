@@ -1,4 +1,5 @@
 #nullable enable
+using System.Text;
 using System.Text.Json;
 using AutoMapper;
 using Duende.IdentityServer.Services;
@@ -40,6 +41,11 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
     protected override async Task BeforeInsert(Db.Entities.User entity, UserInsertRequest insert)
     {
+        insert.Username = Base64Helper.DecodeFromBase64(insert.Username);
+        insert.Password = Base64Helper.DecodeFromBase64(insert.Password);
+        insert.ConfirmPassword = Base64Helper.DecodeFromBase64(insert.ConfirmPassword);
+        insert.Email = Base64Helper.DecodeFromBase64(insert.Email);
+        
         await ValidateUsername(insert.Username);
         await ValidateEmail(insert.Email);
 
@@ -78,6 +84,9 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
     public async Task<EntityResult<UserLoginDto>> Login(UserLoginRequest login)
     {
+        login.Username = Base64Helper.DecodeFromBase64(login.Username);
+        login.Password = Base64Helper.DecodeFromBase64(login.Password);
+        
         var entity = await Context.Users.FirstOrDefaultAsync(user => user.Username == login.Username);
 
         if (entity == null)

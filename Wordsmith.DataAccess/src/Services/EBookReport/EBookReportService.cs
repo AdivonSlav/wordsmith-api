@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
-using Wordsmith.Models.RequestObjects;
 using Wordsmith.Models.RequestObjects.EBookReport;
 using Wordsmith.Models.SearchObjects;
 
@@ -14,39 +13,41 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
     public EBookReportService(DatabaseContext context, IMapper mapper)
         : base(context, mapper) {}
 
-    // protected override IQueryable<Db.Entities.EBookReport> AddInclude(IQueryable<Db.Entities.EBookReport> query, EBookReportSearchObject? search = null)
-    // {
-    //     query = query.Include(report => report.ReportedEBook)
-    //         .ThenInclude(eBook => eBook.CoverArt)
-    //         .Include(report => report.ReportedEBook)
-    //         .ThenInclude(eBook => eBook.MaturityRating)
-    //         .Include(report => report.ReportDetails)
-    //         .ThenInclude(details => details.Reporter)
-    //         .Include(report => report.ReportDetails)
-    //         .ThenInclude(details => details.ReportReason);
-    //
-    //     return query;
-    // }
+    protected override IQueryable<Db.Entities.EBookReport> AddInclude(IQueryable<Db.Entities.EBookReport> query, int userId)
+    {
+        query = query.Include(report => report.ReportedEBook)
+            .ThenInclude(eBook => eBook.CoverArt)
+            .Include(report => report.ReportedEBook)
+            .ThenInclude(eBook => eBook.MaturityRating)
+            .Include(report => report.ReportDetails)
+            .ThenInclude(details => details.Reporter)
+            .Include(report => report.ReportDetails)
+            .ThenInclude(details => details.ReportReason);
+    
+        return query;
+    }
 
     protected override IQueryable<Db.Entities.EBookReport> AddFilter(IQueryable<Db.Entities.EBookReport> query,
         EBookReportSearchObject search, int userId)
     {
-        if (search?.ReportedEBookId != null)
+        if (search.ReportedEBookId != null)
         {
             query = query.Where(report => report.EBookId == search.ReportedEBookId.Value);
         }
 
-        if (search?.IsClosed != null)
+        if (search.IsClosed != null)
         {
             query = query.Where(report => report.ReportDetails.IsClosed == search.IsClosed.Value);
         }
         
-        if (search?.Reason != null)
+        if (search.Reason != null)
         {
-            query = query.Where(report => report.ReportDetails.ReportReason.Reason == search.Reason);
+            query = query
+                .Where(report => report.ReportDetails.ReportReason.Reason
+                    .Contains(search.Reason, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (search?.ReportDate != null)
+        if (search.ReportDate != null)
         {
             query = query.Where(report => report.ReportDetails.SubmissionDate.Day == search.ReportDate.Value.Day &&
                                           report.ReportDetails.SubmissionDate.Month == search.ReportDate.Value.Month &&
@@ -58,15 +59,13 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
 
     protected override async Task BeforeInsert(Db.Entities.EBookReport entity, EBookReportInsertRequest insert)
     {
-        if (!insert.ReporterUserId.HasValue) throw new AppException("The user making the report does not exist!");
-
-        entity.ReportDetails.UserId = insert.ReporterUserId.Value;
+        await ValidateInsertion(insert);
+        
+        entity.ReportDetails.UserId = insert.ReporterUserId;
         await Context.Entry(entity).Reference(e => e.ReportedEBook).LoadAsync();
         await Context.Entry(entity.ReportDetails).Reference(e => e.Reporter).LoadAsync();
         await Context.Entry(entity.ReportDetails).Reference(e => e.ReportReason).LoadAsync();
-
-        if (entity.ReportedEBook == null) throw new AppException("The reported eBook does not exist");
-
+        
         entity.ReportDetails.SubmissionDate = DateTime.UtcNow;
         entity.ReportDetails.IsClosed = false;
     }
@@ -74,5 +73,25 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
     protected override async Task BeforeUpdate(Db.Entities.EBookReport entity, EBookReportUpdateRequest update)
     {
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
+    }
+    
+    private async Task ValidateInsertion(EBookReportInsertRequest insert)
+    {
+        var ebook = await Context.EBooks.FindAsync(insert.ReportedEBookId);
+
+        if (ebook != null)
+        {
+            if (!await Context.Users.AnyAsync(e => e.Id == insert.ReporterUserId))
+            {
+                throw new AppException("The user making the report does not exist!");
+            }
+
+            if (insert.ReporterUserId == ebook.AuthorId)
+            {
+                throw new AppException("You cannot report an ebook you own!");
+            }
+        }
+        else
+            throw new AppException("The reported eBook does not exist");
     }
 }

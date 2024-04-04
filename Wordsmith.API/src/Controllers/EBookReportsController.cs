@@ -33,6 +33,7 @@ public class EBookReportsController : WriteController<EBookReportDto, EBookRepor
     [Authorize("All")]
     public override Task<ActionResult<EntityResult<EBookReportDto>>> Insert(EBookReportInsertRequest insert)
     {
+        insert.ReporterUserId = GetAuthUserId();
         return base.Insert(insert);
     }
 

@@ -28,22 +28,24 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
     protected override IQueryable<Db.Entities.UserReport> AddFilter(IQueryable<Db.Entities.UserReport> query,
         UserReportSearchObject search, int userId)
     {
-        if (search?.ReportedUserId != null)
+        if (search.ReportedUserId != null)
         {
             query = query.Where(report => report.ReportedUserId == search.ReportedUserId.Value);
         }
 
-        if (search?.IsClosed != null)
+        if (search.IsClosed != null)
         {
             query = query.Where(report => report.ReportDetails.IsClosed == search.IsClosed.Value);
         }
 
-        if (search?.Reason != null)
+        if (search.Reason != null)
         {
-            query = query.Where(report => report.ReportDetails.ReportReason.Reason == search.Reason);
+            query = query
+                .Where(report => report.ReportDetails.ReportReason.Reason
+                    .Contains(search.Reason, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (search?.ReportDate != null)
+        if (search.ReportDate != null)
         {
             query = query.Where(report => report.ReportDetails.SubmissionDate.Day == search.ReportDate.Value.Day &&
                                           report.ReportDetails.SubmissionDate.Month == search.ReportDate.Value.Month &&

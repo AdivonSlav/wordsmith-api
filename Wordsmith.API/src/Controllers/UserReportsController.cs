@@ -37,7 +37,6 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     public override async Task<ActionResult<EntityResult<UserReportDto>>> Insert(UserReportInsertRequest insert)
     {
         insert.ReporterUserId = GetAuthUserId();   
-        
         return await base.Insert(insert);
     }
 

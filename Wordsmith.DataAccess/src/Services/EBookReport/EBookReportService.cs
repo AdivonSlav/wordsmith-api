@@ -47,11 +47,14 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
                     .Contains(search.Reason, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (search.ReportDate != null)
+        if (search.StartDate != null)
         {
-            query = query.Where(report => report.ReportDetails.SubmissionDate.Day == search.ReportDate.Value.Day &&
-                                          report.ReportDetails.SubmissionDate.Month == search.ReportDate.Value.Month &&
-                                          report.ReportDetails.SubmissionDate.Year == search.ReportDate.Value.Year);
+            query = query.Where(e => e.ReportDetails.SubmissionDate.Date >= search.StartDate.Value.Date);
+        }
+
+        if (search.EndDate != null)
+        {
+            query = query.Where(e => e.ReportDetails.SubmissionDate.Date <= search.EndDate.Value.Date);
         }
 
         return query;

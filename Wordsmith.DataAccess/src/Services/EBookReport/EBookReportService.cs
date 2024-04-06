@@ -19,6 +19,8 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
             .ThenInclude(eBook => eBook.CoverArt)
             .Include(report => report.ReportedEBook)
             .ThenInclude(eBook => eBook.MaturityRating)
+            .Include(eBook => eBook.ReportedEBook)
+            .ThenInclude(eBook => eBook.Author)
             .Include(report => report.ReportDetails)
             .ThenInclude(details => details.Reporter)
             .Include(report => report.ReportDetails)

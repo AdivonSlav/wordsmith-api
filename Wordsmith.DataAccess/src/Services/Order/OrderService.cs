@@ -61,6 +61,11 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
             throw new AppException("Ebook does not exist!");
         }
 
+        if (await Context.UserBans.AnyAsync(e => e.UserId == ebook.AuthorId))
+        {
+            throw new AppException("You cannot buy this ebook as the author has been banned!");
+        }
+
         if (!ebook.Price.HasValue)
         {
             throw new AppException("Ebook is free. Cannot create an order for it");

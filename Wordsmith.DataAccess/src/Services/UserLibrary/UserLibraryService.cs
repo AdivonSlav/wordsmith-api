@@ -41,6 +41,11 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
             throw new AppException("The ebook does not exist");
         }
 
+        if (await Context.UserBans.AnyAsync(e => e.UserId == ebook.AuthorId))
+        {
+            throw new AppException("You cannot add this ebook to your library as the author has been banned!");
+        }
+
         var alreadyAdded = await Context.UserLibraries.AnyAsync(e => e.UserId == insert.UserId && e.EBookId == insert.EBookId);
 
         if (alreadyAdded)

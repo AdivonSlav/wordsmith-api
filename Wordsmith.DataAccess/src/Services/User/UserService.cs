@@ -36,7 +36,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         _messageListener = messageListener;
     }
 
-    protected override async Task BeforeInsert(Db.Entities.User entity, UserInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.User entity, UserInsertRequest insert, int userId)
     {
         insert.Username = Base64Helper.DecodeFromBase64(insert.Username);
         insert.Password = Base64Helper.DecodeFromBase64(insert.Password);
@@ -66,7 +66,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         entity.ProfileImage = newImageEntity;
     }
 
-    protected override Task AfterInsert(Db.Entities.User entity, UserInsertRequest insert)
+    protected override Task AfterInsert(Db.Entities.User entity, UserInsertRequest insert, int userId)
     {
         _messageProducer.SendMessage("user_insertion", new RegisterUserMessage()
         {

@@ -16,7 +16,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
 {
     public EBookService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override async Task BeforeInsert(Db.Entities.EBook entity, EBookInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.EBook entity, EBookInsertRequest insert, int userId)
     {
         await ValidateForeignKeys(insert);
         await HandleImage(entity, insert);
@@ -29,7 +29,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         entity.Path = fileName;
     }
 
-    protected override async Task AfterInsert(Db.Entities.EBook entity, EBookInsertRequest insert)
+    protected override async Task AfterInsert(Db.Entities.EBook entity, EBookInsertRequest insert, int userId)
     {
         await HandleChapters(entity, insert);
         await HandleGenres(entity, insert);
@@ -39,9 +39,18 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         await Context.Entry(entity).Reference(e => e.Author).LoadAsync();
     }
 
+    protected override async Task AfterUpdate(Db.Entities.EBook entity, EBookUpdateRequest update, int userId)
+    {
+        await Context.Entry(entity).Reference(e => e.MaturityRating).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.CoverArt).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.Author).LoadAsync();
+    }
+
     protected override IQueryable<Db.Entities.EBook> AddFilter(IQueryable<Db.Entities.EBook> query,
         EBookSearchObject search, int userId)
     {
+        query = query.Where(e => !e.IsHidden);
+        
         if (search.Title != null)
         {
             query = query.Where(e => e.Title.Contains(search.Title, StringComparison.InvariantCultureIgnoreCase));
@@ -90,6 +99,48 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         var ebookFile = await EBookFileHelper.GetFile(entity.Path);
 
         return ebookFile;
+    }
+
+    public async Task<EntityResult<EBookDto>> Hide(int id)
+    {
+        await ValidateHiding(id);
+
+        var ebook = await Context.EBooks
+            .Include(e => e.MaturityRating)
+            .Include(e => e.CoverArt)
+            .Include(e => e.Author)
+            .SingleAsync(e => e.Id == id);
+        ebook.IsHidden = true;
+        ebook.HiddenDate = DateTime.UtcNow;
+
+        await Context.SaveChangesAsync();
+        
+        return new EntityResult<EBookDto>()
+        {
+            Message = "Ebook is hidden!",
+            Result = Mapper.Map<EBookDto>(ebook)
+        };
+    }
+
+    public async Task<EntityResult<EBookDto>> Unhide(int id)
+    {
+        await ValidateHiding(id);
+
+        var ebook = await Context.EBooks
+            .Include(e => e.MaturityRating)
+            .Include(e => e.CoverArt)
+            .Include(e => e.Author)
+            .SingleAsync(e => e.Id == id);
+        ebook.IsHidden = false;
+        ebook.HiddenDate = null;
+
+        await Context.SaveChangesAsync();
+        
+        return new EntityResult<EBookDto>()
+        {
+            Message = "Ebook is unhidden!",
+            Result = Mapper.Map<EBookDto>(ebook)
+        };
     }
 
     private async Task ValidateForeignKeys(EBookInsertRequest insert)
@@ -167,5 +218,13 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         }
 
         await Context.EBookGenres.AddRangeAsync(eBookGenres);
+    }
+
+    private async Task ValidateHiding(int id)
+    {
+        if (!await Context.EBooks.AnyAsync(e => e.Id == id))
+        {
+            throw new AppException("The requested ebook does not exist!");
+        }
     }
 }

@@ -24,6 +24,13 @@ public class
         return base.Insert(insert);
     }
 
+    [SwaggerOperation("Update an existing ebook")]
+    [Authorize("All")]
+    public override Task<ActionResult<EntityResult<EBookDto>>> Update(int id, EBookUpdateRequest update)
+    {
+        return base.Update(id, update);
+    }
+
     [SwaggerOperation("Parses an EPUB file and returns metadata information")]
     [Authorize("All")]
     [HttpPost("parse")]
@@ -40,5 +47,21 @@ public class
         var ebookFile = await (WriteService as IEBookService)!.Download(id);
 
         return File(ebookFile.Bytes, ebookFile.MimeType, fileDownloadName: ebookFile.Filename);
+    }
+
+    [SwaggerOperation("Hide an ebook from being displayed")]
+    [HttpPut("{id:int}/hide")]
+    [Authorize("AdminOperations")]
+    public async Task<ActionResult<EntityResult<EBookDto>>> Hide(int id)
+    {
+        return Ok(await (WriteService as IEBookService)!.Hide(id));
+    }
+    
+    [SwaggerOperation("Reveal a hidden ebook for displaying")]
+    [HttpPut("{id:int}/unhide")]
+    [Authorize("AdminOperations")]
+    public async Task<ActionResult<EntityResult<EBookDto>>> Unhide(int id)
+    {
+        return Ok(await (WriteService as IEBookService)!.Unhide(id));
     }
 }

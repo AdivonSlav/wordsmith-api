@@ -20,7 +20,7 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         _profanityDetector = profanityDetector;
     }
 
-    protected override async Task BeforeInsert(Db.Entities.Comment entity, CommentInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.Comment entity, CommentInsertRequest insert, int userId)
     {
         await ValidateInsertion(entity, insert);
         entity.DateAdded = DateTime.UtcNow;

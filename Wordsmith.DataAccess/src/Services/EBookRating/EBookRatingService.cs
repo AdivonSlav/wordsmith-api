@@ -13,24 +13,28 @@ public class EBookRatingService : WriteService<EBookRatingDto, Db.Entities.EBook
 {
     public EBookRatingService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override async Task BeforeInsert(Db.Entities.EBookRating entity, EBookRatingInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.EBookRating entity, EBookRatingInsertRequest insert,
+        int userId)
     {
         await ValidateInsertion(insert.EBookId, insert.UserId);
         entity.RatingDate = DateTime.UtcNow;
     }
 
-    protected override async Task AfterInsert(Db.Entities.EBookRating entity, EBookRatingInsertRequest insert)
+    protected override async Task AfterInsert(Db.Entities.EBookRating entity, EBookRatingInsertRequest insert,
+        int userId)
     {
         await CalculateRatingAverage(entity);
     }
 
-    protected override async Task BeforeUpdate(Db.Entities.EBookRating entity, EBookRatingUpdateRequest update)
+    protected override async Task BeforeUpdate(Db.Entities.EBookRating entity, EBookRatingUpdateRequest update,
+        int userId)
     {
         await ValidateUpdate(entity.Id, update.UserId);
         entity.RatingDate = DateTime.UtcNow;
     }
 
-    protected override async Task AfterUpdate(Db.Entities.EBookRating entity, EBookRatingUpdateRequest update)
+    protected override async Task AfterUpdate(Db.Entities.EBookRating entity, EBookRatingUpdateRequest update,
+        int userId)
     {
         await CalculateRatingAverage(entity);
     }

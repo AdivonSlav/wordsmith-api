@@ -62,7 +62,8 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
         return query;
     }
 
-    protected override async Task BeforeInsert(Db.Entities.EBookReport entity, EBookReportInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.EBookReport entity, EBookReportInsertRequest insert,
+        int userId)
     {
         await ValidateInsertion(insert);
         
@@ -75,7 +76,8 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
         entity.ReportDetails.IsClosed = false;
     }
 
-    protected override async Task BeforeUpdate(Db.Entities.EBookReport entity, EBookReportUpdateRequest update)
+    protected override async Task BeforeUpdate(Db.Entities.EBookReport entity, EBookReportUpdateRequest update,
+        int userId)
     {
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
     }

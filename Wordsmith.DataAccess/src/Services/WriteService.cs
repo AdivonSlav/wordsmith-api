@@ -20,7 +20,7 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
     public WriteService(DatabaseContext context, IMapper mapper)
         : base(context, mapper) { }
 
-    public virtual async Task<EntityResult<T>> Insert(TInsert insert)
+    public virtual async Task<EntityResult<T>> Insert(TInsert insert, int userId)
     {
         var set = Context.Set<TDb>();
         var entity = Mapper.Map<TDb>(insert);
@@ -31,9 +31,9 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         {
             await set.AddAsync(entity);
 
-            await BeforeInsert(entity, insert);
+            await BeforeInsert(entity, insert, userId);
             await Context.SaveChangesAsync();
-            await AfterInsert(entity, insert);
+            await AfterInsert(entity, insert, userId);
             await transaction.CommitAsync();
         }
         catch
@@ -49,7 +49,7 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
         };
     }
 
-    public virtual async Task<EntityResult<T>> Update(int id, TUpdate update)
+    public virtual async Task<EntityResult<T>> Update(int id, TUpdate update, int userId)
     {
         var set = Context.Set<TDb>();
         var entity = await set.FindAsync(id);
@@ -63,11 +63,11 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
 
         try
         {
-            await BeforeUpdate(entity, update);
+            await BeforeUpdate(entity, update, userId);
             Mapper.Map(update, entity);
 
             await Context.SaveChangesAsync();
-            await AfterUpdate(entity, update);
+            await AfterUpdate(entity, update, userId);
             await transaction.CommitAsync();
         }
         catch
@@ -117,16 +117,16 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
     }
 
     // A task that needs to be done before a DB add operation is finalized
-    protected virtual async Task BeforeInsert(TDb entity, TInsert insert) { }
+    protected virtual async Task BeforeInsert(TDb entity, TInsert insert, int userId) { }
 
     // A task that needs to be done after a DB add operation is finalized
-    protected virtual async Task AfterInsert(TDb entity, TInsert insert) { }
+    protected virtual async Task AfterInsert(TDb entity, TInsert insert, int userId) { }
 
     // A task that needs to be done before a DB update operation is finalized
-    protected virtual async Task BeforeUpdate(TDb entity, TUpdate update) { }
+    protected virtual async Task BeforeUpdate(TDb entity, TUpdate update, int userId) { }
     
     // A task that needs to be done after a DB update operation is finalized
-    protected virtual async Task AfterUpdate(TDb entity, TUpdate update) { }
+    protected virtual async Task AfterUpdate(TDb entity, TUpdate update, int userId) { }
     
     // A task that needs to be done before a DB delete operation is finalized
     protected virtual async Task BeforeDeletion(int userId, TDb entity) { }

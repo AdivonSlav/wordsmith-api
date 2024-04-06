@@ -58,7 +58,8 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
         return query;
     }
 
-    protected override async Task BeforeInsert(Db.Entities.UserReport entity, UserReportInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.UserReport entity, UserReportInsertRequest insert,
+        int userId)
     {
         await ValidateInsertion(insert);
 
@@ -71,7 +72,8 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
         entity.ReportDetails.IsClosed = false;
     }
 
-    protected override async Task BeforeUpdate(Db.Entities.UserReport entity, UserReportUpdateRequest update)
+    protected override async Task BeforeUpdate(Db.Entities.UserReport entity, UserReportUpdateRequest update,
+        int userId)
     {
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
     }

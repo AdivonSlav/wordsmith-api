@@ -21,7 +21,7 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
         _paypalService = paypalService;
     }
 
-    protected override async Task BeforeInsert(Db.Entities.Order entity, OrderInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.Order entity, OrderInsertRequest insert, int userId)
     {
         var user = await ValidateUser(insert);
         var ebook = await ValidateEbook(insert);

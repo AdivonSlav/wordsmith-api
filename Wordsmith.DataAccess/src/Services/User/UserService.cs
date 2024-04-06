@@ -310,6 +310,8 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
     public async Task<EntityResult<UserDto>> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, int adminId)
     {
+        await using var transaction = await Context.Database.BeginTransactionAsync();
+        
         var user = await UserExists(userId);
         var admin = await UserExists(adminId);
 
@@ -354,6 +356,21 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             lastRemoval.ExpiryDate = DateTime.UtcNow;
         }
 
+        try
+        {
+            // All ebooks that the author had should be hidden
+            await Context.EBooks
+                .Where(e => e.AuthorId == user.Id)
+                .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(e => e.IsHidden, true).SetProperty(e => e.HiddenDate, DateTime.UtcNow));
+            await Context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+        
         // Persist the access status over at the IdentityServer
         var id = _messageProducer.SendMessage("user_change_access", new ChangeUserAccessMessage()
         {
@@ -369,6 +386,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
         if (!response.Succeeded)
         {
+            await transaction.RollbackAsync();
             throw new AppException($"Could not change access for user {user.Username}!",
                 new Dictionary<string, object>()
                 {
@@ -376,8 +394,8 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
                 });
         }
 
-        await Context.SaveChangesAsync();
-
+        await transaction.CommitAsync();
+        
         return new EntityResult<UserDto>()
         {
             Message = "Changed access for user",

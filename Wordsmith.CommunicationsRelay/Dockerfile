@@ -22,4 +22,9 @@ RUN dotnet publish "Wordsmith.CommunicationsRelay.csproj" -c $BUILD_CONFIGURATIO
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Wordsmith.CommunicationsRelay.dll"]
+# The wait-for script ensures that the entrypoint will not be called until the RabbitMQ server is ready to accept connections
+# Netcat is installed so TCP listening works
+RUN apt update && apt install wget netcat -y
+RUN wget -qO wait-for.sh https://raw.githubusercontent.com/eficode/wait-for/v2.2.4/wait-for
+RUN chmod +x wait-for.sh
+CMD ["sh", "-c", "./wait-for.sh $WORDSMITH_Connection__RabbitMQ__Host:5672 -- dotnet Wordsmith.CommunicationsRelay.dll"]

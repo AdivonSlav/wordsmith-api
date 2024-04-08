@@ -46,4 +46,12 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     {
         return await base.Update(id, update);
     }
+
+    [SwaggerOperation("Send an email to the reported user")]
+    [Authorize("AdminOperations")]
+    [HttpPost("email")]
+    public async Task<ActionResult<EntityResult<UserReportDto>>> SendEmail(UserReportEmailSendRequest request)
+    {
+        return Ok(await (WriteService as IUserReportService)!.SendEmail(request));
+    }
 }

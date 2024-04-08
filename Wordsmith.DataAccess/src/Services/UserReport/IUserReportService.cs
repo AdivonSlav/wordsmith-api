@@ -7,5 +7,5 @@ namespace Wordsmith.DataAccess.Services.UserReport;
 public interface IUserReportService : IWriteService<UserReportDto, Db.Entities.UserReport, UserReportSearchObject,
     UserReportInsertRequest, UserReportUpdateRequest>
 {
-    
+    Task<EntityResult<UserReportDto>> SendEmail(UserReportEmailSendRequest request);
 }

@@ -3,15 +3,22 @@ using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
+using Wordsmith.Models.MessageObjects;
 using Wordsmith.Models.RequestObjects.EBookReport;
 using Wordsmith.Models.SearchObjects;
+using Wordsmith.Utils.RabbitMQ;
 
 namespace Wordsmith.DataAccess.Services.EBookReport;
 
 public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBookReport, EBookReportSearchObject, EBookReportInsertRequest, EBookReportUpdateRequest>, IEBookReportService
 {
-    public EBookReportService(DatabaseContext context, IMapper mapper)
-        : base(context, mapper) {}
+    private readonly IMessageProducer _messageProducer;
+
+    public EBookReportService(DatabaseContext context, IMapper mapper, IMessageProducer messageProducer)
+        : base(context, mapper)
+    {
+        _messageProducer = messageProducer;
+    }
 
     protected override IQueryable<Db.Entities.EBookReport> AddInclude(IQueryable<Db.Entities.EBookReport> query, int userId)
     {
@@ -100,5 +107,54 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
         }
         else
             throw new AppException("The reported eBook does not exist");
+    }
+
+    public async Task<EntityResult<EBookReportDto>> SendEmail(EBookReportEmailSendRequest request)
+    {
+        await ValidateSendEmail(request);
+
+        var report = await Context.EBookReports
+            .Include(e => e.ReportedEBook)
+            .ThenInclude(eBook => eBook.Author)
+            .Include(e => e.ReportDetails)
+            .ThenInclude(e => e.ReportReason)
+            .Include(e => e.ReportDetails.Reporter)
+            .SingleAsync(e => e.Id == request.ReportId);
+        
+        request.Body += @$"<br><br>Report ID: {report.Id}<br>Report reason: {report.ReportDetails.ReportReason.Reason}
+          <br>Reported ebook: {report.ReportedEBook.Title}";
+        
+        var emailMessage = new SendEmailMessage()
+        {
+            EmailToId = report.ReportedEBook.Author.Email,
+            EmailToName = report.ReportedEBook.Author.Username,
+            EmailSubject = $"Report filed against an ebook you authored",
+            EmailBody = request.Body,
+        };
+        
+        _messageProducer.SendMessage("send_email", emailMessage);
+
+        return new EntityResult<EBookReportDto>()
+        {
+            Message = "Successfully sent email",
+            Result = Mapper.Map<EBookReportDto>(report)
+        };
+    }
+    
+    private async Task ValidateSendEmail(EBookReportEmailSendRequest request)
+    {
+        var report = await Context.EBookReports
+            .Include(e => e.ReportDetails)
+            .FirstOrDefaultAsync(e => e.Id == request.ReportId);
+
+        if (report == null)
+        {
+            throw new AppException("The requested report does not exist!");
+        }
+
+        if (report.ReportDetails.IsClosed)
+        {
+            throw new AppException("You cannot send an email for a closed report!");
+        }
     }
 }

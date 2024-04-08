@@ -4,27 +4,44 @@ using Microsoft.Extensions.Hosting;
 using Wordsmith.CommunicationsRelay;
 using Wordsmith.CommunicationsRelay.HostedServices;
 using Wordsmith.CommunicationsRelay.Services;
+using Wordsmith.Utils;
 using Wordsmith.Utils.RabbitMQ;
 
-var builder = Host.CreateDefaultBuilder();
-
-builder.ConfigureAppConfiguration(configuration =>
+try
 {
-    configuration.AddJsonFile("appsettings.json", optional: false);
-    configuration.AddJsonFile("appsettings.Development.json", optional: true);
-});
+    var builder = Host.CreateDefaultBuilder()
+        .ConfigureAppConfiguration(configuration =>
+        {
+            configuration.AddJsonFile("appsettings.json", optional: false);
+            configuration.AddJsonFile("appsettings.Development.json", optional: true);
+        })
+        .ConfigureServices((hostContext, services) =>
+        {
+            var config = hostContext.Configuration;
 
-builder.ConfigureServices((hostContext, services) =>
+            var rabbitConnection = config.GetSection("Connection:RabbitMQ");
+            RabbitService.Init(rabbitConnection["Host"], rabbitConnection["User"], rabbitConnection["Password"]);
+            Logger.Init(config["Logging:NLog:LogLevel"] ?? "Debug");
+
+            services.Configure<EmailSettings>(config.GetSection("EmailSettings"));
+            services.AddTransient<IMessageListener, MessageListener>();
+            services.AddTransient<IEmailService, EmailService>();
+            services.AddHostedService<EmailBackgroundService>();
+        })
+        .UseConsoleLifetime()
+        .Build();
+
+    Logger.LogInfo("Starting up...");
+    builder.Run();
+}
+catch (Exception e)
 {
-    var config = hostContext.Configuration;
+    Logger.LogFatal("Encountered fatal error", e);
+    return 1;
+}
+finally
+{
+    Logger.Cleanup();
+}
 
-    var rabbitConnection = config.GetSection("Connection:RabbitMQ");
-    RabbitService.Init(rabbitConnection["Host"], rabbitConnection["User"], rabbitConnection["Password"]);
-    
-    services.Configure<EmailSettings>(config.GetSection("EmailSettings"));
-    services.AddTransient<IMessageListener, MessageListener>();
-    services.AddTransient<IEmailService, EmailService>();
-    services.AddHostedService<EmailBackgroundService>();
-});
-
-await builder.RunConsoleAsync();
+return 0;

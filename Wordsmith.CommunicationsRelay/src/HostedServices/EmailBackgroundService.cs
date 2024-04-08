@@ -20,6 +20,7 @@ public class EmailBackgroundService : BackgroundService
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        Logger.LogInfo("Starting background service for email operations...");
         await _messageListener.Listen("send_email", HandleSendingEmail);
     }
 
@@ -53,6 +54,8 @@ public class EmailBackgroundService : BackgroundService
             status.Errors.Add("Could not send email");
             return status;
         }
+        
+        Logger.LogInfo($"Sent email to {emailMessage.EmailToId}");
 
         status.Succeeded = true;
         status.Errors.Clear();

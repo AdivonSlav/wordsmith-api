@@ -20,11 +20,19 @@ public class EmailService : IEmailService
     public async Task<bool> SendEmail(SendEmailMessage message)
     {
         var email = new MimeMessage();
-        email.From.Add(MailboxAddress.Parse(_emailSettings.Value.SenderEmail));
-        email.Sender = MailboxAddress.Parse(_emailSettings.Value.SenderEmail);
-        email.To.Add(MailboxAddress.Parse(message.EmailToId));
-        email.Subject = message.EmailSubject;
-        email.Body = new TextPart(TextFormat.Plain) { Text = message.EmailBody };
+
+        try
+        {
+            email.From.Add(MailboxAddress.Parse(_emailSettings.Value.SenderEmail));
+            email.To.Add(MailboxAddress.Parse(message.EmailToId));
+            email.Subject = message.EmailSubject;
+            email.Body = new TextPart(TextFormat.Html) { Text = message.EmailBody };
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Could not prepare email message!", e);
+            return false;
+        }
         
         using var smtp = new SmtpClient();
         try

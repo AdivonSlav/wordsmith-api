@@ -43,4 +43,12 @@ public class EBookReportsController : WriteController<EBookReportDto, EBookRepor
     {
         return base.Update(id, update);
     }
+    
+    [SwaggerOperation("Send an email to the author of the reported ebook")]
+    [Authorize("AdminOperations")]
+    [HttpPost("email")]
+    public async Task<ActionResult<EntityResult<EBookReportDto>>> SendEmail(EBookReportEmailSendRequest request)
+    {
+        return Ok(await (WriteService as IEBookReportService)!.SendEmail(request));
+    }
 }

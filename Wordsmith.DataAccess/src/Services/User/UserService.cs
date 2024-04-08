@@ -1,7 +1,6 @@
 #nullable enable
 using System.Text.Json;
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Wordsmith.DataAccess.Db;
@@ -37,8 +36,13 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         _messageListener = messageListener;
     }
 
-    protected override async Task BeforeInsert(Db.Entities.User entity, UserInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.User entity, UserInsertRequest insert, int userId)
     {
+        insert.Username = Base64Helper.DecodeFromBase64(insert.Username);
+        insert.Password = Base64Helper.DecodeFromBase64(insert.Password);
+        insert.ConfirmPassword = Base64Helper.DecodeFromBase64(insert.ConfirmPassword);
+        insert.Email = Base64Helper.DecodeFromBase64(insert.Email);
+        
         await ValidateUsername(insert.Username);
         await ValidateEmail(insert.Email);
 
@@ -62,7 +66,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         entity.ProfileImage = newImageEntity;
     }
 
-    protected override Task AfterInsert(Db.Entities.User entity, UserInsertRequest insert)
+    protected override Task AfterInsert(Db.Entities.User entity, UserInsertRequest insert, int userId)
     {
         _messageProducer.SendMessage("user_insertion", new RegisterUserMessage()
         {
@@ -77,6 +81,9 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
     public async Task<EntityResult<UserLoginDto>> Login(UserLoginRequest login)
     {
+        login.Username = Base64Helper.DecodeFromBase64(login.Username);
+        login.Password = Base64Helper.DecodeFromBase64(login.Password);
+        
         var entity = await Context.Users.FirstOrDefaultAsync(user => user.Username == login.Username);
 
         if (entity == null)
@@ -84,21 +91,21 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             throw new AppException("Wrong username!");
         }
 
-        var clientSecret = "";
         var clientId = "";
+        var clientSecret = "";
         var scopes = "";
 
         if (string.Equals(entity.Role, "admin", StringComparison.OrdinalIgnoreCase))
         {
             clientSecret = _configuration["IdentityServer:Secrets:Admin"];
-            clientId = "admin.client";
             scopes = "offline_access wordsmith_api.full_access";
+            clientId = string.IsNullOrEmpty(login.ClientId) ? "admin.client" : login.ClientId;
         }
         else if (string.Equals(entity.Role, "user", StringComparison.OrdinalIgnoreCase))
         {
             clientSecret = _configuration["IdentityServer:Secrets:User"];
-            clientId = "user.client";
             scopes = "offline_access wordsmith_api.read wordsmith_api.write";
+            clientId = string.IsNullOrEmpty(login.ClientId) ? "user.client" : login.ClientId;
         }
 
         if (string.IsNullOrEmpty(clientSecret))
@@ -303,6 +310,8 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
     public async Task<EntityResult<UserDto>> ChangeAccess(int userId, UserChangeAccessRequest changeAccess, int adminId)
     {
+        await using var transaction = await Context.Database.BeginTransactionAsync();
+        
         var user = await UserExists(userId);
         var admin = await UserExists(adminId);
 
@@ -347,21 +356,30 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             lastRemoval.ExpiryDate = DateTime.UtcNow;
         }
 
-        // Persist the access status over at the IdentityServer
-        var id = _messageProducer.SendMessage("user_change_access", new ChangeUserAccessMessage()
+        try
         {
-            Id = user.Id,
-            AllowedAccess = changeAccess.AllowedAccess,
-            ExpiryDate = changeAccess.ExpiryDate
-        });
+            if (changeAccess.AllowedAccess)
+            {
+                await UnhideAuthorEbooks(user.Id);
+            }
+            else
+            {
+                await HideAuthorEbooks(user.Id);
+            }
+            
+            await Context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
 
-        var autoResetEvent = new AutoResetEvent(false);
-        var response = await WaitForReply(autoResetEvent, "user_change_access_replies", id);
-
-        Logger.LogDebug($"Got reply with id {id} from IdentityServer when updating user information");
-
+        var response = await SendMessageForAccessChange(changeAccess, userId);
+        
         if (!response.Succeeded)
         {
+            await transaction.RollbackAsync();
             throw new AppException($"Could not change access for user {user.Username}!",
                 new Dictionary<string, object>()
                 {
@@ -369,8 +387,8 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
                 });
         }
 
-        await Context.SaveChangesAsync();
-
+        await transaction.CommitAsync();
+        
         return new EntityResult<UserDto>()
         {
             Message = "Changed access for user",
@@ -433,5 +451,40 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         }
 
         return response;
+    }
+
+    private async Task<OperationStatusMessage> SendMessageForAccessChange(UserChangeAccessRequest changeAccess,
+        int userId)
+    {
+        // Persist the access status over at the IdentityServer
+        var id = _messageProducer.SendMessage("user_change_access", new ChangeUserAccessMessage()
+        {
+            Id = userId,
+            AllowedAccess = changeAccess.AllowedAccess,
+            ExpiryDate = changeAccess.ExpiryDate
+        });
+
+        var autoResetEvent = new AutoResetEvent(false);
+        var response = await WaitForReply(autoResetEvent, "user_change_access_replies", id);
+
+        Logger.LogDebug($"Got reply with id {id} from IdentityServer when updating user information");
+
+        return response;
+    }
+
+    private async Task HideAuthorEbooks(int authorId)
+    {
+        await Context.EBooks
+            .Where(e => e.AuthorId == authorId)
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(e => e.IsHidden, true).SetProperty(e => e.HiddenDate, DateTime.UtcNow));
+    }
+    
+    private async Task UnhideAuthorEbooks(int authorId)
+    {
+        await Context.EBooks
+            .Where(e => e.AuthorId == authorId)
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(e => e.IsHidden, false).SetProperty(e => e.HiddenDate, (DateTime?)null));
     }
 }

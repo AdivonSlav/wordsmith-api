@@ -9,7 +9,7 @@ public interface IWriteService<T, TDb, TSearch, TInsert, TUpdate> : IReadService
     where TInsert : class
     where TUpdate : class
 {
-    Task<EntityResult<T>> Insert(TInsert insert);
-    Task<EntityResult<T>> Update(int id, TUpdate update);
+    Task<EntityResult<T>> Insert(TInsert insert, int userId);
+    Task<EntityResult<T>> Update(int id, TUpdate update, int userId);
     Task<EntityResult<T>> Delete(int userId, params int[] ids);
 }

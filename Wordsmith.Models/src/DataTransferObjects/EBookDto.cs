@@ -20,6 +20,10 @@ public class EBookDto
     
     public string Path { get; set; }
     
+    public bool IsHidden { get; set; }
+    
+    public DateTime? HiddenDate { get; set; }
+    
     public UserDto Author { get; set; }
     
     public ImageDto CoverArt { get; set; }

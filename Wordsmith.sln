@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordsmith.Utils", "Wordsmit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordsmith.Integration", "Wordsmith.Integration\Wordsmith.Integration.csproj", "{4AF50E87-8376-4CAF-993A-598E6D8F9AA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordsmith.CommunicationsRelay", "Wordsmith.CommunicationsRelay\Wordsmith.CommunicationsRelay.csproj", "{4C4545BB-1C6E-4EB3-8235-555344A8CCAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,5 +48,9 @@ Global
 		{4AF50E87-8376-4CAF-993A-598E6D8F9AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AF50E87-8376-4CAF-993A-598E6D8F9AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AF50E87-8376-4CAF-993A-598E6D8F9AA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C4545BB-1C6E-4EB3-8235-555344A8CCAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C4545BB-1C6E-4EB3-8235-555344A8CCAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C4545BB-1C6E-4EB3-8235-555344A8CCAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C4545BB-1C6E-4EB3-8235-555344A8CCAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

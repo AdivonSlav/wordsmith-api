@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.DataTransferObjects;
@@ -13,9 +12,10 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
 {
     public UserLibraryService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
 
-    protected override async Task BeforeInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert,
+        int userId)
     {
-        await ValidateInsertion(entity, insert);
+        await ValidateInsertion(insert);
         
         entity.IsRead = false;
         entity.SyncDate = DateTime.UtcNow;
@@ -23,7 +23,8 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         entity.ReadProgress = "0%";
     }
 
-    protected override async Task AfterInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert)
+    protected override async Task AfterInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert,
+        int userId)
     {
         await Context.Entry(entity).Reference(e => e.EBook).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
@@ -31,13 +32,18 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
     }
 
-    private async Task ValidateInsertion(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert)
+    private async Task ValidateInsertion(UserLibraryInsertRequest insert)
     {
         var ebook = await Context.EBooks.FindAsync(insert.EBookId);
         
         if (ebook == null)
         {
             throw new AppException("The ebook does not exist");
+        }
+
+        if (await Context.UserBans.AnyAsync(e => e.UserId == ebook.AuthorId))
+        {
+            throw new AppException("You cannot add this ebook to your library as the author has been banned!");
         }
 
         var alreadyAdded = await Context.UserLibraries.AnyAsync(e => e.UserId == insert.UserId && e.EBookId == insert.EBookId);
@@ -80,6 +86,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         UserLibrarySearchObject search, int userId)
     {
         query = query.Where(e => e.UserId == search.UserId);
+        query = query.Where(e => !e.EBook.IsHidden);
 
         if (search.IsRead.HasValue)
         {
@@ -102,32 +109,5 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         }
 
         return query;
-    }
-    
-    public async Task<IActionResult> RemoveFromCategory(int libraryId)
-    {
-        var libraryEntry = await LibraryEntryExists(libraryId);
-
-        if (libraryEntry.UserLibraryCategoryId == null)
-        {
-            throw new AppException("The library entry does not belong to any category!");
-        }
-
-        libraryEntry.UserLibraryCategoryId = null;
-        await Context.SaveChangesAsync();
-
-        return new OkObjectResult("Removed entry from the specified category");
-    }
-    
-    private async Task<Db.Entities.UserLibrary> LibraryEntryExists(int userLibraryId)
-    {
-        var libraryEntry = await Context.UserLibraries.FindAsync(userLibraryId);
-
-        if (libraryEntry == null)
-        {
-            throw new AppException("This book is not in your library!");
-        }
-
-        return libraryEntry;
     }
 }

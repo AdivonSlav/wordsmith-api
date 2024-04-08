@@ -15,6 +15,9 @@ public class EBookReportSearchObject : SearchObject
     [StringLength(30)]
     public string? Reason { get; set; }
     
-    [SwaggerParameter("The date when the report was made")]
-    public DateTime? ReportDate { get; set; }
+    [SwaggerParameter("Start date for reports")]
+    public DateTime? StartDate { get; set; }
+    
+    [SwaggerParameter("End date for reports")]
+    public DateTime? EndDate { get; set; }
 }

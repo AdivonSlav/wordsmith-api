@@ -21,7 +21,7 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
         _paypalService = paypalService;
     }
 
-    protected override async Task BeforeInsert(Db.Entities.Order entity, OrderInsertRequest insert)
+    protected override async Task BeforeInsert(Db.Entities.Order entity, OrderInsertRequest insert, int userId)
     {
         var user = await ValidateUser(insert);
         var ebook = await ValidateEbook(insert);
@@ -59,6 +59,11 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
         if (ebook == null)
         {
             throw new AppException("Ebook does not exist!");
+        }
+
+        if (await Context.UserBans.AnyAsync(e => e.UserId == ebook.AuthorId))
+        {
+            throw new AppException("You cannot buy this ebook as the author has been banned!");
         }
 
         if (!ebook.Price.HasValue)

@@ -10,4 +10,6 @@ public interface IEBookService : IWriteService<EBookDto, Db.Entities.EBook, EBoo
 {
     public Task<EntityResult<EBookParseDto>> Parse(IFormFile file);
     public Task<EBookFile> Download(int id);
+    public Task<EntityResult<EBookDto>> Hide(int id);
+    public Task<EntityResult<EBookDto>> Unhide(int id);
 }

@@ -33,6 +33,7 @@ public class EBookReportsController : WriteController<EBookReportDto, EBookRepor
     [Authorize("All")]
     public override Task<ActionResult<EntityResult<EBookReportDto>>> Insert(EBookReportInsertRequest insert)
     {
+        insert.ReporterUserId = GetAuthUserId();
         return base.Insert(insert);
     }
 
@@ -41,5 +42,13 @@ public class EBookReportsController : WriteController<EBookReportDto, EBookRepor
     public override Task<ActionResult<EntityResult<EBookReportDto>>> Update(int id, EBookReportUpdateRequest update)
     {
         return base.Update(id, update);
+    }
+    
+    [SwaggerOperation("Send an email to the author of the reported ebook")]
+    [Authorize("AdminOperations")]
+    [HttpPost("email")]
+    public async Task<ActionResult<EntityResult<EBookReportDto>>> SendEmail(EBookReportEmailSendRequest request)
+    {
+        return Ok(await (WriteService as IEBookReportService)!.SendEmail(request));
     }
 }

@@ -6,5 +6,5 @@ namespace Wordsmith.DataAccess.Services.EBookReport;
 
 public interface IEBookReportService : IWriteService<EBookReportDto, Db.Entities.EBookReport, EBookReportSearchObject, EBookReportInsertRequest, EBookReportUpdateRequest>
 {
-    
+    Task<EntityResult<EBookReportDto>> SendEmail(EBookReportEmailSendRequest request);
 }

@@ -37,7 +37,6 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     public override async Task<ActionResult<EntityResult<UserReportDto>>> Insert(UserReportInsertRequest insert)
     {
         insert.ReporterUserId = GetAuthUserId();   
-        
         return await base.Insert(insert);
     }
 
@@ -46,5 +45,13 @@ public class UserReportsController : WriteController<UserReportDto, UserReport, 
     public override async Task<ActionResult<EntityResult<UserReportDto>>> Update(int id, UserReportUpdateRequest update)
     {
         return await base.Update(id, update);
+    }
+
+    [SwaggerOperation("Send an email to the reported user")]
+    [Authorize("AdminOperations")]
+    [HttpPost("email")]
+    public async Task<ActionResult<EntityResult<UserReportDto>>> SendEmail(UserReportEmailSendRequest request)
+    {
+        return Ok(await (WriteService as IUserReportService)!.SendEmail(request));
     }
 }

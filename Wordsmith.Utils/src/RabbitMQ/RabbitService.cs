@@ -27,7 +27,7 @@ public static class RabbitService
             Password = password,
             VirtualHost = "/",
             Port = AmqpTcpEndpoint.UseDefaultPort,
-            DispatchConsumersAsync = true
+            DispatchConsumersAsync = true,
         };
 
         Logger.LogDebug("Initialized RabbitMQ connection factory");

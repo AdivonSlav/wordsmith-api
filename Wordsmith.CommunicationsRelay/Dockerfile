@@ -1,9 +1,9 @@
 ﻿# Setting up the runtime (Using .NET 6 Runtime on Ubuntu 22.04)
-FROM mcr.microsoft.com/dotnet/runtime:6.0-jammy-amd64 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-jammy-amd64 AS base
 WORKDIR /app
 
 # Build stage (Using .NET 6 SDK on ubuntu 22.04)
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-jammy-amd64 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Wordsmith.CommunicationsRelay/Wordsmith.CommunicationsRelay.csproj", "Wordsmith.CommunicationsRelay/"]

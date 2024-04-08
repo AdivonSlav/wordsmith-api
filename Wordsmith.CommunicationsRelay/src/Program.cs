@@ -14,14 +14,15 @@ try
         {
             configuration.AddJsonFile("appsettings.json", optional: false);
             configuration.AddJsonFile("appsettings.Development.json", optional: true);
+            configuration.AddEnvironmentVariables(prefix: "WORDSMITH_");
         })
         .ConfigureServices((hostContext, services) =>
         {
             var config = hostContext.Configuration;
-
             var rabbitConnection = config.GetSection("Connection:RabbitMQ");
-            RabbitService.Init(rabbitConnection["Host"], rabbitConnection["User"], rabbitConnection["Password"]);
+            
             Logger.Init(config["Logging:NLog:LogLevel"] ?? "Debug");
+            RabbitService.Init(rabbitConnection["Host"], rabbitConnection["User"], rabbitConnection["Password"]);
 
             services.Configure<EmailSettings>(config.GetSection("EmailSettings"));
             services.AddTransient<IMessageListener, MessageListener>();

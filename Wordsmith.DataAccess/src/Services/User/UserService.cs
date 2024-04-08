@@ -358,11 +358,15 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
         try
         {
-            // All ebooks that the author had should be hidden
-            await Context.EBooks
-                .Where(e => e.AuthorId == user.Id)
-                .ExecuteUpdateAsync(setters =>
-                    setters.SetProperty(e => e.IsHidden, true).SetProperty(e => e.HiddenDate, DateTime.UtcNow));
+            if (changeAccess.AllowedAccess)
+            {
+                await UnhideAuthorEbooks(user.Id);
+            }
+            else
+            {
+                await HideAuthorEbooks(user.Id);
+            }
+            
             await Context.SaveChangesAsync();
         }
         catch (Exception e)
@@ -370,20 +374,9 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             await transaction.RollbackAsync();
             throw;
         }
+
+        var response = await SendMessageForAccessChange(changeAccess, userId);
         
-        // Persist the access status over at the IdentityServer
-        var id = _messageProducer.SendMessage("user_change_access", new ChangeUserAccessMessage()
-        {
-            Id = user.Id,
-            AllowedAccess = changeAccess.AllowedAccess,
-            ExpiryDate = changeAccess.ExpiryDate
-        });
-
-        var autoResetEvent = new AutoResetEvent(false);
-        var response = await WaitForReply(autoResetEvent, "user_change_access_replies", id);
-
-        Logger.LogDebug($"Got reply with id {id} from IdentityServer when updating user information");
-
         if (!response.Succeeded)
         {
             await transaction.RollbackAsync();
@@ -458,5 +451,40 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         }
 
         return response;
+    }
+
+    private async Task<OperationStatusMessage> SendMessageForAccessChange(UserChangeAccessRequest changeAccess,
+        int userId)
+    {
+        // Persist the access status over at the IdentityServer
+        var id = _messageProducer.SendMessage("user_change_access", new ChangeUserAccessMessage()
+        {
+            Id = userId,
+            AllowedAccess = changeAccess.AllowedAccess,
+            ExpiryDate = changeAccess.ExpiryDate
+        });
+
+        var autoResetEvent = new AutoResetEvent(false);
+        var response = await WaitForReply(autoResetEvent, "user_change_access_replies", id);
+
+        Logger.LogDebug($"Got reply with id {id} from IdentityServer when updating user information");
+
+        return response;
+    }
+
+    private async Task HideAuthorEbooks(int authorId)
+    {
+        await Context.EBooks
+            .Where(e => e.AuthorId == authorId)
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(e => e.IsHidden, true).SetProperty(e => e.HiddenDate, DateTime.UtcNow));
+    }
+    
+    private async Task UnhideAuthorEbooks(int authorId)
+    {
+        await Context.EBooks
+            .Where(e => e.AuthorId == authorId)
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(e => e.IsHidden, false).SetProperty(e => e.HiddenDate, (DateTime?)null));
     }
 }

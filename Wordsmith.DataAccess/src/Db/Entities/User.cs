@@ -12,6 +12,13 @@ namespace Wordsmith.DataAccess.Db.Entities;
 [Index(nameof(Email), IsUnique = true)]
 public class User : IEntity
 {
+    public enum UserStatus
+    {
+        Active,
+        TemporarilyBanned,
+        Banned,
+    }
+    
     [Key] public int Id { get; set; }
     
     [StringLength(20)]
@@ -32,6 +39,8 @@ public class User : IEntity
     
     [StringLength(100)]
     public string PayPalEmail { get; set; }
+    
+    public UserStatus Status { get; set; }
     
     [ForeignKey(nameof(ProfileImageId))] public virtual Image ProfileImage { get; set; }
 }

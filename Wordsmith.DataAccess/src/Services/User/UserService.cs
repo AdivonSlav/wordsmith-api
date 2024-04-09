@@ -342,6 +342,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             };
 
             await Context.UserBans.AddAsync(newBan);
+            user.Status = changeAccess.ExpiryDate.HasValue ? Db.Entities.User.UserStatus.TemporarilyBanned : Db.Entities.User.UserStatus.Banned;
         }
         else
         {
@@ -354,6 +355,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             if (lastRemoval == null) throw new Exception("The ban for this user not found!");
             
             lastRemoval.ExpiryDate = DateTime.UtcNow;
+            user.Status = Db.Entities.User.UserStatus.Active;
         }
 
         try

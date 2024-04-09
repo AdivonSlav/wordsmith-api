@@ -11,4 +11,6 @@ public class UserDto
     public ImageDto? ProfileImage { get; set; }
     
     public DateTime RegistrationDate { get; set; }
+    
+    public string Status { get; set; }
 }

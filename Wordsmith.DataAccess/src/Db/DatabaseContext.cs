@@ -41,11 +41,13 @@ public class DatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Order>().Property(e => e.Status)
-            .HasConversion(
-                v => v.ToString(),
-                v => (Order.OrderStatus)Enum.Parse(typeof(Order.OrderStatus), v));
+            .HasConversion(v => v.ToString(), v => (Order.OrderStatus)Enum.Parse(typeof(Order.OrderStatus), v));
+
+        modelBuilder.Entity<User>().Property(e => e.Status)
+            .HasConversion(v => v.ToString(), v => (User.UserStatus)Enum.Parse(typeof(User.UserStatus), v));
 
         modelBuilder.Entity<Comment>().Property(e => e.LikeCount).HasDefaultValue(0);
+        modelBuilder.Entity<User>().Property(e => e.Status).HasDefaultValue(User.UserStatus.Active);
         
         base.OnModelCreating(modelBuilder);
     }

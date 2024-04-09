@@ -314,11 +314,24 @@ public static class DatabaseSeeds
     {
         if (await context.EBookReports.AnyAsync()) return;
 
+        var author = await context.Users.FirstOrDefaultAsync(e => e.Username == DefaultAuthorUsername);
         var user = await context.Users.FirstOrDefaultAsync(e => e.Username == DefaultUserUsername);
+        
+        if (author == null)
+        {
+            Logger.LogWarn("Seeded author account needed for ebook report seeding not found, skipping seeding");
+            return;
+        }
 
         if (user == null)
         {
             Logger.LogWarn("Seeded user account needed for ebook report seeding not found, skipping seeding");
+            return;
+        }
+        
+        if (!await context.EBooks.AnyAsync(e => e.AuthorId == author.Id))
+        {
+            Logger.LogWarn("No ebooks authored by the default seed author found in database, skipping seeding of ebook reports");
             return;
         }
 
@@ -392,6 +405,12 @@ public static class DatabaseSeeds
         if (user == null)
         {
             Logger.LogWarn("Seeded user account needed for comment seeding not found, skipping seeding");
+        }
+        
+        if (!await context.EBooks.AnyAsync(e => e.AuthorId == author.Id))
+        {
+            Logger.LogWarn("No ebooks authored by the default seed author found in database, skipping seeding of comments");
+            return;
         }
 
         var ebooks = await context.EBooks.Where(e => e.AuthorId == author.Id).ToListAsync();

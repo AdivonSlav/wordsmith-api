@@ -76,6 +76,10 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
         
         entity.ReportDetails.UserId = insert.ReporterUserId;
         await Context.Entry(entity).Reference(e => e.ReportedEBook).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
+        await Context.Entry(entity.ReportedEBook).Reference(e => e.Author).LoadAsync();
+        await Context.Entry(entity.ReportedEBook).Reference(e => e.MaturityRating).LoadAsync();
+        await Context.Entry(entity.ReportedEBook).Reference(e => e.CoverArt).LoadAsync();
         await Context.Entry(entity.ReportDetails).Reference(e => e.Reporter).LoadAsync();
         await Context.Entry(entity.ReportDetails).Reference(e => e.ReportReason).LoadAsync();
         
@@ -86,7 +90,13 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
     protected override async Task BeforeUpdate(Db.Entities.EBookReport entity, EBookReportUpdateRequest update,
         int userId)
     {
+        await Context.Entry(entity).Reference(e => e.ReportedEBook).LoadAsync();
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
+        await Context.Entry(entity.ReportedEBook).Reference(e => e.Author).LoadAsync();
+        await Context.Entry(entity.ReportedEBook).Reference(e => e.MaturityRating).LoadAsync();
+        await Context.Entry(entity.ReportedEBook).Reference(e => e.CoverArt).LoadAsync();
+        await Context.Entry(entity.ReportDetails).Reference(e => e.Reporter).LoadAsync();
+        await Context.Entry(entity.ReportDetails).Reference(e => e.ReportReason).LoadAsync();
     }
     
     private async Task ValidateInsertion(EBookReportInsertRequest insert)

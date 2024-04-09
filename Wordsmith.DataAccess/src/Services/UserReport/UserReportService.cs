@@ -73,8 +73,9 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
 
         entity.ReportDetails.UserId = insert.ReporterUserId;
         await Context.Entry(entity).Reference(e => e.ReportedUser).LoadAsync();
-        await Context.Entry(entity.ReportDetails).Reference(e => e.Reporter).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
         await Context.Entry(entity.ReportDetails).Reference(e => e.ReportReason).LoadAsync();
+        await Context.Entry(entity.ReportDetails).Reference(e => e.Reporter).LoadAsync();
 
         entity.ReportDetails.SubmissionDate = DateTime.UtcNow;
         entity.ReportDetails.IsClosed = false;
@@ -83,7 +84,10 @@ public class UserReportService : WriteService<UserReportDto, Db.Entities.UserRep
     protected override async Task BeforeUpdate(Db.Entities.UserReport entity, UserReportUpdateRequest update,
         int userId)
     {
+        await Context.Entry(entity).Reference(e => e.ReportedUser).LoadAsync();
         await Context.Entry(entity).Reference(e => e.ReportDetails).LoadAsync();
+        await Context.Entry(entity.ReportDetails).Reference(e => e.ReportReason).LoadAsync();
+        await Context.Entry(entity.ReportDetails).Reference(e => e.Reporter).LoadAsync();
     }
 
     private async Task ValidateInsertion(UserReportInsertRequest insert)

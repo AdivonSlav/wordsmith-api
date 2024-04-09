@@ -116,6 +116,10 @@ public class EBookReportService : WriteService<EBookReportDto, Db.Entities.EBook
         var report = await Context.EBookReports
             .Include(e => e.ReportedEBook)
             .ThenInclude(eBook => eBook.Author)
+            .Include(e => e.ReportedEBook)
+            .ThenInclude(e => e.MaturityRating)
+            .Include(e => e.ReportedEBook)
+            .ThenInclude(e => e.CoverArt)
             .Include(e => e.ReportDetails)
             .ThenInclude(e => e.ReportReason)
             .Include(e => e.ReportDetails.Reporter)

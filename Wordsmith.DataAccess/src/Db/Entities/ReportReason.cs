@@ -8,7 +8,6 @@ using Wordsmith.Models.Enums;
 namespace Wordsmith.DataAccess.Db.Entities;
 
 [Table("report_reasons")]
-[Index(nameof(Reason), IsUnique = true)]
 public class ReportReason : IEntity
 {
     [Key] public int Id { get; set; }

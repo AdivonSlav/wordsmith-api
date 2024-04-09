@@ -1,3 +1,5 @@
+using Wordsmith.Models.Enums;
+
 namespace Wordsmith.Models.DataTransferObjects;
 
 public class ReportReasonDto
@@ -6,5 +8,5 @@ public class ReportReasonDto
 
     public string Reason { get; set; }
     
-    public string Subject { get; set; }
+    public string Type { get; set; }
 }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
+using Wordsmith.Models.Enums;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.MessageObjects;
 using Wordsmith.Models.RequestObjects.Image;
@@ -342,7 +343,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             };
 
             await Context.UserBans.AddAsync(newBan);
-            user.Status = changeAccess.ExpiryDate.HasValue ? Db.Entities.User.UserStatus.TemporarilyBanned : Db.Entities.User.UserStatus.Banned;
+            user.Status = changeAccess.ExpiryDate.HasValue ? UserStatus.TemporarilyBanned : UserStatus.Banned;
         }
         else
         {
@@ -355,7 +356,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             if (lastRemoval == null) throw new Exception("The ban for this user not found!");
             
             lastRemoval.ExpiryDate = DateTime.UtcNow;
-            user.Status = Db.Entities.User.UserStatus.Active;
+            user.Status = UserStatus.Active;
         }
 
         try

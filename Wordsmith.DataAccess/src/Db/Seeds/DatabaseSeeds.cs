@@ -285,7 +285,7 @@ public static class DatabaseSeeds
             "Historical Romance",
         };
     }
-    
+
     private static IEnumerable<T> ParseSeedList<T>(string path) where T : class
     {
         var jsonString = File.ReadAllText(path);

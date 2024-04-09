@@ -1,9 +1,10 @@
 using Swashbuckle.AspNetCore.Annotations;
+using Wordsmith.Models.Enums;
 
 namespace Wordsmith.Models.SearchObjects;
 
 public class ReportReasonSearch : SearchObject
 {
-    [SwaggerParameter("Subject of the report")]
-    public string? Subject { get; set; }
+    [SwaggerParameter("Type of the report")]
+    public ReportType? Type { get; set; }
 }

@@ -5,6 +5,7 @@ using Wordsmith.Integration.Paypal;
 using Wordsmith.Integration.Paypal.Enums;
 using Wordsmith.Integration.Paypal.Models;
 using Wordsmith.Models.DataTransferObjects;
+using Wordsmith.Models.Enums;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects.Order;
 using Wordsmith.Models.SearchObjects;
@@ -40,7 +41,7 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
         order.PayPalCaptureId = captureResponse.PurchaseUnits.First().Payments.Captures.First().Id;
         await HandlePayout(captureResponse, order);
 
-        order.Status = Db.Entities.Order.OrderStatus.Completed;
+        order.Status = OrderStatus.Completed;
         order.PaymentDate = DateTime.UtcNow;
 
         await Context.SaveChangesAsync();
@@ -100,7 +101,7 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
             throw new AppException("Order does not exist!");
         }
 
-        if (order.Status == Db.Entities.Order.OrderStatus.Completed)
+        if (order.Status == OrderStatus.Completed)
         {
             throw new AppException("Order is already completed!");
         }
@@ -155,7 +156,7 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
 
             order.PayPalRefundId = refundResponse.Id;
             order.RefundDate = DateTime.UtcNow;
-            order.Status = Db.Entities.Order.OrderStatus.Refunded;
+            order.Status = OrderStatus.Refunded;
 
             await Context.SaveChangesAsync();
             
@@ -168,7 +169,7 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
         PaypalOrderResponse orderResponse)
     {
         order.OrderCreationDate = DateTime.UtcNow;
-        order.Status = Db.Entities.Order.OrderStatus.Pending;
+        order.Status = OrderStatus.Pending;
         order.ReferenceId = orderResponse.PurchaseUnits.First().ReferenceId;
         order.PayPalOrderId = orderResponse.Id;
         order.PayerId = user.Id;

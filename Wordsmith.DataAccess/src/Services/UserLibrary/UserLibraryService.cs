@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.Models.DataTransferObjects;
+using Wordsmith.Models.Enums;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects.UserLibrary;
 using Wordsmith.Models.SearchObjects;
@@ -60,7 +61,7 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
             if (order != null)
             {
                 if (order.EBookId != ebook.Id || order.PayerId != insert.UserId ||
-                    order.Status != Db.Entities.Order.OrderStatus.Completed)
+                    order.Status != OrderStatus.Completed)
                 {
                     throw new AppException("You have not purchased the ebook!");
                 }

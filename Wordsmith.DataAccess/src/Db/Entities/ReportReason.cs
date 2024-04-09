@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Wordsmith.Models.Enums;
 
 #pragma warning disable CA1825
 
@@ -15,6 +16,5 @@ public class ReportReason : IEntity
     [StringLength(100)]
     public string Reason { get; set; }
     
-    [StringLength(100)]
-    public string Subject { get; set; }
+    public ReportType Type { get; set; }
 }

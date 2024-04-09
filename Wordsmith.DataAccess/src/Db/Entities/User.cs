@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Wordsmith.Models.Enums;
+
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 #pragma warning disable CA1825
@@ -12,13 +14,6 @@ namespace Wordsmith.DataAccess.Db.Entities;
 [Index(nameof(Email), IsUnique = true)]
 public class User : IEntity
 {
-    public enum UserStatus
-    {
-        Active,
-        TemporarilyBanned,
-        Banned,
-    }
-    
     [Key] public int Id { get; set; }
     
     [StringLength(20)]

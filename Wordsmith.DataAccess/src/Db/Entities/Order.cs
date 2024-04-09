@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using Wordsmith.Models.Enums;
+
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
 namespace Wordsmith.DataAccess.Db.Entities;
@@ -9,13 +11,6 @@ namespace Wordsmith.DataAccess.Db.Entities;
 [Index(nameof(ReferenceId))]
 public class Order : IEntity
 {
-    public enum OrderStatus
-    {
-        Pending,
-        Completed,
-        Refunded
-    }
-    
     [Key] public int Id { get; set; }
     
     [StringLength(50)]

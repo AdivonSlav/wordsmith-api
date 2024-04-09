@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Db.ValueConverters;
+using Wordsmith.Models.Enums;
 
 namespace Wordsmith.DataAccess.Db;
 
@@ -41,13 +42,14 @@ public class DatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Order>().Property(e => e.Status)
-            .HasConversion(v => v.ToString(), v => (Order.OrderStatus)Enum.Parse(typeof(Order.OrderStatus), v));
-
+            .HasConversion(v => v.ToString(), v => Enum.Parse<OrderStatus>(v));
         modelBuilder.Entity<User>().Property(e => e.Status)
-            .HasConversion(v => v.ToString(), v => (User.UserStatus)Enum.Parse(typeof(User.UserStatus), v));
+            .HasConversion(v => v.ToString(), v => Enum.Parse<UserStatus>(v));
+        modelBuilder.Entity<ReportReason>().Property(e => e.Type)
+            .HasConversion(v => v.ToString(), v => Enum.Parse<ReportType>(v));
 
         modelBuilder.Entity<Comment>().Property(e => e.LikeCount).HasDefaultValue(0);
-        modelBuilder.Entity<User>().Property(e => e.Status).HasDefaultValue(User.UserStatus.Active);
+        modelBuilder.Entity<User>().Property(e => e.Status).HasDefaultValue(UserStatus.Active);
         
         base.OnModelCreating(modelBuilder);
     }

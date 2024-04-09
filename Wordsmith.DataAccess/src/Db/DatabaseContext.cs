@@ -51,8 +51,10 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<Comment>().Property(e => e.LikeCount).HasDefaultValue(0);
         modelBuilder.Entity<Comment>().Property(e => e.IsShown).HasDefaultValue(true);
         modelBuilder.Entity<User>().Property(e => e.Status).HasDefaultValue(UserStatus.Active);
+        modelBuilder.Entity<EBook>().Property(e => e.RatingAverage).HasDefaultValue(0.0);
         modelBuilder.Entity<UserLibrary>().Property(e => e.IsRead).HasDefaultValue(false);
         modelBuilder.Entity<UserLibrary>().Property(e => e.ReadProgress).HasDefaultValue("0%");
+        modelBuilder.Entity<UserLibrary>().Property(e => e.LastPage).HasDefaultValue(0);
         
         base.OnModelCreating(modelBuilder);
     }

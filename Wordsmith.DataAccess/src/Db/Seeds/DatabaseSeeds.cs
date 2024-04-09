@@ -28,6 +28,7 @@ public static class DatabaseSeeds
         await CreateUserReports(context);
         await CreateEbookReports(context);
         await CreateAppReports(context);
+        await CreateComments(context);
         
         await context.SaveChangesAsync();
         await CreateEbooks(context);
@@ -315,7 +316,7 @@ public static class DatabaseSeeds
 
         if (user == null)
         {
-            Logger.LogWarn("Seeded user account needed for user report seeding not found, skipping seeding");
+            Logger.LogWarn("Seeded user account needed for ebook report seeding not found, skipping seeding");
         }
 
         var reportDetails = await context.ReportDetails.AddAsync(new ReportDetails()
@@ -355,7 +356,7 @@ public static class DatabaseSeeds
 
         if (user == null)
         {
-            Logger.LogWarn("Seeded user account needed for user report seeding not found, skipping seeding");
+            Logger.LogWarn("Seeded user account needed for app report seeding not found, skipping seeding");
         }
 
         await context.AppReports.AddAsync(new AppReport()
@@ -370,6 +371,39 @@ public static class DatabaseSeeds
         });
         
         Logger.LogInfo("Seeded new app reports");
+    }
+
+    private static async Task CreateComments(DatabaseContext context)
+    {
+        if (await context.Comments.AnyAsync()) return;
+        
+        var author = await context.Users.FirstOrDefaultAsync(e => e.Username == DefaultAuthorUsername);
+        var user = await context.Users.FirstOrDefaultAsync(e => e.Username == DefaultUserUsername);
+        
+        if (author == null)
+        {
+            Logger.LogWarn("Seeded author account needed for comment seeding not found, skipping seeding");
+        }
+        
+        if (user == null)
+        {
+            Logger.LogWarn("Seeded user account needed for comment seeding not found, skipping seeding");
+        }
+
+        var ebooks = await context.EBooks.Where(e => e.AuthorId == author.Id).ToListAsync();
+
+        foreach (var ebook in ebooks)
+        {
+            await context.Comments.AddAsync(new Comment()
+            {
+                DateAdded = DateTime.UtcNow,
+                Content = "Great book! Highly recommended",
+                EBook = ebook,
+                User = user,
+            });
+        }
+        
+        Logger.LogInfo("Seeded new comments");
     }
     
     private static IEnumerable<string> GetMaturityRatings()

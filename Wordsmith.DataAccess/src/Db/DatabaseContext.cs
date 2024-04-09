@@ -49,6 +49,7 @@ public class DatabaseContext : DbContext
             .HasConversion(v => v.ToString(), v => Enum.Parse<ReportType>(v));
 
         modelBuilder.Entity<Comment>().Property(e => e.LikeCount).HasDefaultValue(0);
+        modelBuilder.Entity<Comment>().Property(e => e.IsShown).HasDefaultValue(true);
         modelBuilder.Entity<User>().Property(e => e.Status).HasDefaultValue(UserStatus.Active);
         
         base.OnModelCreating(modelBuilder);

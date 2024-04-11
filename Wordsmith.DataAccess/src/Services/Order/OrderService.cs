@@ -24,8 +24,10 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
 
     protected override async Task BeforeInsert(Db.Entities.Order entity, OrderInsertRequest insert, int userId)
     {
-        var user = await ValidateUser(insert);
-        var ebook = await ValidateEbook(insert);
+        await ValidateInsertion(insert);
+
+        var ebook = await Context.EBooks.FirstAsync(e => e.Id == insert.EbookId);
+        var user = await Context.Users.FirstAsync(e => e.Id == insert.UserId);
         
         var orderResponse = await _paypalService.CreateOrder(ebook.Price!.Value, ebook.Title, $"Ebook published by {user.Username}");
         MapNewOrderEntity(entity, user, ebook, orderResponse);
@@ -53,43 +55,35 @@ public class OrderService : WriteService<OrderDto, Db.Entities.Order, OrderSearc
         };
     }
     
-    private async Task<Db.Entities.EBook> ValidateEbook(OrderInsertRequest request)
+    private async Task ValidateInsertion(OrderInsertRequest request)
     {
         var ebook = await Context.EBooks.Include(e => e.Author).FirstOrDefaultAsync(e => e.Id == request.EbookId);
+        var user = await Context.Users.FindAsync(request.UserId);
         
         if (ebook == null)
         {
             throw new AppException("Ebook does not exist!");
         }
-
-        if (await Context.UserBans.AnyAsync(e => e.UserId == ebook.AuthorId))
+        
+        if (ebook.Author.Status != UserStatus.Active)
         {
-            throw new AppException("You cannot buy this ebook as the author has been banned!");
+            throw new AppException("Cannot purchase this ebook as the author has been banned!");
         }
-
-        if (!ebook.Price.HasValue)
-        {
-            throw new AppException("Ebook is free. Cannot create an order for it");
-        }
-
-        return ebook;
-    }
-
-    private async Task<Db.Entities.User> ValidateUser(OrderInsertRequest request)
-    {
-        var user = await Context.Users.FindAsync(request.UserId);
         
         if (user == null)
         {
             throw new AppException("User does not exist!");
         }
-
+        
         if (await Context.UserLibraries.AnyAsync(e => e.UserId == request.UserId && e.EBookId == request.EbookId))
         {
             throw new AppException("User already owns the requested ebook!");
         }
-
-        return user;
+        
+        if (!ebook.Price.HasValue)
+        {
+            throw new AppException("Ebook is free. Cannot create an order for it");
+        }
     }
 
     private async Task<Db.Entities.Order> ValidateOrder(int id)

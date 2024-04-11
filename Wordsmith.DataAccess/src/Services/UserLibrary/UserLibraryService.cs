@@ -32,14 +32,14 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
 
     private async Task ValidateInsertion(UserLibraryInsertRequest insert)
     {
-        var ebook = await Context.EBooks.FindAsync(insert.EBookId);
+        var ebook = await Context.EBooks.Include(e => e.Author).FirstOrDefaultAsync(e => e.Id == insert.EBookId);
         
         if (ebook == null)
         {
             throw new AppException("The ebook does not exist");
         }
 
-        if (await Context.UserBans.AnyAsync(e => e.UserId == ebook.AuthorId))
+        if (ebook.Author.Status != UserStatus.Active)
         {
             throw new AppException("You cannot add this ebook to your library as the author has been banned!");
         }

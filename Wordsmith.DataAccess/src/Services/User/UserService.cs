@@ -156,7 +156,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
         if (!response.Succeeded)
         {
-            throw new AppException($"Could not change access for user {entity.Username}!",
+            throw new AppException(response.Errors.First(),
                 new Dictionary<string, object>()
                 {
                     { "reason", response.Errors }

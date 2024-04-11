@@ -91,7 +91,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         login.Username = Base64Helper.DecodeFromBase64(login.Username);
         login.Password = Base64Helper.DecodeFromBase64(login.Password);
         
-        var entity = await Context.Users.FirstOrDefaultAsync(user => user.Username == login.Username);
+        var entity = await Context.Users.Include(e => e.ProfileImage).FirstOrDefaultAsync(user => user.Username == login.Username);
 
         if (entity == null)
         {
@@ -419,7 +419,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
 
     private async Task<Db.Entities.User> UserExists(int userId)
     {
-        var user = await Context.Users.FindAsync(userId);
+        var user = await Context.Users.Include(e => e.ProfileImage).FirstOrDefaultAsync(e => e.Id == userId);
 
         if (user == null)
         {

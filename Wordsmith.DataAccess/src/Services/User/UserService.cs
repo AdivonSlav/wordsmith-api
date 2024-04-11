@@ -130,8 +130,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
     {
         var entity = await UserExists(userId);
 
-        if (request.Username != null) await ValidateUsername(request.Username);
-        if (request.Email != null) await ValidateEmail(request.Email);
+        await ValidateUpdateProfile(entity, request);
 
         Mapper.Map(request, entity);
 
@@ -489,5 +488,24 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             .Where(e => e.AuthorId == authorId)
             .ExecuteUpdateAsync(setters =>
                 setters.SetProperty(e => e.IsHidden, false).SetProperty(e => e.HiddenDate, (DateTime?)null));
+    }
+
+    private async Task ValidateUpdateProfile(Db.Entities.User user, UserUpdateRequest request)
+    {
+        if (request.Email != user.Email)
+        {
+            if (await Context.Users.AnyAsync(e => e.Id != user.Id && e.Email == request.Email))
+            {
+                throw new AppException("Email is taken!");
+            }
+        }
+
+        if (request.Username != user.Username)
+        {
+            if (await Context.Users.AnyAsync(e => e.Id != user.Id && e.Username == request.Username))
+            {
+                throw new AppException("Username is taken");
+            }
+        }
     }
 }

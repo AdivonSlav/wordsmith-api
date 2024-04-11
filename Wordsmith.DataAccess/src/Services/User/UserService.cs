@@ -185,7 +185,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return result;
     }
 
-    public async Task<EntityResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, int userId)
+    public async Task<EntityResult<UserDto>> UpdateProfileImage(ImageInsertRequest update, int userId)
     {
         var entity = await UserExists(userId);
         
@@ -198,7 +198,6 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             ImageHelper.DeleteImage(entity.ProfileImage.Path);
         }
         
-        ImageDto updatedImage;
         var savePath = Path.Combine("images", "users",
             $"{entity.Username}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.{update.Format}");
         var result = ImageHelper.SaveFromBase64(update.EncodedImage, update.Format, savePath);
@@ -208,7 +207,6 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             entity.ProfileImage.Format = result.Format;
             entity.ProfileImage.Path = result.Path;
             entity.ProfileImage.Size = result.Size;
-            updatedImage = Mapper.Map<ImageDto>(entity.ProfileImage);
         }
         else
         {
@@ -221,15 +219,14 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
             
             await Context.Images.AddAsync(newImageEntity);
             entity.ProfileImage = newImageEntity;
-            updatedImage = Mapper.Map<ImageDto>(entity.ProfileImage);
         }
         
         await Context.SaveChangesAsync();
 
-        return new EntityResult<ImageDto>()
+        return new EntityResult<UserDto>()
         {
             Message = "Updated profile image",
-            Result = updatedImage
+            Result = Mapper.Map<UserDto>(entity),
         };
     }
 

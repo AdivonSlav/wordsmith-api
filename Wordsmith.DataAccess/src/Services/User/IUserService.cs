@@ -11,7 +11,7 @@ public interface IUserService : IWriteService<UserDto, Db.Entities.User, SearchO
     public Task<EntityResult<UserLoginDto>> Login(UserLoginRequest login);
     public Task<EntityResult<UserDto>> UpdateProfile(UserUpdateRequest update, int userId);
     public Task<QueryResult<ImageDto>> GetProfileImage(int userId);
-    public Task<EntityResult<ImageDto>> UpdateProfileImage(ImageInsertRequest update, int userId); 
+    public Task<EntityResult<UserDto>> UpdateProfileImage(ImageInsertRequest update, int userId); 
     public Task<QueryResult<UserLoginDto>> Refresh(string? bearerToken, int userId);
     public Task<QueryResult<UserLoginDto>> VerifyLogin(string? bearerToken,
         int userId);

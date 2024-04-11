@@ -62,7 +62,7 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
     [SwaggerOperation("Updates the profile image of the user from the provided bearer token")]
     [Authorize("All")]
     [HttpPut("profile/image")]
-    public async Task<ActionResult<ImageDto>> UpdateProfileImage([FromBody] ImageInsertRequest update)
+    public async Task<ActionResult<EntityResult<UserDto>>> UpdateProfileImage([FromBody] ImageInsertRequest update)
     {
         var userId = GetAuthUserId();
         var result = await ((WriteService as IUserService)!).UpdateProfileImage(update, userId);

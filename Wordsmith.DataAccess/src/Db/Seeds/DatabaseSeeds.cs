@@ -25,11 +25,15 @@ public static class DatabaseSeeds
         await CreateMaturityRatings(context);
         await CreateGenres(context);
         await CreateReportReasons(context);
+        await context.SaveChangesAsync();
+        
         await CreateUserReports(context);
         await CreateAppReports(context);
         await context.SaveChangesAsync();
         
         await CreateEbooks(context);
+        await context.SaveChangesAsync();
+        
         await CreateComments(context);
         await CreateEbookReports(context);
         await CreateUserLibraries(context);

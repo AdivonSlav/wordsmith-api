@@ -24,12 +24,18 @@ jobs:
 
     - name: Restore dependencies (IdentityServer)
       run: dotnet restore Wordsmith.IdentityServer/Wordsmith.IdentityServer.csproj
+
+    - name: Restore dependencies (CommunicationsRelay)
+      run: dotnet restore Wordsmith.CommunicationsRelay/Wordsmith.CommunicationsRelay.csproj
       
     - name: Build (API)
       run: dotnet build --no-restore Wordsmith.API/Wordsmith.API.csproj
 
     - name: Build (IdentityServer)
       run: dotnet build --no-restore Wordsmith.IdentityServer/Wordsmith.IdentityServer.csproj
+      
+    - name: Build (CommunicationsRelay)
+      run: dotnet build --no-restore Wordsmith.CommunicationsRelay/Wordsmith.CommunicationsRelay.csproj
 
   qodana:
     runs-on: ubuntu-latest

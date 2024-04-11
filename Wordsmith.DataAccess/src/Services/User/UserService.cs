@@ -80,6 +80,12 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
         return Task.CompletedTask;
     }
 
+    protected override IQueryable<Db.Entities.User> AddInclude(IQueryable<Db.Entities.User> query, int userId)
+    {
+        query = query.Include(e => e.ProfileImage);
+        return query;
+    }
+
     public async Task<EntityResult<UserLoginDto>> Login(UserLoginRequest login)
     {
         login.Username = Base64Helper.DecodeFromBase64(login.Username);

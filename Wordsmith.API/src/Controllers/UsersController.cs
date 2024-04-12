@@ -105,4 +105,13 @@ public class UsersController : WriteController<UserDto, User, UserSearchObject, 
         var result = await ((WriteService as IUserService)!).ChangeAccess(userId, changeAccess, adminId);
         return Ok(result);
     }
+
+    [SwaggerOperation("Get user statistics for profile display purposes")]
+    [Authorize("All")]
+    [HttpGet("{userId:int}/statistics")]
+    public async Task<ActionResult<QueryResult<UserStatisticsDto>>> GetUserStatistics(int userId)
+    {
+        var result = await ((WriteService as IUserService)!.GetUserStatistics(userId));
+        return Ok(result);
+    }
 }

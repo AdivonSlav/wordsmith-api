@@ -411,6 +411,22 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
         };
     }
 
+    public async Task<QueryResult<UserStatisticsDto>> GetUserStatistics(int userId)
+    {
+        var user = await UserExists(userId);
+
+        var userStatistics = new UserStatisticsDto()
+        {
+            PublishedBooksCount = await Context.EBooks.CountAsync(e => e.AuthorId == user.Id),
+            FavoriteBooksCount = await Context.FavoriteEBooks.CountAsync(e => e.UserId == user.Id)
+        };
+
+        return new QueryResult<UserStatisticsDto>()
+        {
+            Result = new List<UserStatisticsDto>() { userStatistics },
+        };
+    }
+
     private async Task ValidateUsername(string username)
     {
         if (await Context.Users.AnyAsync(u => u.Username == username))

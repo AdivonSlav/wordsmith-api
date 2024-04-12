@@ -6,7 +6,7 @@ using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.DataAccess.Services.User;
 
-public interface IUserService : IWriteService<UserDto, Db.Entities.User, SearchObject, UserInsertRequest, UserUpdateRequest>
+public interface IUserService : IWriteService<UserDto, Db.Entities.User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
 {
     public Task<EntityResult<UserLoginDto>> Login(UserLoginRequest login);
     public Task<EntityResult<UserDto>> UpdateProfile(UserUpdateRequest update, int userId);

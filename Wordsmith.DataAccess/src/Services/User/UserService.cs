@@ -18,7 +18,7 @@ using Wordsmith.Utils.RabbitMQ;
 
 namespace Wordsmith.DataAccess.Services.User;
 
-public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject, UserInsertRequest, UserUpdateRequest>, IUserService
+public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObject, UserInsertRequest, UserUpdateRequest>, IUserService
 {
     private readonly IMessageProducer _messageProducer;
     private readonly IMessageListener _messageListener;
@@ -83,6 +83,16 @@ public class UserService : WriteService<UserDto, Db.Entities.User, SearchObject,
     protected override IQueryable<Db.Entities.User> AddInclude(IQueryable<Db.Entities.User> query, int userId)
     {
         query = query.Include(e => e.ProfileImage);
+        return query;
+    }
+
+    protected override IQueryable<Db.Entities.User> AddFilter(IQueryable<Db.Entities.User> query, UserSearchObject search, int userId)
+    {
+        if (search.Username != null)
+        {
+            query = query.Where(e => e.Username.Contains(search.Username, StringComparison.OrdinalIgnoreCase));
+        }
+
         return query;
     }
 

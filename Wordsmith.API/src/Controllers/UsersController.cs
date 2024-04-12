@@ -12,7 +12,7 @@ namespace Wordsmith.API.Controllers;
 
 [ApiController]
 [Route("users")]
-public class UsersController : WriteController<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>
+public class UsersController : WriteController<UserDto, User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
 {
     public UsersController(IUserService userService)
         : base(userService) { }

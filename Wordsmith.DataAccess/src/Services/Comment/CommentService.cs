@@ -25,6 +25,9 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
         await ValidateInsertion(entity, insert);
         entity.DateAdded = DateTime.UtcNow;
         entity.IsShown = true;
+        await Context.Entry(entity).Reference(e => e.EBookChapter).LoadAsync();
+        await Context.Entry(entity).Reference(e => e.User).LoadAsync();
+        await Context.Entry(entity.User).Reference(e => e.ProfileImage).LoadAsync();
     }
     
     protected override Task BeforeDeletion(int userId, Db.Entities.Comment entity)
@@ -62,7 +65,10 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
 
     protected override IQueryable<Db.Entities.Comment> AddInclude(IQueryable<Db.Entities.Comment> query, int userId)
     {
-        query = query.Include(e => e.User).Include(e => e.EBookChapter);
+        query = query
+            .Include(e => e.User)
+            .ThenInclude(e => e.ProfileImage)
+            .Include(e => e.EBookChapter);
 
         return query;
     }
@@ -80,6 +86,7 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
 
         var comment = await Context.Comments
             .Include(e => e.User)
+            .ThenInclude(e => e.ProfileImage)
             .Include(e => e.EBookChapter)
             .FirstAsync(e => e.Id == id);
         var newCommentLike = new CommentLike()
@@ -109,6 +116,7 @@ public class CommentService : WriteService<CommentDto, Db.Entities.Comment, Comm
 
         var comment = await Context.Comments
             .Include(e => e.User)
+            .ThenInclude(e => e.ProfileImage)
             .Include(e => e.EBookChapter)
             .FirstAsync(e => e.Id == id);
         var like = await Context.CommentLikes.FirstAsync(e => e.CommentId == id && e.UserId == userId);

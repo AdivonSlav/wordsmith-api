@@ -55,6 +55,7 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<UserLibrary>().Property(e => e.IsRead).HasDefaultValue(false);
         modelBuilder.Entity<UserLibrary>().Property(e => e.ReadProgress).HasDefaultValue("0%");
         modelBuilder.Entity<UserLibrary>().Property(e => e.LastPage).HasDefaultValue(0);
+        modelBuilder.Entity<AppReport>().Property(e => e.IsClosed).HasDefaultValue(false);
         
         base.OnModelCreating(modelBuilder);
     }

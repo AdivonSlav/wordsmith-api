@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Services.AppReport;
 using Wordsmith.DataAccess.Services.Comment;
 using Wordsmith.DataAccess.Services.EBook;
 using Wordsmith.DataAccess.Services.EBookChapter;
@@ -75,6 +76,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<IEBookRatingService, EBookRatingService>();
         services.AddTransient<ICommentService, CommentService>();
         services.AddTransient<IEBookChapterService, EBookChapterService>();
+        services.AddTransient<IAppReportService, AppReportService>();
 
         services.AddScoped<IProfanityDetector, ProfanityDetector>();
         services.AddScoped<IMessageProducer, MessageProducer>();

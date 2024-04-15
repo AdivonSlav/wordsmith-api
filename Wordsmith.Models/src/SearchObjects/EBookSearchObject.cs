@@ -12,4 +12,7 @@ public class EBookSearchObject : SearchObject
     
     [SwaggerParameter("Maturity rating of the ebook")]
     public int? MaturityRatingId { get; set; }
+    
+    [SwaggerParameter("The ID of the book's author")]
+    public int? AuthorId { get; set; }
 }

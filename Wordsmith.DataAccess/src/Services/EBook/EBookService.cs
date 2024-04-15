@@ -65,6 +65,11 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
             query = query.Where(e => e.MaturityRatingId == search.MaturityRatingId.Value);
         }
 
+        if (search.AuthorId.HasValue)
+        {
+            query = query.Where(e => e.AuthorId == search.AuthorId.Value);
+        }
+
         return query;
     }
 

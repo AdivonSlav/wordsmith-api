@@ -12,7 +12,7 @@ namespace Wordsmith.API.Controllers;
 
 [ApiController]
 [Route("users")]
-public class UsersController : WriteController<UserDto, User, SearchObject, UserInsertRequest, UserUpdateRequest>
+public class UsersController : WriteController<UserDto, User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
 {
     public UsersController(IUserService userService)
         : base(userService) { }
@@ -103,6 +103,15 @@ public class UsersController : WriteController<UserDto, User, SearchObject, User
     {
         var adminId = GetAuthUserId();
         var result = await ((WriteService as IUserService)!).ChangeAccess(userId, changeAccess, adminId);
+        return Ok(result);
+    }
+
+    [SwaggerOperation("Get user statistics for profile display purposes")]
+    [Authorize("All")]
+    [HttpGet("{userId:int}/statistics")]
+    public async Task<ActionResult<QueryResult<UserStatisticsDto>>> GetUserStatistics(int userId)
+    {
+        var result = await ((WriteService as IUserService)!.GetUserStatistics(userId));
         return Ok(result);
     }
 }

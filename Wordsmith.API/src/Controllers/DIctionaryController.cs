@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Wordsmith.Integration.MerriamWebster;
@@ -18,6 +19,7 @@ public class DictionaryController
     }
 
     [SwaggerOperation("Return dictionary entries for a given search term")]
+    [Authorize("All")]
     [HttpGet]
     public async Task<ActionResult<QueryResult<DictionaryResponse>>> GetDefinition([FromQuery] string searchTerm)
     {

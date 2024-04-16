@@ -33,8 +33,6 @@ public class MerriamWebsterService : IMerriamWebsterService
 
         foreach (var entry in model.Entries)
         {
-            if (entry.Homograph == null) continue;
-            
             var headword = new DictionaryHeadword()
             {
                 Text = entry.Headword.Text
@@ -56,7 +54,7 @@ public class MerriamWebsterService : IMerriamWebsterService
             
             response.Entries.Add(new DictionaryEntry()
             {
-                Homograph = entry.Homograph.Value,
+                Homograph = entry.Homograph,
                 Date = entry.Date?.Text,
                 FunctionalLabel = entry.FunctionalLabel?.Text,
                 Headword = headword,

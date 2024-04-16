@@ -2,7 +2,7 @@ namespace Wordsmith.Integration.MerriamWebster.Models;
 
 public class DictionaryEntry
 {
-    public int Homograph { get; set; }
+    public int? Homograph { get; set; }
     
     public string? Date { get; set; }
 

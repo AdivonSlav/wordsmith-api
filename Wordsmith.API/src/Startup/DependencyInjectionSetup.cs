@@ -1,4 +1,5 @@
 using System.Reflection;
+using MerriamWebster.NET;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,6 +20,7 @@ using Wordsmith.DataAccess.Services.User;
 using Wordsmith.DataAccess.Services.UserLibrary;
 using Wordsmith.DataAccess.Services.UserLibraryCategory;
 using Wordsmith.DataAccess.Services.UserReport;
+using Wordsmith.Integration.MerriamWebster;
 using Wordsmith.Integration.Paypal;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.ProfanityDetector;
@@ -78,6 +80,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<IEBookChapterService, EBookChapterService>();
         services.AddTransient<IAppReportService, AppReportService>();
 
+        services.AddScoped<IMerriamWebsterService, MerriamWebsterService>();
         services.AddScoped<IProfanityDetector, ProfanityDetector>();
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();
@@ -107,7 +110,10 @@ public static class DependencyInjectionSetup
 
             return new PaypalService(clientId, clientSecret, clientFactory!);
         });
-
+        
+        // Registers the MerriamWebster.NET package for DI
+        services.RegisterMerriamWebster(configuration.GetSection("MerriamWebster").Get<MerriamWebsterConfig>());
+        
         // Registers the HttpClientFactory to be used for managing client instances
         services.AddHttpClient();
 

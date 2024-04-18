@@ -39,6 +39,8 @@ services:
       - WORDSMITH_Connection__RabbitMQ__Password=wordsmith_user
       - WORDSMITH_PayPalClientId=<SET HERE>
       - WORDSMITH_PayPalClientSecret=<SET HERE>
+      - WORDSMITH_MerriamWebster__ApiKey=<SET HERE>
+      - WORDSMITH_GoogleCloud__ApiKey=<SET HERE>
     networks:
       - wordsmith
     volumes:

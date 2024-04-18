@@ -1,6 +1,9 @@
+using System.Net;
+using Google;
 using Google.Cloud.Translation.V2;
 using Microsoft.Extensions.Options;
 using Wordsmith.Integration.GoogleTranslate.Models;
+using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.SearchObjects;
 using Language = Wordsmith.Integration.GoogleTranslate.Models.Language;
 
@@ -14,24 +17,62 @@ public class GoogleTranslateService : IGoogleTranslateService
     {
         _config = config.Value; 
     }
-    
+
+    public async Task<QueryResult<TranslationResponse>> Translate(TranslationRequest request)
+    {
+        try
+        {
+            var client = TranslationClient.CreateFromApiKey(_config.ApiKey);
+            var translation = await client.TranslateTextAsync(request.Text, request.TargetLanguageCode, request.SourceLanguageCode);
+
+            var translationResponse = new TranslationResponse()
+            {
+                OriginalLanguageCode = translation.DetectedSourceLanguage,
+                OriginalText = translation.OriginalText,
+                TranslatedLanguageCode = translation.TargetLanguage,
+                Translation = translation.TranslatedText
+            };
+
+            return new QueryResult<TranslationResponse>()
+            {
+                Result = new List<TranslationResponse>() { translationResponse }
+            };
+            
+        } catch (GoogleApiException e)
+        {
+            throw HandleGoogleException(e);
+        }
+    }
+
     public async Task<QueryResult<SupportedLanguages>> GetSupportedLanguages()
     {
-        var client = TranslationClient.CreateFromApiKey(_config.ApiKey);
-        var languages = await client.ListLanguagesAsync("en");
-
-        var supportedLanguages = new SupportedLanguages()
+        try
         {
-            Languages = languages.Select(e => new Language()
+            var client = TranslationClient.CreateFromApiKey(_config.ApiKey);
+            var languages = await client.ListLanguagesAsync("en");
+
+            var supportedLanguages = new SupportedLanguages()
             {
-                Name = e.Name,
-                LanguageCode = e.Code
-            })
-        };
+                Languages = languages.Select(e => new Language()
+                {
+                    Name = e.Name,
+                    LanguageCode = e.Code
+                })
+            };
 
-        return new QueryResult<SupportedLanguages>()
+            return new QueryResult<SupportedLanguages>()
+            {
+                Result = new List<SupportedLanguages>() { supportedLanguages }
+            };
+        }
+        catch (GoogleApiException e)
         {
-            Result = new List<SupportedLanguages>() { supportedLanguages } 
-        };
+            throw HandleGoogleException(e);
+        }
+    }
+
+    private static Exception HandleGoogleException(GoogleApiException e)
+    {
+        return e.HttpStatusCode >= HttpStatusCode.InternalServerError ? new Exception(e.Message) : new AppException(e.Message);
     }
 }

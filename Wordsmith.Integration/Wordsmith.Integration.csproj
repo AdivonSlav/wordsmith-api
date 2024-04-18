@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Google.Cloud.Translation.V2" Version="3.4.0" />
       <PackageReference Include="MerriamWebster.NET" Version="3.1.1" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
       <PackageReference Include="System.Net.Http" Version="4.3.4" />

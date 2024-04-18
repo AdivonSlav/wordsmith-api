@@ -20,6 +20,7 @@ using Wordsmith.DataAccess.Services.User;
 using Wordsmith.DataAccess.Services.UserLibrary;
 using Wordsmith.DataAccess.Services.UserLibraryCategory;
 using Wordsmith.DataAccess.Services.UserReport;
+using Wordsmith.Integration.GoogleTranslate;
 using Wordsmith.Integration.MerriamWebster;
 using Wordsmith.Integration.Paypal;
 using Wordsmith.Utils.LoginClient;
@@ -64,6 +65,8 @@ public static class DependencyInjectionSetup
     public static IServiceCollection RegisterStandardServices(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.Configure<GoogleTranslateConfig>(configuration.GetSection("GoogleCloud"));
+        
         services.AddTransient<GlobalExceptionHandler>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IReportReasonService, ReportReasonService>();
@@ -80,6 +83,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<IEBookChapterService, EBookChapterService>();
         services.AddTransient<IAppReportService, AppReportService>();
 
+        services.AddScoped<IGoogleTranslateService, GoogleTranslateService>();
         services.AddScoped<IMerriamWebsterService, MerriamWebsterService>();
         services.AddScoped<IProfanityDetector, ProfanityDetector>();
         services.AddScoped<IMessageProducer, MessageProducer>();

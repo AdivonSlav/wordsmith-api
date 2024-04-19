@@ -16,5 +16,5 @@ public interface IGoogleTranslateService
     /// Gets the supported languages for translation
     /// </summary>
     /// <returns>The supported languages response</returns>
-    Task<QueryResult<SupportedLanguages>> GetSupportedLanguages();
+    Task<QueryResult<Language>> GetSupportedLanguages();
 }

@@ -21,7 +21,7 @@ public class TranslationsController
     [SwaggerOperation("Get supported translation languages")]
     [Authorize("All")]
     [HttpGet("languages")]
-    public async Task<ActionResult<QueryResult<SupportedLanguages>>> GetSupportedLanguages()
+    public async Task<ActionResult<QueryResult<Language>>> GetSupportedLanguages()
     {
         return await _translateService.GetSupportedLanguages();
     }

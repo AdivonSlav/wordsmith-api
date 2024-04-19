@@ -44,25 +44,22 @@ public class GoogleTranslateService : IGoogleTranslateService
         }
     }
 
-    public async Task<QueryResult<SupportedLanguages>> GetSupportedLanguages()
+    public async Task<QueryResult<Language>> GetSupportedLanguages()
     {
         try
         {
             var client = TranslationClient.CreateFromApiKey(_config.ApiKey);
             var languages = await client.ListLanguagesAsync("en");
 
-            var supportedLanguages = new SupportedLanguages()
+            var supportedLanguages = languages.Select(e => new Language()
             {
-                Languages = languages.Select(e => new Language()
-                {
-                    Name = e.Name,
-                    LanguageCode = e.Code
-                })
-            };
+                Name = e.Name,
+                LanguageCode = e.Code
+            }).ToList();
 
-            return new QueryResult<SupportedLanguages>()
+            return new QueryResult<Language>()
             {
-                Result = new List<SupportedLanguages>() { supportedLanguages }
+                Result = supportedLanguages
             };
         }
         catch (GoogleApiException e)

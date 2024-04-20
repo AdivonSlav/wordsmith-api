@@ -27,7 +27,7 @@ public class GoogleTranslateService : IGoogleTranslateService
 
             var translationResponse = new TranslationResponse()
             {
-                OriginalLanguageCode = translation.DetectedSourceLanguage,
+                OriginalLanguageCode = request.SourceLanguageCode != null ? translation.SpecifiedSourceLanguage : translation.DetectedSourceLanguage,
                 OriginalText = translation.OriginalText,
                 TranslatedLanguageCode = translation.TargetLanguage,
                 Translation = translation.TranslatedText

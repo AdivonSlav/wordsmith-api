@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wordsmith.DataAccess.Db;
 
@@ -10,9 +11,11 @@ using Wordsmith.DataAccess.Db;
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240420192020_V25")]
+    partial class V25
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -438,7 +441,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<DateTime>("DateAdded")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("EBookId")
+                    b.Property<int>("EBookChapterId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
@@ -446,7 +449,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EBookId");
+                    b.HasIndex("EBookChapterId");
 
                     b.HasIndex("UserId");
 
@@ -967,9 +970,9 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.Note", b =>
                 {
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
+                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBookChapter", "Chapter")
                         .WithMany()
-                        .HasForeignKey("EBookId")
+                        .HasForeignKey("EBookChapterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -979,7 +982,7 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EBook");
+                    b.Navigation("Chapter");
 
                     b.Navigation("User");
                 });

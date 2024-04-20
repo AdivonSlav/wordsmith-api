@@ -14,6 +14,7 @@ using Wordsmith.DataAccess.Services.EBookRating;
 using Wordsmith.DataAccess.Services.EBookReport;
 using Wordsmith.DataAccess.Services.Genre;
 using Wordsmith.DataAccess.Services.MaturityRating;
+using Wordsmith.DataAccess.Services.Note;
 using Wordsmith.DataAccess.Services.Order;
 using Wordsmith.DataAccess.Services.ReportReason;
 using Wordsmith.DataAccess.Services.User;
@@ -82,6 +83,7 @@ public static class DependencyInjectionSetup
         services.AddTransient<ICommentService, CommentService>();
         services.AddTransient<IEBookChapterService, EBookChapterService>();
         services.AddTransient<IAppReportService, AppReportService>();
+        services.AddTransient<INoteService, NoteService>();
 
         services.AddScoped<IGoogleTranslateService, GoogleTranslateService>();
         services.AddScoped<IMerriamWebsterService, MerriamWebsterService>();

@@ -10,7 +10,10 @@ public class Note : IEntity
     [Key] public int Id { get; set; }
     
     [StringLength(1000)]
-    public string Cfi { get; set; }    
+    public string Cfi { get; set; }
+    
+    [StringLength(1000)]
+    public string ReferencedText;
     
     [StringLength(400)]
     public string Content { get; set; }

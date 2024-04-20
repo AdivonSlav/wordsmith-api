@@ -13,7 +13,7 @@ public class Note : IEntity
     public string Cfi { get; set; }
     
     [StringLength(1000)]
-    public string ReferencedText;
+    public string ReferencedText { get; set; }
     
     [StringLength(400)]
     public string Content { get; set; }

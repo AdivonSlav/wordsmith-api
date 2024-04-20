@@ -11,7 +11,7 @@ using Wordsmith.DataAccess.Db;
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240420202513_V27")]
+    [Migration("20240420205757_V27")]
     partial class V27
     {
         /// <inheritdoc />
@@ -443,6 +443,10 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
 
                     b.Property<int>("EBookId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ReferencedText")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

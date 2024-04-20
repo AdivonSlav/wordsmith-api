@@ -441,6 +441,10 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.Property<int>("EBookId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ReferencedText")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 

@@ -32,6 +32,7 @@ public class NoteService : WriteService<NoteDto, Db.Entities.Note, NoteSearchObj
     protected override async Task BeforeInsert(Db.Entities.Note entity, NoteInsertRequest insert, int userId)
     {
         await ValidateInsertion(insert);
+        entity.DateAdded = DateTime.UtcNow;
     }
     
     private async Task ValidateInsertion(NoteInsertRequest request)

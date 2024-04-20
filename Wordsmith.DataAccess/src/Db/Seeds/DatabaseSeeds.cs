@@ -383,11 +383,13 @@ public static class DatabaseSeeds
         await context.AppReports.AddAsync(new AppReport()
         {
             Content = "I want to be able to use other payment methods and not just PayPal!",
+            SubmissionDate = DateTime.UtcNow,
             User = user,
         });
         await context.AppReports.AddAsync(new AppReport()
         {
             Content = "The built-in app reader is very laggy!",
+            SubmissionDate = DateTime.UtcNow,
             User = user,
         });
         

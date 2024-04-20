@@ -1,10 +1,12 @@
 using System.Reflection;
+using MerriamWebster.NET;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Wordsmith.API.Middleware;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Services.AppReport;
 using Wordsmith.DataAccess.Services.Comment;
 using Wordsmith.DataAccess.Services.EBook;
 using Wordsmith.DataAccess.Services.EBookChapter;
@@ -18,6 +20,8 @@ using Wordsmith.DataAccess.Services.User;
 using Wordsmith.DataAccess.Services.UserLibrary;
 using Wordsmith.DataAccess.Services.UserLibraryCategory;
 using Wordsmith.DataAccess.Services.UserReport;
+using Wordsmith.Integration.GoogleTranslate;
+using Wordsmith.Integration.MerriamWebster;
 using Wordsmith.Integration.Paypal;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.ProfanityDetector;
@@ -61,6 +65,8 @@ public static class DependencyInjectionSetup
     public static IServiceCollection RegisterStandardServices(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.Configure<GoogleTranslateConfig>(configuration.GetSection("GoogleCloud"));
+        
         services.AddTransient<GlobalExceptionHandler>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IReportReasonService, ReportReasonService>();
@@ -75,7 +81,10 @@ public static class DependencyInjectionSetup
         services.AddTransient<IEBookRatingService, EBookRatingService>();
         services.AddTransient<ICommentService, CommentService>();
         services.AddTransient<IEBookChapterService, EBookChapterService>();
+        services.AddTransient<IAppReportService, AppReportService>();
 
+        services.AddScoped<IGoogleTranslateService, GoogleTranslateService>();
+        services.AddScoped<IMerriamWebsterService, MerriamWebsterService>();
         services.AddScoped<IProfanityDetector, ProfanityDetector>();
         services.AddScoped<IMessageProducer, MessageProducer>();
         services.AddScoped<IMessageListener, MessageListener>();
@@ -105,7 +114,10 @@ public static class DependencyInjectionSetup
 
             return new PaypalService(clientId, clientSecret, clientFactory!);
         });
-
+        
+        // Registers the MerriamWebster.NET package for DI
+        services.RegisterMerriamWebster(configuration.GetSection("MerriamWebster").Get<MerriamWebsterConfig>());
+        
         // Registers the HttpClientFactory to be used for managing client instances
         services.AddHttpClient();
 

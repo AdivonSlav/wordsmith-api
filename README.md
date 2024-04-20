@@ -31,7 +31,7 @@ Afterwards, you need to open [compose.yml](compose.yml) and set any required env
 
 If you are running this outside of a Docker container, check for the env vars in appsettings.json.
 
-For info regarding all the available environment variables, see [.env.example](.env.example).
+For info regarding all the available environment variables, see [.environment.vars](.environment.vars).
 
 ### Credentials
 ```bash

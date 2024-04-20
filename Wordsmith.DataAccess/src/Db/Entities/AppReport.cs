@@ -13,6 +13,8 @@ public class AppReport : IEntity
 
     [StringLength(400)]
     public string Content { get; set; }
+    
+    public DateTime SubmissionDate { get; set; }
 
     public bool IsClosed { get; set; }
 

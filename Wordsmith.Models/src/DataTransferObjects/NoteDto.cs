@@ -10,6 +10,9 @@ public class NoteDto
     [SwaggerSchema("The exact section of the EPUB that the note refers to")]
     public string Cfi { get; set; }
     
+    [SwaggerSchema("The text of the ebook that the note refers to")]
+    public string ReferencedText { get; set; }
+    
     [SwaggerSchema("Content of the note")]
     public string Content { get; set; }
     

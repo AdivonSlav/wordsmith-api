@@ -17,4 +17,6 @@ public class NoteInsertRequest
     [SwaggerSchema("The exact section of the EPUB that the note refers to")]
     [Required]
     public string Cfi { get; set; }
+    
+    public int UserId { get; set; }
 }

@@ -65,7 +65,12 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
             }
         }
     }
-
+    
+    protected override async Task BeforeDeletion(int userId, Db.Entities.UserLibrary entity)
+    {
+        await ValidateDeletion(userId, entity);
+    }
+    
     protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query,
         int userId)
     {
@@ -107,5 +112,15 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         }
 
         return query;
+    }
+    
+    private Task ValidateDeletion(int userId, Db.Entities.UserLibrary entity)
+    {
+        if (entity.EBook.AuthorId == userId)
+        {
+            throw new AppException("You cannot remove a book you published from your library!");
+        }
+        
+        return Task.CompletedTask;
     }
 }

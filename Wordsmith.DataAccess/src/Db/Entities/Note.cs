@@ -9,22 +9,22 @@ public class Note : IEntity
 {
     [Key] public int Id { get; set; }
     
-    public int Page { get; set; }
+    [StringLength(1000)]
+    public string Cfi { get; set; }
     
-    public int CharBegin { get; set; }
-    
-    public int CharEnd { get; set; }
+    [StringLength(1000)]
+    public string ReferencedText { get; set; }
     
     [StringLength(400)]
     public string Content { get; set; }
     
     public DateTime DateAdded { get; set; }
     
-    public int EBookChapterId { get; set; }
+    public int EBookId { get; set; }
     
     public int UserId { get; set; }
     
-    [ForeignKey(nameof(EBookChapterId))] public virtual EBookChapter Chapter { get; set; }
+    [ForeignKey(nameof(EBookId))] public virtual EBook EBook { get; set; }
     
     [ForeignKey(nameof(UserId))] public virtual User User { get; set; }
 }

@@ -97,9 +97,8 @@ public class WriteService<T, TDb, TSearch, TInsert, TUpdate> : ReadService<T, TD
 
         try
         {
-            set.Remove(entity);
-
             await BeforeDeletion(userId, entity);
+            set.Remove(entity);
             await Context.SaveChangesAsync();
             await AfterDeletion(userId, entity);
             await transaction.CommitAsync();

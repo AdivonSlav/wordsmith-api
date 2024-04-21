@@ -68,6 +68,10 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
     
     protected override async Task BeforeDeletion(int userId, Db.Entities.UserLibrary entity)
     {
+        await Context.Entry(entity).Reference(e => e.EBook).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.CoverArt).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
         await ValidateDeletion(userId, entity);
     }
     
@@ -114,13 +118,11 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         return query;
     }
     
-    private Task ValidateDeletion(int userId, Db.Entities.UserLibrary entity)
+    private async Task ValidateDeletion(int userId, Db.Entities.UserLibrary entity)
     {
         if (entity.EBook.AuthorId == userId)
         {
             throw new AppException("You cannot remove a book you published from your library!");
         }
-        
-        return Task.CompletedTask;
     }
 }

@@ -6,6 +6,7 @@ using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects.EBook;
+using Wordsmith.Models.RequestObjects.UserLibrary;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.EBookFileHelper;
@@ -14,7 +15,10 @@ namespace Wordsmith.DataAccess.Services.EBook;
 
 public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearchObject, EBookInsertRequest, EBookUpdateRequest>, IEBookService
 {
-    public EBookService(DatabaseContext context, IMapper mapper) : base(context, mapper) { }
+    public EBookService(DatabaseContext context, IMapper mapper) : base(context,
+        mapper)
+    {
+    }
 
     protected override async Task BeforeInsert(Db.Entities.EBook entity, EBookInsertRequest insert, int userId)
     {
@@ -30,6 +34,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
 
     protected override async Task AfterInsert(Db.Entities.EBook entity, EBookInsertRequest insert, int userId)
     {
+        await HandleLibraryAdd(entity, insert);
         await HandleChapters(entity, insert);
         await HandleGenres(entity, insert);
         await Context.SaveChangesAsync();
@@ -222,6 +227,18 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         }
 
         await Context.EBookGenres.AddRangeAsync(eBookGenres);
+    }
+    
+    private async Task HandleLibraryAdd(Db.Entities.EBook entity, EBookInsertRequest insert)
+    {
+        var libraryInsert = new Db.Entities.UserLibrary()
+        {
+            EBookId = entity.Id,
+            UserId = entity.AuthorId,
+            SyncDate = DateTime.UtcNow,
+        };
+        
+        await Context.UserLibraries.AddAsync(libraryInsert);
     }
 
     private async Task ValidateHiding(int id)

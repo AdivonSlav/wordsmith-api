@@ -16,18 +16,15 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
     protected override async Task BeforeInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert,
         int userId)
     {
-        await ValidateInsertion(insert);
-        
-        entity.SyncDate = DateTime.UtcNow;
-    }
-
-    protected override async Task AfterInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert,
-        int userId)
-    {
         await Context.Entry(entity).Reference(e => e.EBook).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.CoverArt).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
+        
+        await ValidateInsertion(insert);
+        
+        entity.SyncDate = DateTime.UtcNow;
+        entity.EBook.SyncCount++;
     }
 
     private async Task ValidateInsertion(UserLibraryInsertRequest insert)
@@ -72,7 +69,10 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.CoverArt).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
+        
         await ValidateDeletion(userId, entity);
+        
+        entity.EBook.SyncCount--;
     }
     
     protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query,

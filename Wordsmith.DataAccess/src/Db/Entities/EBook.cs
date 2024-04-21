@@ -25,6 +25,8 @@ public class EBook : IEntity
     
     public double? RatingAverage { get; set; }
     
+    public int SyncCount { get; set; }
+    
     public DateTime PublishedDate { get; set; }
     
     public DateTime UpdatedDate { get; set; }

@@ -11,6 +11,7 @@ using Wordsmith.Models.Enums;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.MessageObjects;
 using Wordsmith.Models.RequestObjects.Image;
+using Wordsmith.Models.RequestObjects.Statistics;
 using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;

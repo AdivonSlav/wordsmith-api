@@ -5,6 +5,7 @@ using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.DataAccess.Services.User;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects.Image;
+using Wordsmith.Models.RequestObjects.Statistics;
 using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils.StatisticsHelper;
@@ -119,7 +120,7 @@ public class UsersController : WriteController<UserDto, User, UserSearchObject, 
     [SwaggerOperation("Get user registration statistics")]
     [Authorize("AdminOperations")]
     [HttpGet("statistics/registrations")]
-    public async Task<ActionResult<QueryResult<UserRegistrationStatisticsDto>>> GetRegistrationStatistics(StatisticsRequest request)
+    public async Task<ActionResult<QueryResult<UserRegistrationStatisticsDto>>> GetRegistrationStatistics([FromQuery]StatisticsRequest request)
     {
         var result = await ((WriteService as IUserService)!.GetRegistrationStatistics(request));
         return Ok(result);

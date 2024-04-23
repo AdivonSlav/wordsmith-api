@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects.EBook;
+using Wordsmith.Models.RequestObjects.Statistics;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils.EBookFileHelper;
-using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.DataAccess.Services.EBook;
 

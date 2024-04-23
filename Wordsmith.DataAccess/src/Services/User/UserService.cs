@@ -431,7 +431,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
     
     public async Task<QueryResult<UserRegistrationStatisticsDto>> GetRegistrationStatistics(StatisticsRequest request)
     {
-        var allMonths = StatisticsHelper.GetAllMonthsInRange(request);
+        var allMonths = StatisticsHelper.GetAllMonthsInRange(request.StartDate, request.EndDate);
         var registrations = await Context.Users
             .Where(e => e.RegistrationDate.Date >= request.StartDate.Date &&
                         e.RegistrationDate.Date <= request.EndDate.Date)

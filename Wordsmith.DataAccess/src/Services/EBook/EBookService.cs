@@ -1,3 +1,4 @@
+using System.Globalization;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using Wordsmith.Models.RequestObjects.UserLibrary;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.EBookFileHelper;
+using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.DataAccess.Services.EBook;
 
@@ -151,7 +153,40 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
             Result = Mapper.Map<EBookDto>(ebook)
         };
     }
-
+    
+    public async Task<QueryResult<EBookPublishStatisticsDto>> GetPublishStatistics(StatisticsRequest request)
+    {
+        var allMonths = StatisticsHelper.GetAllMonthsInRange(request.StartDate, request.EndDate);
+        var publishes = await Context.EBooks
+            .Where(e => e.PublishedDate.Date >= request.StartDate.Date &&
+                        e.PublishedDate.Date <= request.EndDate.Date)
+            .GroupBy(e => new { Month = e.PublishedDate.Month, Year = e.PublishedDate.Year })
+            .Select(g => new
+            {
+                Month = g.Key.Month,
+                Year = g.Key.Year,
+                RegistrationCount = g.Count()
+            })
+            .ToListAsync();
+        
+        var result = allMonths.Select(month =>
+        {
+            var registrationsForMonth = publishes.FirstOrDefault(r => r.Year == month.Year && r.Month == month.Month);
+            return new EBookPublishStatisticsDto()
+            {
+                Month = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month.Month),
+                Year = month.Year,
+                PublishCount = registrationsForMonth?.RegistrationCount ?? 0
+            };
+        }).ToList();
+        
+        return new QueryResult<EBookPublishStatisticsDto>()
+        {
+            Result = result,
+            TotalCount = result.Count
+        };
+    }
+    
     private async Task ValidateForeignKeys(EBookInsertRequest insert)
     {
         var authorExists = await Context.Users.AnyAsync(user => user.Id == insert.AuthorId);

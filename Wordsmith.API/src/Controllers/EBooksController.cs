@@ -7,6 +7,7 @@ using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects.EBook;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Models.ValidationAttributes;
+using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.API.Controllers;
 
@@ -63,5 +64,14 @@ public class
     public async Task<ActionResult<EntityResult<EBookDto>>> Unhide(int id)
     {
         return Ok(await (WriteService as IEBookService)!.Unhide(id));
+    }
+    
+    [SwaggerOperation("Get ebook publish statistics")]
+    [Authorize("AdminOperations")]
+    [HttpGet("statistics/publishing")]
+    public async Task<ActionResult<QueryResult<EBookPublishStatisticsDto>>> GetRegistrationStatistics(StatisticsRequest request)
+    {
+        var result = await ((WriteService as IEBookService)!.GetPublishStatistics(request));
+        return Ok(result);
     }
 }

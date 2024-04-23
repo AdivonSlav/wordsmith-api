@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Enums;
 using Wordsmith.Models.Exceptions;
@@ -25,8 +26,15 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         
         entity.SyncDate = DateTime.UtcNow;
         entity.EBook.SyncCount++;
+        
+        await Context.UserLibraryHistories.AddAsync(new UserLibraryHistory()
+        {
+            UserId = entity.UserId,
+            EBookId = entity.EBookId,
+            SyncDate = entity.SyncDate
+        });
     }
-
+    
     private async Task ValidateInsertion(UserLibraryInsertRequest insert)
     {
         var ebook = await Context.EBooks.Include(e => e.Author).FirstOrDefaultAsync(e => e.Id == insert.EBookId);

@@ -1,4 +1,5 @@
 #nullable enable
+using System.Globalization;
 using System.Text.Json;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
+using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.DataAccess.Services.User;
 
@@ -426,7 +428,40 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
             Result = new List<UserStatisticsDto>() { userStatistics },
         };
     }
-
+    
+    public async Task<QueryResult<UserRegistrationStatisticsDto>> GetRegistrationStatistics(StatisticsRequest request)
+    {
+        var allMonths = StatisticsHelper.GetAllMonthsInRange(request);
+        var registrations = await Context.Users
+            .Where(e => e.RegistrationDate.Date >= request.StartDate.Date &&
+                        e.RegistrationDate.Date <= request.EndDate.Date)
+            .GroupBy(e => new { Month = e.RegistrationDate.Month, Year = e.RegistrationDate.Year })
+            .Select(g => new
+            {
+                Month = g.Key.Month,
+                Year = g.Key.Year,
+                RegistrationCount = g.Count()
+            })
+            .ToListAsync();
+        
+        var result = allMonths.Select(month =>
+        {
+            var registrationsForMonth = registrations.FirstOrDefault(r => r.Year == month.Year && r.Month == month.Month);
+            return new UserRegistrationStatisticsDto
+            {
+                Month = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month.Month),
+                Year = month.Year,
+                RegistrationCount = registrationsForMonth?.RegistrationCount ?? 0
+            };
+        }).ToList();
+        
+        return new QueryResult<UserRegistrationStatisticsDto>()
+        {
+            Result = result,
+            TotalCount = result.Count
+        };
+    }
+    
     private async Task ValidateUsername(string username)
     {
         if (await Context.Users.AnyAsync(u => u.Username == username))

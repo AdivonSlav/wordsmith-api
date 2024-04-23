@@ -75,4 +75,13 @@ public class
         var result = await ((WriteService as IEBookService)!.GetPublishStatistics(request));
         return Ok(result);
     }
+    
+    [SwaggerOperation("Get ebook traffic statistics")]
+    [Authorize("AdminOperations")]
+    [HttpGet("statistics/traffic")]
+    public async Task<ActionResult<QueryResult<EBookTrafficStatisticsDto>>> GetTrafficStatistics([FromQuery]StatisticsRequest request)
+    {
+        var result = await ((WriteService as IEBookService)!.GetTrafficStatistics(request));
+        return Ok(result);
+    }
 }

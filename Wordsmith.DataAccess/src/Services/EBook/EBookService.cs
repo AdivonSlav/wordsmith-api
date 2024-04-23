@@ -184,7 +184,35 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         return new QueryResult<EBookPublishStatisticsDto>()
         {
             Result = result,
-            TotalCount = result.Count
+            Page = 1,
+            TotalCount = result.Count,
+            TotalPages = 1,
+        };
+    }
+    
+    public async Task<QueryResult<EBookTrafficStatisticsDto>> GetTrafficStatistics(StatisticsRequest request)
+    {
+        var result = await Context.UserLibraryHistories
+            .Include(e => e.EBook)
+            .Where(e => e.SyncDate.Date >= request.StartDate.Date &&
+                        e.SyncDate.Date <= request.EndDate.Date)
+            .GroupBy(e => e.EBook)
+            .Select(g => new EBookTrafficStatisticsDto()
+            {
+                Id = g.Key.Id,
+                Title = g.Key.Title,
+                SyncCount = g.Count()
+            })
+            .OrderByDescending(g => g.SyncCount)
+            .Take(request.Limit ?? 10)
+            .ToListAsync();
+        
+        return new QueryResult<EBookTrafficStatisticsDto>()
+        {
+            Result = result,
+            Page = 1,
+            TotalCount = result.Count,
+            TotalPages = 1,
         };
     }
     

@@ -18,4 +18,6 @@ public interface IEBookService : IWriteService<EBookDto, Db.Entities.EBook, EBoo
     public Task<EntityResult<EBookDto>> Unhide(int id);
     
     public Task<QueryResult<EBookPublishStatisticsDto>> GetPublishStatistics(StatisticsRequest request);
+    
+    public Task<QueryResult<EBookTrafficStatisticsDto>> GetTrafficStatistics(StatisticsRequest request);
 }

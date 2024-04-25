@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text.Json;
 using AutoMapper;
+using MerriamWebster.NET.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Wordsmith.DataAccess.Db;
@@ -460,6 +461,32 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
         {
             Result = result,
             TotalCount = result.Count
+        };
+    }
+    
+    public async Task<QueryResult<UserPurchasesStatisticsDto>> GetPurchaseStatistics(StatisticsRequest request)
+    {
+        var result = await Context.Orders
+            .Where(e => e.Status == OrderStatus.Completed)
+            .Where(e => e.PaymentDate != null && e.PaymentDate.Value.Date >= request.StartDate.Date &&
+                        e.PaymentDate.Value.Date <= request.EndDate.Date)
+            .GroupBy(e => e.PayerUsername)
+            .Select(g => new UserPurchasesStatisticsDto()
+            {
+                Username = g.Key,
+                PurchaseCount = g.Count(),
+                TotalSpent = g.Sum(e => e.PaymentAmount)
+            })
+            .OrderByDescending(g => g.TotalSpent)
+            .Take(request.Limit ?? 10)
+            .ToListAsync();
+        
+        return new QueryResult<UserPurchasesStatisticsDto>()
+        {
+            Result = result,
+            TotalCount = result.Count,
+            Page = 1,
+            TotalPages = 1,
         };
     }
     

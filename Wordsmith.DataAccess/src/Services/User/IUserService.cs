@@ -29,4 +29,6 @@ public interface IUserService : IWriteService<UserDto, Db.Entities.User, UserSea
     public Task<QueryResult<UserStatisticsDto>> GetUserStatistics(int userId);
     
     public Task<QueryResult<UserRegistrationStatisticsDto>> GetRegistrationStatistics(StatisticsRequest request);
+    
+    public Task<QueryResult<UserPurchasesStatisticsDto>> GetPurchaseStatistics(StatisticsRequest request);
 }

@@ -125,4 +125,13 @@ public class UsersController : WriteController<UserDto, User, UserSearchObject, 
         var result = await ((WriteService as IUserService)!.GetRegistrationStatistics(request));
         return Ok(result);
     }
+    
+    [SwaggerOperation("Get user purchase statistics")]
+    [Authorize("AdminOperations")]
+    [HttpGet("statistics/purchases")]
+    public async Task<ActionResult<QueryResult<UserPurchasesStatisticsDto>>> GetPurchaseStatistics([FromQuery]StatisticsRequest request)
+    {
+        var result = await ((WriteService as IUserService)!.GetPurchaseStatistics(request));
+        return Ok(result);
+    }
 }

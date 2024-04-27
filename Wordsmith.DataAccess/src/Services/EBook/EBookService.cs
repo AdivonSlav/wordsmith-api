@@ -160,29 +160,42 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
         request.StartDate = request.StartDate.ToUniversalTime();
         request.EndDate = request.EndDate.ToUniversalTime();
         
-        var allMonths = StatisticsHelper.GetAllMonthsInRange(request.StartDate, request.EndDate);
-        var publishes = await Context.EBooks
+        var isHourlyGranularity = StatisticsHelper.IsHourlyGranularity(request.StartDate, request.EndDate);
+        
+        var publishesDict = await Context.EBooks
             .Where(e => e.PublishedDate.Date >= request.StartDate.Date &&
                         e.PublishedDate.Date <= request.EndDate.Date)
-            .GroupBy(e => new { Month = e.PublishedDate.Month, Year = e.PublishedDate.Year })
-            .Select(g => new
+            .GroupBy(e => new DateTime(e.PublishedDate.Year, e.PublishedDate.Month, e.PublishedDate.Day,
+                isHourlyGranularity ? e.PublishedDate.Hour : 0, 0, 0))
+            .Select(g => new EBookPublishStatisticsDto()
             {
-                Month = g.Key.Month,
-                Year = g.Key.Year,
-                RegistrationCount = g.Count()
+                Date = g.Key,
+                PublishCount = g.Count()
             })
-            .ToListAsync();
+            .ToDictionaryAsync(e => e.Date);
         
-        var result = allMonths.Select(month =>
+        var result = new List<EBookPublishStatisticsDto>();
+        var dateIncrement = StatisticsHelper.GetIncrementForGranularity(isHourlyGranularity);
+        request.StartDate = StatisticsHelper.AdjustDateForGranularity(request.StartDate, isHourlyGranularity);
+        request.EndDate = StatisticsHelper.AdjustDateForGranularity(request.EndDate, isHourlyGranularity);
+        
+        while (request.StartDate != request.EndDate)
         {
-            var registrationsForMonth = publishes.FirstOrDefault(r => r.Year == month.Year && r.Month == month.Month);
-            return new EBookPublishStatisticsDto()
+            if (publishesDict.TryGetValue(request.StartDate, out var statistic))
             {
-                Month = month.Month,
-                Year = month.Year,
-                PublishCount = registrationsForMonth?.RegistrationCount ?? 0
-            };
-        }).ToList();
+                result.Add(statistic);
+            }
+            else
+            {
+                result.Add(new EBookPublishStatisticsDto()
+                {
+                    Date = request.StartDate,
+                    PublishCount = 0
+                });
+            }
+            
+            request.StartDate += dateIncrement;
+        }
         
         return new QueryResult<EBookPublishStatisticsDto>()
         {

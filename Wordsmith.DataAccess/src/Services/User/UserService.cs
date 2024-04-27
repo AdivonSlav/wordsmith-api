@@ -5,6 +5,7 @@ using AutoMapper;
 using MerriamWebster.NET.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic.CompilerServices;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
@@ -436,34 +437,49 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
         request.StartDate = request.StartDate.ToUniversalTime();
         request.EndDate = request.EndDate.ToUniversalTime();
         
-        var allMonths = StatisticsHelper.GetAllMonthsInRange(request.StartDate, request.EndDate);
-        var registrations = await Context.Users
+        var isHourlyGranularity = StatisticsHelper.IsHourlyGranularity(request.StartDate, request.EndDate);
+        
+        var registrationDict = await Context.Users
             .Where(e => e.RegistrationDate.Date >= request.StartDate.Date &&
                         e.RegistrationDate.Date <= request.EndDate.Date)
-            .GroupBy(e => new { Month = e.RegistrationDate.Month, Year = e.RegistrationDate.Year })
-            .Select(g => new
+            .GroupBy(e => new DateTime(e.RegistrationDate.Year, e.RegistrationDate.Month, e.RegistrationDate.Day,
+                isHourlyGranularity ? e.RegistrationDate.Hour : 0, 0, 0))
+            .Select(g => new UserRegistrationStatisticsDto()
             {
-                Month = g.Key.Month,
-                Year = g.Key.Year,
+                Date = g.Key,
                 RegistrationCount = g.Count()
             })
-            .ToListAsync();
+            .ToDictionaryAsync(e => e.Date);
+
+        var result = new List<UserRegistrationStatisticsDto>();
+        var dateIncrement = StatisticsHelper.GetIncrementForGranularity(isHourlyGranularity);
+        request.StartDate = StatisticsHelper.AdjustDateForGranularity(request.StartDate, isHourlyGranularity);
+        request.EndDate = StatisticsHelper.AdjustDateForGranularity(request.EndDate, isHourlyGranularity);
         
-        var result = allMonths.Select(month =>
+        while (request.StartDate != request.EndDate)
         {
-            var registrationsForMonth = registrations.FirstOrDefault(r => r.Year == month.Year && r.Month == month.Month);
-            return new UserRegistrationStatisticsDto
+            if (registrationDict.TryGetValue(request.StartDate, out var statistic))
             {
-                Month = month.Month,
-                Year = month.Year,
-                RegistrationCount = registrationsForMonth?.RegistrationCount ?? 0
-            };
-        }).ToList();
+                result.Add(statistic);
+            }
+            else
+            {
+                result.Add(new UserRegistrationStatisticsDto()
+                {
+                    Date = request.StartDate,
+                    RegistrationCount = 0,
+                });
+            }
+            
+            request.StartDate += dateIncrement;
+        }
         
         return new QueryResult<UserRegistrationStatisticsDto>()
         {
             Result = result,
-            TotalCount = result.Count
+            Page = 1,
+            TotalCount = result.Count,
+            TotalPages = 1,
         };
     }
     

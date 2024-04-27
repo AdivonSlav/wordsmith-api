@@ -2,17 +2,22 @@ namespace Wordsmith.Utils.StatisticsHelper;
 
 public static class StatisticsHelper
 {
-    public static IEnumerable<DateTime> GetAllMonthsInRange(DateTime start, DateTime end)
+    private const int StatisticsMaxDaysForHourlyGranularity = 5;
+    
+    public static bool IsHourlyGranularity(DateTime start, DateTime end)
     {
-        var startDate = new DateTime(start.Year, start.Month, 1);
-        var endDate = new DateTime(end.Year, end.Month, 1).AddMonths(1).AddDays(-1); // Set end date to the last day of the month
-        
-        var allMonths = new List<DateTime>();
-        for (var date = startDate; date <= endDate; date = date.AddMonths(1))
-        {
-            allMonths.Add(date);
-        }
-        
-        return allMonths;
+        return (end.Date - start.Date).TotalDays <= StatisticsMaxDaysForHourlyGranularity;
+    }
+    
+    public static DateTime AdjustDateForGranularity(DateTime date, bool isHourlyGranularity)
+    {
+        return isHourlyGranularity
+            ? new DateTime(date.Year, date.Month, date.Day, date.Hour, 0, 0)
+            : date.Date;
+    }
+    
+    public static TimeSpan GetIncrementForGranularity(bool isHourlyGranularity)
+    {
+        return isHourlyGranularity ? TimeSpan.FromHours(1) : TimeSpan.FromDays(1);
     }
 }

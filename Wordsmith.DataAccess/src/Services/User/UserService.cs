@@ -1,11 +1,8 @@
 #nullable enable
-using System.Globalization;
 using System.Text.Json;
 using AutoMapper;
-using MerriamWebster.NET.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.VisualBasic.CompilerServices;
 using Wordsmith.DataAccess.Db;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;

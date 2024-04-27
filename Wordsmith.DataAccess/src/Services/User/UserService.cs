@@ -433,6 +433,9 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
     
     public async Task<QueryResult<UserRegistrationStatisticsDto>> GetRegistrationStatistics(StatisticsRequest request)
     {
+        request.StartDate = request.StartDate.ToUniversalTime();
+        request.EndDate = request.EndDate.ToUniversalTime();
+        
         var allMonths = StatisticsHelper.GetAllMonthsInRange(request.StartDate, request.EndDate);
         var registrations = await Context.Users
             .Where(e => e.RegistrationDate.Date >= request.StartDate.Date &&
@@ -451,7 +454,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
             var registrationsForMonth = registrations.FirstOrDefault(r => r.Year == month.Year && r.Month == month.Month);
             return new UserRegistrationStatisticsDto
             {
-                Month = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month.Month),
+                Month = month.Month,
                 Year = month.Year,
                 RegistrationCount = registrationsForMonth?.RegistrationCount ?? 0
             };
@@ -466,6 +469,9 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
     
     public async Task<QueryResult<UserPurchasesStatisticsDto>> GetPurchaseStatistics(StatisticsRequest request)
     {
+        request.StartDate = request.StartDate.ToUniversalTime();
+        request.EndDate = request.EndDate.ToUniversalTime();
+        
         var result = await Context.Orders
             .Where(e => e.Status == OrderStatus.Completed)
             .Where(e => e.PaymentDate != null && e.PaymentDate.Value.Date >= request.StartDate.Date &&

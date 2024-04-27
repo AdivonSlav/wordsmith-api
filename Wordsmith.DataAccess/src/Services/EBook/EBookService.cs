@@ -157,6 +157,9 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
     
     public async Task<QueryResult<EBookPublishStatisticsDto>> GetPublishStatistics(StatisticsRequest request)
     {
+        request.StartDate = request.StartDate.ToUniversalTime();
+        request.EndDate = request.EndDate.ToUniversalTime();
+        
         var allMonths = StatisticsHelper.GetAllMonthsInRange(request.StartDate, request.EndDate);
         var publishes = await Context.EBooks
             .Where(e => e.PublishedDate.Date >= request.StartDate.Date &&
@@ -175,7 +178,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
             var registrationsForMonth = publishes.FirstOrDefault(r => r.Year == month.Year && r.Month == month.Month);
             return new EBookPublishStatisticsDto()
             {
-                Month = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month.Month),
+                Month = month.Month,
                 Year = month.Year,
                 PublishCount = registrationsForMonth?.RegistrationCount ?? 0
             };
@@ -192,6 +195,9 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
     
     public async Task<QueryResult<EBookTrafficStatisticsDto>> GetTrafficStatistics(StatisticsRequest request)
     {
+        request.StartDate = request.StartDate.ToUniversalTime();
+        request.EndDate = request.EndDate.ToUniversalTime();
+        
         var result = await Context.UserLibraryHistories
             .Include(e => e.EBook)
             .Where(e => e.SyncDate.Date >= request.StartDate.Date &&

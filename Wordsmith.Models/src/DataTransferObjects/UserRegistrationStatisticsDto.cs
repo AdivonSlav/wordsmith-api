@@ -8,7 +8,7 @@ public class UserRegistrationStatisticsDto
     public int Year { get; set; }
     
     [SwaggerSchema("Month of the registrations")]
-    public string Month { get; set; }
+    public int Month { get; set; }
     
     [SwaggerSchema("How many users have registered for that month and year")]
     public long RegistrationCount { get; set; }

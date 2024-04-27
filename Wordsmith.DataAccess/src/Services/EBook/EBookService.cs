@@ -1,4 +1,3 @@
-using System.Globalization;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +7,6 @@ using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.RequestObjects.EBook;
 using Wordsmith.Models.RequestObjects.Statistics;
-using Wordsmith.Models.RequestObjects.UserLibrary;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.EBookFileHelper;

@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
+using Wordsmith.Models.SearchObjects;
 
 namespace Wordsmith.Models.RequestObjects.Statistics;
 
-public class StatisticsRequest
+public class StatisticsRequest : SearchObject
 {
     [SwaggerParameter("Start date for statistics gathering")]
     [Required]
@@ -12,7 +13,4 @@ public class StatisticsRequest
     [SwaggerParameter("End date for statistics gathering")]
     [Required]
     public DateTime EndDate { get; set; }
-    
-    [SwaggerParameter("How many entities to take into account")]
-    public int? Limit { get; set; }
 }

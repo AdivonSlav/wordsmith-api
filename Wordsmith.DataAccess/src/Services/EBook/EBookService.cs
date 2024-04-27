@@ -204,7 +204,7 @@ public class EBookService : WriteService<EBookDto, Db.Entities.EBook, EBookSearc
                 SyncCount = g.Count()
             })
             .OrderByDescending(g => g.SyncCount)
-            .Take(request.Limit ?? 10)
+            .Take(request.PageSize)
             .ToListAsync();
         
         return new QueryResult<EBookTrafficStatisticsDto>()

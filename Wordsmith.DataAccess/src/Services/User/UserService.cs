@@ -478,7 +478,7 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
                 TotalSpent = g.Sum(e => e.PaymentAmount)
             })
             .OrderByDescending(g => g.TotalSpent)
-            .Take(request.Limit ?? 10)
+            .Take(request.PageSize)
             .ToListAsync();
         
         return new QueryResult<UserPurchasesStatisticsDto>()

@@ -460,3 +460,6 @@ appsettings.*.json
 
 # IdentityServer keys
 keys/
+
+# .env
+.env

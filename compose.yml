@@ -93,7 +93,7 @@ services:
   wordsmith-db:
     container_name: wordsmith-db
     hostname: wordsmith-db
-    image: mysql:latest
+    image: mysql:8.0
     restart: unless-stopped
     ports:
       - 3306:3306

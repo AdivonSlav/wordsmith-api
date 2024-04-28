@@ -37,10 +37,10 @@ services:
       - WORDSMITH_Connection__RabbitMQ__Host=wordsmith-rabbitmq
       - WORDSMITH_Connection__RabbitMQ__User=wordsmith_user
       - WORDSMITH_Connection__RabbitMQ__Password=wordsmith_user
-      - WORDSMITH_PayPalClientId=<SET HERE>
-      - WORDSMITH_PayPalClientSecret=<SET HERE>
-      - WORDSMITH_MerriamWebster__ApiKey=<SET HERE>
-      - WORDSMITH_GoogleCloud__ApiKey=<SET HERE>
+      - WORDSMITH_PayPalClientId=${WORDSMITH_PayPalClientId}
+      - WORDSMITH_PayPalClientSecret=${WORDSMITH_PayPalClientSecret}
+      - WORDSMITH_MerriamWebster__ApiKey=${WORDSMITH_MerriamWebster__ApiKey}
+      - WORDSMITH_GoogleCloud__ApiKey=${WORDSMITH_GoogleCloud__ApiKey}
     networks:
       - wordsmith
     volumes:
@@ -93,7 +93,7 @@ services:
   wordsmith-db:
     container_name: wordsmith-db
     hostname: wordsmith-db
-    image: mysql:latest
+    image: mysql:8.0
     restart: unless-stopped
     ports:
       - 3306:3306

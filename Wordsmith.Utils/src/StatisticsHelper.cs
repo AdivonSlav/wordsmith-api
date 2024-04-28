@@ -1,4 +1,4 @@
-namespace Wordsmith.Utils.StatisticsHelper;
+namespace Wordsmith.Utils;
 
 public static class StatisticsHelper
 {

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using CrypticWizard.RandomWordGenerator;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
@@ -9,13 +10,36 @@ using Wordsmith.Utils.EBookFileHelper;
 
 namespace Wordsmith.DataAccess.Db.Seeds;
 
+internal class DateTimeRange
+{
+    public DateTime Start { get; }
+    public DateTime End { get; }
+    
+    public DateTimeRange(DateTime start, DateTime end)
+    {
+        Start = start;
+        End = end;
+    }
+}
+
 public static class DatabaseSeeds
 {
+    private static readonly Random Rand = new();
+    private static readonly WordGenerator WordGenerator = new();
+    
     private static readonly string SeedDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedData");
 
     private const string DefaultAdminUsername = "orwell47";
     private const string DefaultUserUsername = "john_doe1";
     private const string DefaultAuthorUsername = "jane_doe2";
+    
+    private static readonly List<DateTimeRange> SeedDateClusters = new()
+    {
+        new DateTimeRange(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow.AddYears(-1).AddMonths(3)), // Cluster 1: 1 year ago to 9 months ago
+        new DateTimeRange(DateTime.UtcNow.AddYears(-1).AddMonths(6), DateTime.UtcNow.AddMonths(-6)), // Cluster 2: 6 months ago to 6 months ago
+        new DateTimeRange(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMonths(-1)), // Cluster 3: 3 months ago to 1 month ago
+        new DateTimeRange(DateTime.UtcNow.AddDays(-30), DateTime.UtcNow), // Cluster 4: 30 days ago to now
+    };
 
     public static async Task EnsureSeedData(DatabaseContext context)
     {
@@ -81,12 +105,33 @@ public static class DatabaseSeeds
             }
         };
 
+        // Create accessible users
         foreach (var user in users)
         {
             if (!await context.Users.AnyAsync(e => e.Id == user.Id && e.Username == user.Username))
             {
                 await context.Users.AddAsync(user);
             }    
+        }
+        
+        // Create inaccessible users (starting from ID4)
+        for (var i = 4; i < 104; i++)
+        {
+            var username = GenerateUsername();
+            
+            if (await context.Users.AnyAsync(e => e.Username == username)) continue;
+            
+            await context.Users.AddAsync(new User()
+            {
+                Id = i,
+                Username = username,
+                Email = $"{username}@inaccessible.com",
+                PayPalEmail = $"{username}@inaccessible.com",
+                Role = "user",
+                RegistrationDate = GenerateRandomDate(),
+                About = "Inaccessible user",
+                Status = UserStatus.Banned
+            });
         }
         
         Logger.LogInfo("Seeded users to the database");
@@ -158,10 +203,8 @@ public static class DatabaseSeeds
             var parsedInfo = await EBookFileHelper.ParseEpub(pathToEpub);
             var image = await CreateEBookImage(parsedInfo, context);
             var newPathToEpub = EBookFileHelper.SaveFile(pathToEpub);
-
-            var random = new Random();
-            var randomNumberOfDays = random.Next(-365, 0);
-            var bookDate = DateTime.UtcNow.AddDays(randomNumberOfDays);
+            
+            var randomDate = GenerateRandomDate();
             var ebook = new EBook()
             {
                 Title = seed.Title,
@@ -173,8 +216,8 @@ public static class DatabaseSeeds
                 Path = newPathToEpub,
                 Genres = "",
                 MaturityRating = await context.MaturityRatings.FirstAsync(e => e.ShortName == seed.MaturityRating),
-                PublishedDate = bookDate,
-                UpdatedDate = bookDate,
+                PublishedDate = randomDate,
+                UpdatedDate = randomDate,
                 IsHidden = false,
                 CoverArt = image,
             };
@@ -460,13 +503,98 @@ public static class DatabaseSeeds
             return;
         }
 
-        var ebook = await context.EBooks.FirstAsync(e => e.AuthorId == author.Id);
+        // Create library entry for the accessible user
+        var ebooks = await context.EBooks
+            .Include(e => e.Author)
+            .Where(e => e.Price != null)
+            .Where(e => e.Author == author)
+            .ToListAsync();
+        var ebookForAccessibleUser = ebooks.First();
+        var dateNow = DateTime.UtcNow;
         await context.UserLibraries.AddAsync(new UserLibrary()
         {
-           EBook = ebook,
+           EBook = ebookForAccessibleUser,
            User = user,
-           SyncDate = DateTime.UtcNow,
+           SyncDate = dateNow,
         });
+        await context.UserLibraryHistories.AddAsync(new UserLibraryHistory()
+        {
+            EBook = ebookForAccessibleUser,
+            SyncDate = dateNow,
+            User = user,
+        });
+        await context.Orders.AddAsync(new Order()
+        {
+            ReferenceId = Guid.NewGuid().ToString(),
+            PayPalOrderId = Guid.NewGuid().ToString(),
+            PayPalCaptureId = Guid.NewGuid().ToString(),
+            OrderCreationDate = dateNow,
+            PaymentDate = dateNow,
+            Status = OrderStatus.Completed,
+            Payee = author,
+            PayeeUsername = author.Username,
+            PayeePayPalEmail = author.PayPalEmail,
+            Payer = user,
+            PayerUsername = user.Username,
+            EBook = ebookForAccessibleUser,
+            EBookTitle = ebookForAccessibleUser.Title,
+            PaymentUrl = "https://www.test.com",
+            PaymentAmount = ebookForAccessibleUser.Price!.Value,
+        });
+        
+        // Get first 20 inaccessible users
+        const int inaccessibleToGet = 20;
+        var inaccessibleUsers = await context.Users
+            .Where(e => e.Status == UserStatus.Banned)
+            .OrderBy(e => e.Id)
+            .Take(inaccessibleToGet)
+            .ToListAsync();
+        // Create library entries for the inaccessible users
+        foreach (var ebook in ebooks)
+        {
+            var randomSubset = inaccessibleUsers.Take(Rand.Next(1, inaccessibleUsers.Count));
+            
+            foreach (var inaccessibleUser in randomSubset)
+            {
+                if (await context.UserLibraries.AnyAsync(e => e.UserId == inaccessibleUser.Id && e.EBook == ebook))
+                    continue;
+                
+                var randomDate = GenerateRandomDate();
+                await context.UserLibraries.AddAsync(new UserLibrary()
+                {
+                    EBook = ebook,
+                    User = inaccessibleUser,
+                    SyncDate = randomDate,
+                });
+                await context.UserLibraryHistories.AddAsync(new UserLibraryHistory()
+                {
+                    EBook = ebook,
+                    SyncDate = randomDate,
+                    User = inaccessibleUser
+                });
+                if (ebook.Price != null)
+                {
+                    await context.Orders.AddAsync(new Order()
+                    {
+                        ReferenceId = Guid.NewGuid().ToString(),
+                        PayPalOrderId = Guid.NewGuid().ToString(),
+                        PayPalCaptureId = Guid.NewGuid().ToString(),
+                        OrderCreationDate = randomDate,
+                        PaymentDate = randomDate,
+                        Status = OrderStatus.Completed,
+                        Payee = author,
+                        PayeeUsername = author.Username,
+                        PayeePayPalEmail = author.PayPalEmail,
+                        Payer = inaccessibleUser,
+                        PayerUsername = inaccessibleUser.Username,
+                        EBook = ebook,
+                        EBookTitle = ebook.Title,
+                        PaymentUrl = "https://www.test.com",
+                        PaymentAmount = ebook.Price.Value,
+                    });
+                }
+            }
+        }
         
         Logger.LogInfo("Seeded new user libraries");
     }
@@ -554,5 +682,30 @@ public static class DatabaseSeeds
     {
         var jsonString = File.ReadAllText(path);
         return JsonSerializer.Deserialize<IEnumerable<T>>(jsonString);
+    }
+    
+    private static string GenerateUsername()
+    {
+        const int usernameMaxLength = 20;
+        
+        var username = WordGenerator.GetWord(WordGenerator.PartOfSpeech.adj);
+        username += Rand.Next(1000);
+        
+        // Trim if necessary
+        if (username.Length > usernameMaxLength)
+        {
+            username = username[..usernameMaxLength];
+        }
+        
+        return username;
+    }
+    
+    private static DateTime GenerateRandomDate()
+    {
+        var randomCluster = SeedDateClusters[Rand.Next(SeedDateClusters.Count)];
+        var range = randomCluster.End - randomCluster.Start;
+        var randomTimeSpan = new TimeSpan((long)(Rand.NextDouble() * range.Ticks));
+        
+        return randomCluster.Start + randomTimeSpan;
     }
 }

@@ -35,6 +35,7 @@ public class DatabaseContext : DbContext
     public virtual DbSet<UserBan> UserBans { get; set; }
     public virtual DbSet<UserLibrary> UserLibraries { get; set; }
     public virtual DbSet<UserLibraryCategory> UserLibraryCategories { get; set; }
+    public virtual DbSet<UserLibraryHistory> UserLibraryHistories { get; set; }
     public virtual DbSet<UserReport> UserReports { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<CommentLike> CommentLikes { get; set; }
@@ -52,6 +53,7 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<Comment>().Property(e => e.IsShown).HasDefaultValue(true);
         modelBuilder.Entity<User>().Property(e => e.Status).HasDefaultValue(UserStatus.Active);
         modelBuilder.Entity<EBook>().Property(e => e.RatingAverage).HasDefaultValue(0.0);
+        modelBuilder.Entity<EBook>().Property(e => e.SyncCount).HasDefaultValue(0);
         modelBuilder.Entity<UserLibrary>().Property(e => e.IsRead).HasDefaultValue(false);
         modelBuilder.Entity<UserLibrary>().Property(e => e.ReadProgress).HasDefaultValue("0%");
         modelBuilder.Entity<UserLibrary>().Property(e => e.LastPage).HasDefaultValue(0);

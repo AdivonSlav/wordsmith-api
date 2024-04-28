@@ -10,11 +10,13 @@ using Wordsmith.Models.Enums;
 using Wordsmith.Models.Exceptions;
 using Wordsmith.Models.MessageObjects;
 using Wordsmith.Models.RequestObjects.Image;
+using Wordsmith.Models.RequestObjects.Statistics;
 using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
+using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.DataAccess.Services.User;
 
@@ -426,7 +428,87 @@ public class UserService : WriteService<UserDto, Db.Entities.User, UserSearchObj
             Result = new List<UserStatisticsDto>() { userStatistics },
         };
     }
+    
+    public async Task<QueryResult<UserRegistrationStatisticsDto>> GetRegistrationStatistics(StatisticsRequest request)
+    {
+        request.StartDate = request.StartDate.ToUniversalTime();
+        request.EndDate = request.EndDate.ToUniversalTime();
+        
+        var isHourlyGranularity = StatisticsHelper.IsHourlyGranularity(request.StartDate, request.EndDate);
+        
+        var registrationDict = await Context.Users
+            .Where(e => e.RegistrationDate.Date >= request.StartDate.Date &&
+                        e.RegistrationDate.Date <= request.EndDate.Date)
+            .GroupBy(e => new DateTime(e.RegistrationDate.Year, e.RegistrationDate.Month, e.RegistrationDate.Day,
+                isHourlyGranularity ? e.RegistrationDate.Hour : 0, 0, 0))
+            .Select(g => new UserRegistrationStatisticsDto()
+            {
+                Date = g.Key,
+                RegistrationCount = g.Count()
+            })
+            .ToDictionaryAsync(e => e.Date);
 
+        var result = new List<UserRegistrationStatisticsDto>();
+        var dateIncrement = StatisticsHelper.GetIncrementForGranularity(isHourlyGranularity);
+        request.StartDate = StatisticsHelper.AdjustDateForGranularity(request.StartDate, isHourlyGranularity);
+        request.EndDate = StatisticsHelper.AdjustDateForGranularity(request.EndDate, isHourlyGranularity);
+        
+        while (request.StartDate != request.EndDate)
+        {
+            if (registrationDict.TryGetValue(request.StartDate, out var statistic))
+            {
+                result.Add(statistic);
+            }
+            else
+            {
+                result.Add(new UserRegistrationStatisticsDto()
+                {
+                    Date = request.StartDate,
+                    RegistrationCount = 0,
+                });
+            }
+            
+            request.StartDate += dateIncrement;
+        }
+        
+        return new QueryResult<UserRegistrationStatisticsDto>()
+        {
+            Result = result,
+            Page = 1,
+            TotalCount = result.Count,
+            TotalPages = 1,
+        };
+    }
+    
+    public async Task<QueryResult<UserPurchasesStatisticsDto>> GetPurchaseStatistics(StatisticsRequest request)
+    {
+        request.StartDate = request.StartDate.ToUniversalTime();
+        request.EndDate = request.EndDate.ToUniversalTime();
+        
+        var result = await Context.Orders
+            .Where(e => e.Status == OrderStatus.Completed)
+            .Where(e => e.PaymentDate != null && e.PaymentDate.Value.Date >= request.StartDate.Date &&
+                        e.PaymentDate.Value.Date <= request.EndDate.Date)
+            .GroupBy(e => e.PayerUsername)
+            .Select(g => new UserPurchasesStatisticsDto()
+            {
+                Username = g.Key,
+                PurchaseCount = g.Count(),
+                TotalSpent = g.Sum(e => e.PaymentAmount)
+            })
+            .OrderByDescending(g => g.TotalSpent)
+            .Take(request.PageSize)
+            .ToListAsync();
+        
+        return new QueryResult<UserPurchasesStatisticsDto>()
+        {
+            Result = result,
+            TotalCount = result.Count,
+            Page = 1,
+            TotalPages = 1,
+        };
+    }
+    
     private async Task ValidateUsername(string username)
     {
         if (await Context.Users.AnyAsync(u => u.Username == username))

@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Wordsmith.DataAccess.Db;
+using Wordsmith.DataAccess.Db.Entities;
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.Enums;
 using Wordsmith.Models.Exceptions;
@@ -16,20 +17,24 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
     protected override async Task BeforeInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert,
         int userId)
     {
-        await ValidateInsertion(insert);
-        
-        entity.SyncDate = DateTime.UtcNow;
-    }
-
-    protected override async Task AfterInsert(Db.Entities.UserLibrary entity, UserLibraryInsertRequest insert,
-        int userId)
-    {
         await Context.Entry(entity).Reference(e => e.EBook).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.CoverArt).LoadAsync();
         await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
+        
+        await ValidateInsertion(insert);
+        
+        entity.SyncDate = DateTime.UtcNow;
+        entity.EBook.SyncCount++;
+        
+        await Context.UserLibraryHistories.AddAsync(new UserLibraryHistory()
+        {
+            UserId = entity.UserId,
+            EBookId = entity.EBookId,
+            SyncDate = entity.SyncDate
+        });
     }
-
+    
     private async Task ValidateInsertion(UserLibraryInsertRequest insert)
     {
         var ebook = await Context.EBooks.Include(e => e.Author).FirstOrDefaultAsync(e => e.Id == insert.EBookId);
@@ -65,7 +70,19 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
             }
         }
     }
-
+    
+    protected override async Task BeforeDeletion(int userId, Db.Entities.UserLibrary entity)
+    {
+        await Context.Entry(entity).Reference(e => e.EBook).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.Author).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.CoverArt).LoadAsync();
+        await Context.Entry(entity.EBook).Reference(e => e.MaturityRating).LoadAsync();
+        
+        await ValidateDeletion(userId, entity);
+        
+        entity.EBook.SyncCount--;
+    }
+    
     protected override IQueryable<Db.Entities.UserLibrary> AddInclude(IQueryable<Db.Entities.UserLibrary> query,
         int userId)
     {
@@ -107,5 +124,13 @@ public class UserLibraryService : WriteService<UserLibraryDto, Db.Entities.UserL
         }
 
         return query;
+    }
+    
+    private async Task ValidateDeletion(int userId, Db.Entities.UserLibrary entity)
+    {
+        if (entity.EBook.AuthorId == userId)
+        {
+            throw new AppException("You cannot remove a book you published from your library!");
+        }
     }
 }

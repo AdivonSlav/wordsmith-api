@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wordsmith.DataAccess.Db;
 
@@ -10,9 +11,11 @@ using Wordsmith.DataAccess.Db;
 namespace Wordsmith.DataAccess.src.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240421165048_V28")]
+    partial class V28
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -746,30 +749,6 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                     b.ToTable("user_library_categories");
                 });
 
-            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibraryHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EBookId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SyncDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EBookId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("user_library_histories");
-                });
-
             modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserReport", b =>
                 {
                     b.Property<int>("Id")
@@ -1127,23 +1106,6 @@ namespace Wordsmith.DataAccess.src.Db.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Wordsmith.DataAccess.Db.Entities.UserLibraryHistory", b =>
-                {
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.EBook", "EBook")
-                        .WithMany()
-                        .HasForeignKey("EBookId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Wordsmith.DataAccess.Db.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("EBook");
 
                     b.Navigation("User");
                 });

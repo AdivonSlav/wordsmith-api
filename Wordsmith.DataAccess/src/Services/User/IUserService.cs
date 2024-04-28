@@ -1,8 +1,10 @@
 #nullable enable
 using Wordsmith.Models.DataTransferObjects;
 using Wordsmith.Models.RequestObjects.Image;
+using Wordsmith.Models.RequestObjects.Statistics;
 using Wordsmith.Models.RequestObjects.User;
 using Wordsmith.Models.SearchObjects;
+using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.DataAccess.Services.User;
 
@@ -25,4 +27,8 @@ public interface IUserService : IWriteService<UserDto, Db.Entities.User, UserSea
         int adminId);
     
     public Task<QueryResult<UserStatisticsDto>> GetUserStatistics(int userId);
+    
+    public Task<QueryResult<UserRegistrationStatisticsDto>> GetRegistrationStatistics(StatisticsRequest request);
+    
+    public Task<QueryResult<UserPurchasesStatisticsDto>> GetPurchaseStatistics(StatisticsRequest request);
 }

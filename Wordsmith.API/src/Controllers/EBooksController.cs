@@ -8,7 +8,6 @@ using Wordsmith.Models.RequestObjects.EBook;
 using Wordsmith.Models.RequestObjects.Statistics;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Models.ValidationAttributes;
-using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.API.Controllers;
 

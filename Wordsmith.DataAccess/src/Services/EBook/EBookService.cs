@@ -10,7 +10,6 @@ using Wordsmith.Models.RequestObjects.Statistics;
 using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.EBookFileHelper;
-using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.DataAccess.Services.EBook;
 

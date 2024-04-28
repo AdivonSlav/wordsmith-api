@@ -16,7 +16,6 @@ using Wordsmith.Models.SearchObjects;
 using Wordsmith.Utils;
 using Wordsmith.Utils.LoginClient;
 using Wordsmith.Utils.RabbitMQ;
-using Wordsmith.Utils.StatisticsHelper;
 
 namespace Wordsmith.DataAccess.Services.User;
 

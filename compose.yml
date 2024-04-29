@@ -4,14 +4,6 @@ networks:
   wordsmith:
     driver: bridge
 
-volumes:
-  wwwroot:
-  book-storage:
-  mysql-data:
-  rabbitmq-data:
-  rabbitmq-logs:
-
-
 services:
   wordsmith-api:
     container_name: wordsmith-api
@@ -44,8 +36,9 @@ services:
     networks:
       - wordsmith
     volumes:
-      - wwwroot:/wwwroot
-      - book-storage:/app/books
+      - ./docker_data/api_wwwroot:/wwwroot
+      - ./docker_data/api_book_storage:/app/books
+      - ./docker_data/api_data_protection_keys:/root/.aspnet/DataProtection-Keys
 
   wordsmith-identityserver:
     container_name: wordsmith-identityserver
@@ -72,6 +65,8 @@ services:
       - WORDSMITH_Connection__RabbitMQ__Password=wordsmith_user
     networks:
       - wordsmith
+    volumes:
+      - ./docker_data/identity_server_data_protection_keys:/root/.aspnet/DataProtection-Keys
 
   wordsmith-communicationsrelay:
     container_name: wordsmith-communicationsrelay
@@ -105,7 +100,7 @@ services:
     networks:
       - wordsmith
     volumes:
-      - mysql-data:/var/lib/mysql
+        - ./docker_data/mysql_data:/var/lib/mysql
 
   wordsmith-rabbitmq:
     container_name: wordsmith-rabbitmq
@@ -121,5 +116,5 @@ services:
     networks:
       - wordsmith
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-      - rabbitmq-logs:/var/log/rabbitmq
+        - ./docker_data/rabbitmq_data:/var/lib/rabbitmq
+        - ./docker_data/rabbitmq_logs:/var/log/rabbitmq

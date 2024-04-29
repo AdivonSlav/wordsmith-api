@@ -463,3 +463,8 @@ keys/
 
 # .env
 .env
+
+# Data folders for Docker containers
+docker_data/**
+!docker_data/**/
+!docker_data/**/.gitkeep

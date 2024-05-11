@@ -33,6 +33,8 @@ services:
       - WORDSMITH_PayPalClientSecret=${WORDSMITH_PayPalClientSecret}
       - WORDSMITH_MerriamWebster__ApiKey=${WORDSMITH_MerriamWebster__ApiKey}
       - WORDSMITH_GoogleCloud__ApiKey=${WORDSMITH_GoogleCloud__ApiKey}
+    env_file:
+      - .env
     networks:
       - wordsmith
     volumes:

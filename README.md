@@ -52,6 +52,11 @@ Username: jane_doe2
 Password: default$123
 PayPal email: jane_doe2@personal.com
 PayPal password: default$123
+
+# Email account (for viewing emails sent through the CommunicationsRelay, uses the dummy SMTP server from Ethereal)
+Login URL: https://ethereal.email/login
+Email: lysanne.wisoky97@ethereal.email
+Password: C4Ehka3xkyD3qdS1uM
 ```
 
 ### Running with Docker

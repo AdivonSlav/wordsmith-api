@@ -25,7 +25,7 @@ services:
       - WORDSMITH_Connection__MySQL__Port=3306
       - WORDSMITH_Connection__MySQL__User=wordsmith_user
       - WORDSMITH_Connection__MySQL__Password=wordsmith_user
-      - WORDSMITH_Connection__MySQL__Database=wordsmith
+      - WORDSMITH_Connection__MySQL__Database=IB200121
       - WORDSMITH_Connection__RabbitMQ__Host=wordsmith-rabbitmq
       - WORDSMITH_Connection__RabbitMQ__User=wordsmith_user
       - WORDSMITH_Connection__RabbitMQ__Password=wordsmith_user
@@ -59,7 +59,7 @@ services:
       - WORDSMITH_Connection__MySQL__Port=3306
       - WORDSMITH_Connection__MySQL__User=wordsmith_user
       - WORDSMITH_Connection__MySQL__Password=wordsmith_user
-      - WORDSMITH_Connection__MySQL__Database=wordsmith
+      - WORDSMITH_Connection__MySQL__Database=IB200121
       - WORDSMITH_Connection__RabbitMQ__Host=wordsmith-rabbitmq
       - WORDSMITH_Connection__RabbitMQ__User=wordsmith_user
       - WORDSMITH_Connection__RabbitMQ__Password=wordsmith_user
@@ -96,7 +96,7 @@ services:
       - MYSQL_ROOT_PASSWORD=wordsmith_root_password
       - MYSQL_USER=wordsmith_user
       - MYSQL_PASSWORD=wordsmith_user
-      - MYSQL_DATABASE=wordsmith
+      - MYSQL_DATABASE=IB200121
     networks:
       - wordsmith
     volumes:

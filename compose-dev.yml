@@ -7,7 +7,7 @@ volumes:
 
 services:
   db:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: "dev_mysql"
     restart: always
     environment:

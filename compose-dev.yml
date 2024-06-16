@@ -1,0 +1,35 @@
+version: '3.1'
+
+volumes:
+    db_data:
+    rabbitmq_data:
+    rabbitmq_log:
+
+services:
+  db:
+    image: mysql:latest
+    container_name: "dev_mysql"
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=wordsmithdev
+      - MYSQL_DATABASE=wordsmith
+      - MYSQL_USER=wordsmithdev
+      - MYSQL_PASSWORD=wordsmithdev
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  rabbitmq:
+      image: rabbitmq:3-management-alpine
+      container_name: 'dev_rabbitmq'
+      ports:
+          - 5672:5672
+          - 15672:15672
+      environment:
+        - RABBITMQ_DEFAULT_USER=wordsmithdev
+        - RABBITMQ_DEFAULT_PASS=wordsmithdev
+      volumes:
+          - rabbitmq_data:/var/lib/rabbitmq/
+          - rabbitmq_log:/var/log/rabbitmq
+  
